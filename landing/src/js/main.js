@@ -207,94 +207,6 @@ const initHoras = () => {
 };
 
 
-// ─── AUTOCOMPLETE ─────────────────────────────────────────────────────────────
-const createAutocomplete = (inputEl, listEl, onSelect) => {
-  let timer = null;
-
-  const hide = () => { listEl.hidden = true; listEl.innerHTML = ''; };
-
-  const show = (results) => {
-    listEl.innerHTML = '';
-    if (!results.length) { hide(); return; }
-    results.forEach(r => {
-      const li = document.createElement('li');
-      li.className = 'autocomplete-item';
-      li.setAttribute('role', 'option');
-      li.textContent = r.display_name;
-      li.addEventListener('click', () => {
-        inputEl.value = r.display_name;
-        onSelect({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) });
-        hide();
-      });
-      listEl.appendChild(li);
-    });
-    listEl.hidden = false;
-  };
-
-  inputEl.addEventListener('input', () => {
-    clearTimeout(timer);
-    const q = inputEl.value.trim();
-    if (q.length < 3) { hide(); return; }
-
-    listEl.innerHTML = '<li class="autocomplete-item autocomplete-item--loading">Buscando…</li>';
-    listEl.hidden = false;
-
-    timer = setTimeout(async () => {
-      try {
-        const q2  = encodeURIComponent(q + ', Chile');
-        const url = `https://nominatim.openstreetmap.org/search?q=${q2}&format=json&limit=5&countrycodes=cl&accept-language=es&email=contacto@tellevo.cl`;
-        const res = await fetch(url, { mode: 'cors' });
-        if (!res.ok) throw new Error('network');
-        const data = await res.json();
-        show(data);
-      } catch {
-        // Fallback: usar photon (geocoder europeo, también usa OSM, sin restricciones)
-        try {
-          const q2  = encodeURIComponent(q);
-          const url = `https://photon.komoot.io/api/?q=${q2}&limit=5&lang=es&bbox=-75.6,-55.9,-66.1,-17.5`;
-          const res = await fetch(url, { mode: 'cors' });
-          const data = await res.json();
-          const results = (data.features || []).map(f => ({
-            display_name: [
-              f.properties.name,
-              f.properties.street,
-              f.properties.housenumber,
-              f.properties.city || f.properties.county,
-            ].filter(Boolean).join(', '),
-            lat: f.geometry.coordinates[1],
-            lon: f.geometry.coordinates[0],
-          }));
-          show(results);
-        } catch { hide(); }
-      }
-    }, 700);
-  });
-
-  document.addEventListener('click', e => {
-    if (!inputEl.closest('.autocomplete-wrapper').contains(e.target)) hide();
-  });
-};
-
-const initAutocomplete = () => {
-  createAutocomplete(
-    document.getElementById('centroEvento'),
-    document.getElementById('centroEvento-list'),
-    () => {
-      document.getElementById('centroEvento-error').textContent = '';
-      document.getElementById('centroEvento').classList.remove('form-group__input--invalid');
-    }
-  );
-
-  createAutocomplete(
-    document.getElementById('destino'),
-    document.getElementById('destino-list'),
-    () => {
-      document.getElementById('destino-error').textContent = '';
-      document.getElementById('destino').classList.remove('form-group__input--invalid');
-    }
-  );
-
-};
 
 // ─── PASOS ────────────────────────────────────────────────────────────────────
 const stepValidators = {
@@ -571,12 +483,11 @@ const addParada = () => {
   paradaCount++;
   paradaSeq++;
   updateParadasInput();
-  const seq    = paradaSeq; // ID único e inmutable para este item
-  const pos    = paradaCount; // posición visual actual
-  const id     = `parada-${seq}`;
-  const listId = `${id}-list`;
-  const errId  = `${id}-error`;
-  const label  = pos === 1 ? 'Parada 1 (gratis)' : `Parada ${pos} (+$5.000)`;
+  const seq   = paradaSeq;
+  const pos   = paradaCount;
+  const id    = `parada-${seq}`;
+  const errId = `${id}-error`;
+  const label = pos === 1 ? 'Parada 1 (gratis)' : `Parada ${pos} (+$5.000)`;
 
   const item = document.createElement('div');
   item.className = 'parada-item';
@@ -588,29 +499,15 @@ const addParada = () => {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="autocomplete-wrapper">
-      <input class="form-group__input" type="text" id="${id}" name="${id}"
-        placeholder="Ej: Av. Providencia 123, Providencia"
-        autocomplete="off" aria-autocomplete="list" aria-controls="${listId}"
-        aria-describedby="${errId}">
-      <ul class="autocomplete-list" id="${listId}" role="listbox" hidden></ul>
-    </div>
+    <input class="form-group__input" type="text" id="${id}" name="${id}"
+      placeholder="Ej: Av. Providencia 123, Providencia"
+      aria-describedby="${errId}">
     <span class="form-group__error" id="${errId}" role="alert" aria-live="polite"></span>
   `;
 
   item.querySelector('.parada-item__remove').addEventListener('click', () => removeParada(seq));
 
   document.getElementById('paradas-list').appendChild(item);
-
-  // Bind autocomplete al nuevo input
-  createAutocomplete(
-    document.getElementById(id),
-    document.getElementById(listId),
-    () => {
-      document.getElementById(errId).textContent = '';
-      document.getElementById(id).classList.remove('form-group__input--invalid');
-    }
-  );
 
   // Enfocar el nuevo campo
   setTimeout(() => document.getElementById(id)?.focus(), 50);
@@ -716,7 +613,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initCalendar();
   initHoras();
   initSteps();
-  initAutocomplete();
   initParadaToggle();
   initForm();
   initCarousel();

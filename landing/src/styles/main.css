@@ -229,9 +229,11 @@ fieldset { border: none; }
 .steps-section__header .section-subtitle { margin: 0 auto; }
 .steps { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-7); }
 .step {
+  position: relative;
   display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3);
   background: var(--color-primary-light); border: 1px solid var(--color-primary-mid);
-  border-radius: var(--radius-lg); padding: var(--space-5);
+  border-radius: var(--radius-lg); padding: var(--space-5); padding-top: calc(var(--space-5) + 20px);
+  margin-top: 20px;
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 .step:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-sm); }
@@ -242,17 +244,21 @@ fieldset { border: none; }
 }
 .step:hover .step__icon-block { transform: scale(1.08); }
 .step__num {
-  font-family: var(--font-display); font-size: .75rem; font-weight: 700;
-  letter-spacing: .12em; color: var(--color-gold);
-  background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.3);
-  border-radius: var(--radius-full); padding: 2px 9px; line-height: 1.6;
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-display); font-size: .85rem; font-weight: 800;
+  letter-spacing: .06em; color: var(--color-primary);
+  background: var(--gradient-gold);
+  border-radius: var(--radius-full);
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--glow-gold-md);
 }
 .step__emoji {
   font-size: 2.4rem; line-height: 1;
-  filter: drop-shadow(0 0 10px rgba(201,168,76,.5));
+  filter: sepia(1) saturate(4) hue-rotate(5deg) drop-shadow(0 0 10px rgba(201,168,76,.7));
   transition: filter var(--transition-base);
 }
-.step:hover .step__emoji { filter: drop-shadow(0 0 18px rgba(201,168,76,.9)); }
+.step:hover .step__emoji { filter: sepia(1) saturate(5) hue-rotate(5deg) drop-shadow(0 0 20px rgba(201,168,76,1)); }
 .step__title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--color-white); margin-bottom: var(--space-2); }
 .step__text { color: var(--color-text-muted); line-height: 1.7; }
 .steps-section__cta { text-align: center; }
