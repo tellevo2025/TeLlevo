@@ -10,13 +10,8 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const scriptUrl = process.env.APPSCRIPT_URL;
-  if (!scriptUrl) {
-    return {
-      statusCode: 500,
-      body: '❌ Variable de entorno APPSCRIPT_URL no configurada.',
-    };
-  }
+  const scriptUrl = process.env.APPSCRIPT_URL
+    || 'https://script.google.com/macros/s/AKfycbzzSPTNiUKr-t2D03LLdiwJ1LF_hjVHPaDAPQNozuQZ_9aUhjIhtVT4gUOkN1mYaQ4G/exec';
 
   try {
     const response = await fetch(scriptUrl, {

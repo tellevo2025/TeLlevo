@@ -9,7 +9,6 @@
   <meta property="og:type" content="website">
   <title>TeLlevo — Choferes de Reemplazo Premium</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -144,7 +143,7 @@
       <div class="hero__container">
         <p class="hero__eyebrow">Choferes de Reemplazo Premium · Chile</p>
         <h1 class="hero__title" id="hero-title">
-          ¿Necesitas chofer de reemplazo?
+          ¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em>
         </h1>
         <p class="hero__subtitle">
           Disfruta cada celebración al 100%. Nuestros choferes profesionales
@@ -197,28 +196,28 @@
         </header>
 
         <ol class="steps" role="list">
-          <li class="step">
+          <li class="step reveal reveal--d1">
             <div class="step__number" aria-hidden="true">01</div>
             <div class="step__content">
               <h3 class="step__title">Completa el formulario</h3>
-              <p class="step__text">Ingresa los datos del viaje: fecha, horario, dirección y tu vehículo. Son solo 3 pasos.</p>
+              <p class="step__text">Ingresa los datos del viaje: fecha, horario, dirección y tu vehículo. Son solo 4 pasos.</p>
             </div>
           </li>
-          <li class="step">
+          <li class="step reveal reveal--d2">
             <div class="step__number" aria-hidden="true">02</div>
             <div class="step__content">
               <h3 class="step__title">Confirmación inmediata</h3>
               <p class="step__text">Recibes un correo de confirmación al instante con todos los detalles de tu reserva.</p>
             </div>
           </li>
-          <li class="step">
+          <li class="step reveal reveal--d3">
             <div class="step__number" aria-hidden="true">03</div>
             <div class="step__content">
               <h3 class="step__title">Tu chofer llega puntual</h3>
               <p class="step__text">Un chofer verificado llega al lugar indicado, en el horario exacto que elegiste.</p>
             </div>
           </li>
-          <li class="step">
+          <li class="step reveal reveal--d4">
             <div class="step__number" aria-hidden="true">04</div>
             <div class="step__content">
               <h3 class="step__title">Disfruta sin límites</h3>
@@ -245,7 +244,7 @@
         </header>
 
         <ul class="benefits__grid" role="list">
-          <li class="benefit-card">
+          <li class="benefit-card reveal reveal--d1">
             <div class="benefit-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
@@ -256,7 +255,7 @@
             <p class="benefit-card__text">Tu festejo tiene horario y lo respetamos. Nuestros choferes llegan siempre a tiempo, validado por cientos de clientes.</p>
           </li>
 
-          <li class="benefit-card benefit-card--featured">
+          <li class="benefit-card benefit-card--featured reveal reveal--d2">
             <div class="benefit-card__badge">Nuestra promesa</div>
             <div class="benefit-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -268,7 +267,7 @@
             <p class="benefit-card__text">Choferes verificados, con antecedentes limpios y experiencia comprobada. Tu seguridad no es opcional.</p>
           </li>
 
-          <li class="benefit-card">
+          <li class="benefit-card reveal reveal--d3">
             <div class="benefit-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="13" width="26" height="12" rx="3" stroke="currentColor" stroke-width="2"/>
@@ -296,7 +295,7 @@
         </header>
 
         <ul class="testimonials__grid" role="list">
-          <li class="testimonial-card">
+          <li class="testimonial-card reveal reveal--d1">
             <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
             <blockquote class="testimonial-card__text">
               "Muy bacán el servicio. El chofer llegó puntual, fue súper amable y llegué sin ningún problema. Los recomiendo con los ojos cerrados."
@@ -310,7 +309,7 @@
             </footer>
           </li>
 
-          <li class="testimonial-card testimonial-card--featured">
+          <li class="testimonial-card testimonial-card--featured reveal reveal--d2">
             <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
             <blockquote class="testimonial-card__text">
               "Recomendadísimo. Usé el servicio en el matrimonio de mi primo y fue perfecto. Puntual, seguro y amable. Definitivamente lo vuelvo a usar."
@@ -324,7 +323,7 @@
             </footer>
           </li>
 
-          <li class="testimonial-card">
+          <li class="testimonial-card reveal reveal--d3">
             <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
             <blockquote class="testimonial-card__text">
               "Total confianza. Saber que tenía chofer reservado me permitió disfrutar la noche sin preocupaciones. El formulario es súper fácil."
@@ -350,7 +349,7 @@
         <header class="booking__header">
           <p class="section-eyebrow">Reservas</p>
           <h2 class="section-title" id="booking-title">Reserva tu chofer ahora</h2>
-          <p class="section-subtitle">Solo 3 pasos y recibirás confirmación por correo al instante.</p>
+          <p class="section-subtitle">Solo 4 pasos y recibirás confirmación por correo al instante.</p>
         </header>
 
         <!-- Progress -->
@@ -368,6 +367,11 @@
           <div class="booking-progress__step" data-step="3">
             <span class="booking-progress__num" aria-hidden="true">3</span>
             <span class="booking-progress__label">Tus datos</span>
+          </div>
+          <div class="booking-progress__line" aria-hidden="true"></div>
+          <div class="booking-progress__step" data-step="4">
+            <span class="booking-progress__num" aria-hidden="true">4</span>
+            <span class="booking-progress__label">Tu vehículo</span>
           </div>
         </div>
 
@@ -432,7 +436,7 @@
             </div>
           </div>
 
-          <!-- ── PASO 2 ── -->
+          <!-- ── PASO 2: El viaje ── -->
           <div class="form-step" data-step="2" hidden>
             <h3 class="form-step__title">Detalles del viaje</h3>
 
@@ -462,6 +466,26 @@
               <span class="form-group__error" id="centroEvento-error" role="alert" aria-live="polite"></span>
             </div>
 
+            <!-- Paradas extras -->
+            <div class="form-group">
+              <label class="parada-toggle" for="parada-check">
+                <input type="checkbox" id="parada-check" class="parada-toggle__check">
+                <span class="parada-toggle__box" aria-hidden="true"></span>
+                <span class="parada-toggle__text">
+                  ¿Necesitas paradas en el camino?
+                  <span class="parada-toggle__hint">1ª parada gratis · $5.000 por cada parada adicional</span>
+                </span>
+              </label>
+            </div>
+            <div id="paradas-container" hidden>
+              <div id="paradas-list"></div>
+              <button type="button" class="btn btn--secondary btn--sm paradas-add-btn" id="add-parada-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Añadir otra parada <span class="paradas-add-btn__cost">(+$5.000)</span>
+              </button>
+            </div>
+            <input type="hidden" id="paradas" name="paradas" value="0">
+
             <div class="form-group">
               <label class="form-group__label" for="destino">
                 Dirección de destino <span class="form-group__required" aria-hidden="true">*</span>
@@ -478,65 +502,20 @@
               <span class="form-group__error" id="destino-error" role="alert" aria-live="polite"></span>
             </div>
 
-            <!-- Mapa -->
-            <div class="map-section" id="map-section" hidden>
-              <p class="map-section__label">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                Ruta estimada
-              </p>
-              <div id="route-map" class="map-container" aria-label="Mapa con la ruta del viaje"></div>
-            </div>
-
-            <div class="booking-form__row">
-              <div class="form-group">
-                <label class="form-group__label" for="personas">
-                  Pasajeros <span class="form-group__required" aria-hidden="true">*</span>
-                </label>
-                <select class="form-group__input form-group__input--select" id="personas" name="personas" required aria-required="true" aria-describedby="personas-error">
-                  <option value="" disabled selected>Selecciona</option>
-                  <option value="1">1 persona</option>
-                  <option value="2">2 personas</option>
-                  <option value="3">3 personas</option>
-                  <option value="4">4 personas</option>
-                  <option value="5+">5 o más</option>
-                </select>
-                <span class="form-group__error" id="personas-error" role="alert" aria-live="polite"></span>
-              </div>
-
-              <div class="form-group">
-                <label class="form-group__label" for="paradas">Paradas extras</label>
-                <select class="form-group__input form-group__input--select" id="paradas" name="paradas">
-                  <option value="0">Sin paradas (gratis)</option>
-                  <option value="1">1 parada (gratis)</option>
-                  <option value="2">2 paradas (+$5.000)</option>
-                  <option value="3">3 paradas (+$10.000)</option>
-                </select>
-                <span class="form-group__hint">1ª parada gratis · $5.000 por parada adicional</span>
-              </div>
-            </div>
-
             <div class="form-step__nav form-step__nav--row">
               <button type="button" class="btn btn--secondary btn--lg step-prev" data-prev="1">Atrás</button>
               <button type="button" class="btn btn--primary btn--lg step-next" data-next="3">Continuar</button>
             </div>
           </div>
 
-          <!-- ── PASO 3 ── -->
+          <!-- ── PASO 3: Tus datos ── -->
           <div class="form-step" data-step="3" hidden>
-            <h3 class="form-step__title">Confirma tu reserva</h3>
+            <h3 class="form-step__title">Tus datos de contacto</h3>
 
-            <div class="booking-form__row">
-              <div class="form-group">
-                <label class="form-group__label" for="nombre">Nombre completo <span class="form-group__required" aria-hidden="true">*</span></label>
-                <input class="form-group__input" type="text" id="nombre" name="nombre" placeholder="Tu nombre" required autocomplete="name" aria-required="true" aria-describedby="nombre-error">
-                <span class="form-group__error" id="nombre-error" role="alert" aria-live="polite"></span>
-              </div>
-              <div class="form-group">
-                <label class="form-group__label" for="correo">Correo electrónico <span class="form-group__required" aria-hidden="true">*</span></label>
-                <input class="form-group__input" type="email" id="correo" name="correo" placeholder="correo@email.com" required autocomplete="email" aria-required="true" aria-describedby="correo-error">
-                <span class="form-group__hint">Recibirás la confirmación aquí.</span>
-                <span class="form-group__error" id="correo-error" role="alert" aria-live="polite"></span>
-              </div>
+            <div class="form-group">
+              <label class="form-group__label" for="nombre">Nombre completo <span class="form-group__required" aria-hidden="true">*</span></label>
+              <input class="form-group__input" type="text" id="nombre" name="nombre" placeholder="Tu nombre" required autocomplete="name" aria-required="true" aria-describedby="nombre-error">
+              <span class="form-group__error" id="nombre-error" role="alert" aria-live="polite"></span>
             </div>
 
             <div class="booking-form__row">
@@ -552,16 +531,33 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label class="form-group__label" for="correo">Correo electrónico <span class="form-group__required" aria-hidden="true">*</span></label>
+              <input class="form-group__input" type="email" id="correo" name="correo" placeholder="correo@email.com" required autocomplete="email" aria-required="true" aria-describedby="correo-error">
+              <span class="form-group__hint">Recibirás la confirmación de reserva aquí.</span>
+              <span class="form-group__error" id="correo-error" role="alert" aria-live="polite"></span>
+            </div>
+
+            <div class="form-step__nav form-step__nav--row">
+              <button type="button" class="btn btn--secondary btn--lg step-prev" data-prev="2">Atrás</button>
+              <button type="button" class="btn btn--primary btn--lg step-next" data-next="4">Continuar</button>
+            </div>
+          </div>
+
+          <!-- ── PASO 4: Tu vehículo ── -->
+          <div class="form-step" data-step="4" hidden>
+            <h3 class="form-step__title">Datos del vehículo</h3>
+
             <div class="booking-form__row">
-              <div class="form-group">
-                <label class="form-group__label" for="marcaModelo">Marca y modelo <span class="form-group__required" aria-hidden="true">*</span></label>
-                <input class="form-group__input" type="text" id="marcaModelo" name="marcaModelo" placeholder="Ej: Toyota Corolla 2022" required aria-required="true" aria-describedby="marcaModelo-error">
-                <span class="form-group__error" id="marcaModelo-error" role="alert" aria-live="polite"></span>
-              </div>
               <div class="form-group">
                 <label class="form-group__label" for="patente">Patente <span class="form-group__required" aria-hidden="true">*</span></label>
                 <input class="form-group__input" type="text" id="patente" name="patente" placeholder="ABCD12" required aria-required="true" aria-describedby="patente-error" style="text-transform:uppercase">
                 <span class="form-group__error" id="patente-error" role="alert" aria-live="polite"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-group__label" for="marcaModelo">Marca y modelo <span class="form-group__required" aria-hidden="true">*</span></label>
+                <input class="form-group__input" type="text" id="marcaModelo" name="marcaModelo" placeholder="Ej: Toyota Corolla 2022" required aria-required="true" aria-describedby="marcaModelo-error">
+                <span class="form-group__error" id="marcaModelo-error" role="alert" aria-live="polite"></span>
               </div>
             </div>
 
@@ -586,8 +582,23 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label class="form-group__label" for="personas">
+                Cantidad de pasajeros <span class="form-group__required" aria-hidden="true">*</span>
+              </label>
+              <select class="form-group__input form-group__input--select" id="personas" name="personas" required aria-required="true" aria-describedby="personas-error">
+                <option value="" disabled selected>Selecciona</option>
+                <option value="1">1 persona</option>
+                <option value="2">2 personas</option>
+                <option value="3">3 personas</option>
+                <option value="4">4 personas</option>
+                <option value="5+">5 o más</option>
+              </select>
+              <span class="form-group__error" id="personas-error" role="alert" aria-live="polite"></span>
+            </div>
+
             <div class="form-step__nav form-step__nav--row">
-              <button type="button" class="btn btn--secondary btn--lg step-prev" data-prev="2">Atrás</button>
+              <button type="button" class="btn btn--secondary btn--lg step-prev" data-prev="3">Atrás</button>
               <button type="button" class="btn btn--primary btn--lg" id="open-tyc-confirm">
                 Confirmar reserva
               </button>
@@ -680,7 +691,6 @@
     </svg>
   </a>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="src/js/main.js" defer></script>
 </body>
 </html>

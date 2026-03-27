@@ -38,6 +38,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   font-family: var(--font-body);
@@ -89,6 +90,7 @@ fieldset { border: none; }
 .btn--secondary { background: transparent; color: var(--color-gold); border: 1.5px solid var(--color-gold); }
 .btn--secondary:hover { background: rgba(201,168,76,.08); box-shadow: var(--glow-gold-sm); transform: translateY(-2px); }
 .btn--lg { padding: 14px 32px; font-size: 1rem; }
+.btn--sm { padding: 8px 16px; font-size: .85rem; }
 
 /* ==========================================
    4. NAVBAR
@@ -441,25 +443,6 @@ fieldset { border: none; }
 .autocomplete-item--loading { color: var(--color-text-muted); font-style: italic; cursor: default; }
 .autocomplete-item--loading:hover { background: none; color: var(--color-text-muted); }
 
-/* ==========================================
-   14. FORMULARIO — MAPA
-========================================== */
-.map-section {
-  margin-bottom: var(--space-4); border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary-mid); overflow: hidden;
-  animation: fadeIn .4s ease;
-}
-.map-section__label {
-  display: flex; align-items: center; gap: var(--space-2);
-  font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--color-gold); padding: 10px 14px;
-  background: var(--color-surface); border-bottom: 1px solid var(--color-primary-mid);
-}
-.map-container { height: 240px; width: 100%; background: var(--color-primary); }
-@media (min-width: 640px) { .map-container { height: 280px; } }
-/* Leaflet dark overrides */
-.leaflet-container { background: #0a1628; font-family: var(--font-body); }
-.leaflet-popup-content-wrapper { background: var(--color-surface); color: var(--color-text-light); border: 1px solid var(--color-gold); border-radius: var(--radius-md); }
 .leaflet-popup-tip { background: var(--color-surface); }
 .map-marker-origin, .map-marker-dest {
   width: 28px; height: 28px; border-radius: 50%;
@@ -839,4 +822,268 @@ fieldset { border: none; }
   .section-title { font-size: 1.5rem; }
   .calendar-widget { padding: var(--space-2); }
   .calendar-days { gap: 2px; }
+}
+
+/* ==========================================
+   23. PREMIUM DESIGN UPGRADE
+========================================== */
+
+/* ── Hero: fade a negro al pie de sección ── */
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 180px;
+  background: linear-gradient(to bottom, transparent, var(--color-primary));
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Hero: orb dorado central sutil ── */
+.hero__container::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,.055) 0%, transparent 68%);
+  top: 50%; left: 50%; transform: translate(-50%, -55%);
+  pointer-events: none;
+}
+
+/* ── Hero eyebrow: líneas flanqueadoras ── */
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: 12px;
+}
+.hero__eyebrow::before,
+.hero__eyebrow::after {
+  content: '';
+  width: 28px; height: 1px;
+  background: var(--gradient-gold); flex-shrink: 0;
+}
+
+/* ── Hero title: palabra acento en dorado ── */
+.hero__title-accent {
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold-md);
+  font-style: normal;
+}
+
+/* ── Hero stats: tarjeta de vidrio ── */
+.hero__stats {
+  background: rgba(6,12,24,.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(201,168,76,.18);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-5);
+  display: inline-flex;
+  gap: var(--space-3);
+  box-shadow: 0 8px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* ── Section eyebrow: líneas decorativas ── */
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.section-eyebrow::before,
+.section-eyebrow::after {
+  content: '';
+  display: block;
+  width: 20px; height: 1.5px;
+  background: var(--gradient-gold); flex-shrink: 0;
+}
+.steps-section__header,
+.benefits__header,
+.testimonials__header,
+.booking__header {
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ── Steps: número fantasma dramático ── */
+.step__number {
+  font-size: clamp(3.5rem, 5vw, 5.5rem);
+  opacity: .07;
+  letter-spacing: -.04em;
+  line-height: .85;
+  transition: opacity .4s ease;
+}
+.step:hover .step__number { opacity: .45; }
+
+/* ── Steps: conector horizontal en desktop ── */
+@media (min-width: 1024px) {
+  .steps { position: relative; }
+  .steps::after {
+    content: '';
+    position: absolute;
+    top: 26px; left: 14%; right: 14%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,168,76,.28) 25%, rgba(201,168,76,.28) 75%, transparent);
+    pointer-events: none;
+  }
+}
+
+/* ── Benefit cards: borde con gradiente ── */
+.benefit-card {
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(145deg, rgba(201,168,76,.18) 0%, rgba(18,40,80,0) 55%) border-box;
+  border: 1px solid transparent;
+}
+.benefit-card:hover {
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(145deg, rgba(201,168,76,.65) 0%, rgba(201,168,76,.1) 55%) border-box;
+  transform: translateY(-6px);
+  box-shadow: var(--glow-gold-sm), 0 24px 56px rgba(0,0,0,.3);
+}
+.benefit-card--featured {
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    var(--gradient-gold) border-box;
+}
+.benefit-card--featured:hover { box-shadow: var(--glow-gold-md), 0 24px 56px rgba(0,0,0,.3); }
+
+/* ── Benefit card icon: caja con brillo ── */
+.benefit-card__icon {
+  width: 60px; height: 60px;
+  padding: 10px;
+  background: rgba(201,168,76,.07);
+  border: 1px solid rgba(201,168,76,.15);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-base), border-color var(--transition-base), filter var(--transition-base);
+}
+.benefit-card:hover .benefit-card__icon {
+  background: rgba(201,168,76,.13);
+  border-color: rgba(201,168,76,.35);
+}
+
+/* ── Testimonials: comilla decorativa ── */
+.testimonial-card { position: relative; overflow: hidden; }
+.testimonial-card::before {
+  content: '\201C';
+  position: absolute; top: -12px; right: 14px;
+  font-family: var(--font-display); font-size: 8rem;
+  color: var(--color-gold); opacity: .05;
+  line-height: 1; pointer-events: none; user-select: none;
+}
+.testimonial-card--featured::before { opacity: .12; }
+
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .65s cubic-bezier(.22,.61,.36,1),
+              transform .65s cubic-bezier(.22,.61,.36,1);
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+.reveal--d1 { transition-delay: .08s; }
+.reveal--d2 { transition-delay: .18s; }
+.reveal--d3 { transition-delay: .28s; }
+.reveal--d4 { transition-delay: .38s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Paradas container ── */
+#paradas-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  animation: fadeIn .25s ease;
+}
+.parada-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: rgba(201,168,76,.04);
+  border: 1px solid rgba(201,168,76,.15);
+  border-radius: var(--radius-md);
+  animation: fadeIn .2s ease;
+}
+.parada-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.parada-item__label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.parada-item__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.parada-item__remove:hover {
+  background: rgba(248,113,113,.15);
+  color: #f87171;
+}
+.paradas-add-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .85rem;
+}
+.paradas-add-btn__cost {
+  color: var(--color-text-muted);
+  font-size: .78rem;
+}
+
+/* ── Parada toggle checkbox ── */
+.parada-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--color-text-light);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+.parada-toggle__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.4;
+}
+.parada-toggle__hint {
+  font-size: .75rem;
+  color: var(--color-text-muted);
+}
+.parada-toggle__check {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+.parada-toggle__box {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border: 1.5px solid var(--color-primary-mid);
+  border-radius: 5px;
+  background: var(--color-surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
+}
+.parada-toggle__check:checked + .parada-toggle__box {
+  background: var(--gradient-gold);
+  border-color: var(--color-gold);
+  box-shadow: var(--glow-gold-sm);
+}
+.parada-toggle__check:checked + .parada-toggle__box::after {
+  content: '';
+  display: block;
+  width: 5px; height: 9px;
+  border: 2px solid var(--color-primary);
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+}
+.parada-toggle:hover .parada-toggle__box {
+  border-color: var(--color-gold);
 }
