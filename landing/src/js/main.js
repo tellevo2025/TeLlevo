@@ -638,6 +638,55 @@ const initParadaToggle = () => {
   addBtn?.addEventListener('click', addParada);
 };
 
+// ─── CARRUSEL TESTIMONIOS ─────────────────────────────────────────────────────
+const initCarousel = () => {
+  const track  = document.getElementById('carousel-track');
+  const dotsEl = document.getElementById('carousel-dots');
+  if (!track) return;
+
+  const slides = track.querySelectorAll('.carousel__slide');
+  const total  = slides.length;
+  let current  = 0;
+  let autoTimer = null;
+
+  // Crear dots
+  slides.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'carousel__dot' + (i === 0 ? ' carousel__dot--active' : '');
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-label', `Testimonio ${i + 1}`);
+    btn.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(btn);
+  });
+
+  const goTo = (idx) => {
+    current = (idx + total) % total;
+    track.style.transform = `translateX(calc(-${current * 100}% - ${current} * var(--space-4, 16px)))`;
+    dotsEl.querySelectorAll('.carousel__dot').forEach((d, i) => {
+      d.classList.toggle('carousel__dot--active', i === current);
+    });
+    resetAuto();
+  };
+
+  const resetAuto = () => {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => goTo(current + 1), 4500);
+  };
+
+  document.getElementById('carousel-prev')?.addEventListener('click', () => goTo(current - 1));
+  document.getElementById('carousel-next')?.addEventListener('click', () => goTo(current + 1));
+
+  // Swipe táctil
+  let startX = 0;
+  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+  }, { passive: true });
+
+  resetAuto();
+};
+
 // ─── SCROLL REVEAL ────────────────────────────────────────────────────────────
 const initReveal = () => {
   const els = document.querySelectorAll('.reveal');
@@ -666,5 +715,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initAutocomplete();
   initParadaToggle();
   initForm();
+  initCarousel();
   initReveal();
 });

@@ -22,7 +22,7 @@
   <header class="navbar" id="navbar" role="banner">
     <div class="navbar__container">
       <a href="#" class="navbar__logo" aria-label="TeLlevo — Inicio">
-        <img src="src/assets/logo.png" alt="TeLlevo" class="navbar__logo-img" width="140" height="48">
+        <img src="src/assets/logo.png.png" alt="TeLlevo" class="navbar__logo-img" width="140" height="48">
       </a>
 
       <nav class="navbar__nav" aria-label="Navegación principal">
@@ -200,28 +200,28 @@
             <div class="step__number" aria-hidden="true">01</div>
             <div class="step__content">
               <h3 class="step__title">Completa el formulario</h3>
-              <p class="step__text">Ingresa los datos del viaje: fecha, horario, dirección y tu vehículo. Son solo 4 pasos.</p>
+              <p class="step__text">Ingresa la fecha, horario, direcciones y datos de tu vehículo en simples pasos.</p>
             </div>
           </li>
           <li class="step reveal reveal--d2">
             <div class="step__number" aria-hidden="true">02</div>
             <div class="step__content">
-              <h3 class="step__title">Confirmación inmediata</h3>
-              <p class="step__text">Recibes un correo de confirmación al instante con todos los detalles de tu reserva.</p>
+              <h3 class="step__title">Espera la cotización</h3>
+              <p class="step__text">Te contactaremos por WhatsApp en unos momentos con el valor del servicio y los detalles.</p>
             </div>
           </li>
           <li class="step reveal reveal--d3">
             <div class="step__number" aria-hidden="true">03</div>
             <div class="step__content">
-              <h3 class="step__title">Tu chofer llega puntual</h3>
-              <p class="step__text">Un chofer verificado llega al lugar indicado, en el horario exacto que elegiste.</p>
+              <h3 class="step__title">Procede al pago</h3>
+              <p class="step__text">Confirma tu reserva realizando el pago de forma simple y segura.</p>
             </div>
           </li>
           <li class="step reveal reveal--d4">
             <div class="step__number" aria-hidden="true">04</div>
             <div class="step__content">
-              <h3 class="step__title">Disfruta sin límites</h3>
-              <p class="step__text">Celebra tranquilo. Nosotros te llevamos a casa en tu propio auto, sano y salvo.</p>
+              <h3 class="step__title">Disfruta al 100% — yo te llevo</h3>
+              <p class="step__text">Celebra sin preocupaciones. TeLlevo te lleva a casa en tu propio auto, sano y salvo.</p>
             </div>
           </li>
         </ol>
@@ -233,42 +233,20 @@
     </section>
 
     <!-- ==========================================
-       BENEFICIOS
+       SERVICIOS
     ========================================== -->
-    <section class="benefits" id="beneficios" aria-labelledby="benefits-title">
-      <div class="benefits__container">
-        <header class="benefits__header">
-          <p class="section-eyebrow">Por qué elegirnos</p>
-          <h2 class="section-title" id="benefits-title">Puntualidad y seguridad, sin excusas</h2>
-          <p class="section-subtitle">Los pilares de cada servicio que prestamos.</p>
+    <section class="services" id="beneficios" aria-labelledby="services-title">
+      <div class="services__container">
+        <header class="services__header">
+          <p class="section-eyebrow">Nuestros Servicios</p>
+          <h2 class="section-title" id="services-title">¿Qué necesitas hoy?</h2>
+          <p class="section-subtitle">Elige el servicio que se ajusta a tu situación.</p>
         </header>
 
-        <ul class="benefits__grid" role="list">
-          <li class="benefit-card reveal reveal--d1">
-            <div class="benefit-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
-                <polyline points="16,8 16,16 21,21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="benefit-card__title">94.8% de Puntualidad</h3>
-            <p class="benefit-card__text">Tu festejo tiene horario y lo respetamos. Nuestros choferes llegan siempre a tiempo, validado por cientos de clientes.</p>
-          </li>
+        <div class="services__grid">
 
-          <li class="benefit-card benefit-card--featured reveal reveal--d2">
-            <div class="benefit-card__badge">Nuestra promesa</div>
-            <div class="benefit-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 3 L28 8 V17 C28 23 22 28 16 30 C10 28 4 23 4 17 V8 Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <polyline points="11,16 14,19 21,12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="benefit-card__title">99% volvería a contratarnos</h3>
-            <p class="benefit-card__text">Choferes verificados, con antecedentes limpios y experiencia comprobada. Tu seguridad no es opcional.</p>
-          </li>
-
-          <li class="benefit-card reveal reveal--d3">
-            <div class="benefit-card__icon" aria-hidden="true">
+          <a href="#reserva" class="service-card reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
+            <div class="service-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="13" width="26" height="12" rx="3" stroke="currentColor" stroke-width="2"/>
                 <path d="M6 13 L8 7 H24 L26 13" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -276,10 +254,37 @@
                 <circle cx="23" cy="25" r="2" fill="currentColor"/>
               </svg>
             </div>
-            <h3 class="benefit-card__title">En tu propio auto</h3>
-            <p class="benefit-card__text">Nada de taxis ni remises. Conducimos tu vehículo hasta tu puerta. Tú y tu auto llegan juntos a casa.</p>
-          </li>
-        </ul>
+            <div class="service-card__body">
+              <h3 class="service-card__title">Chofer de reemplazo</h3>
+              <p class="service-card__text">Saliste de fiesta, una celebración o un evento y necesitas llegar a casa en tu propio auto. Reserva online en minutos.</p>
+              <span class="service-card__cta">
+                Reservar ahora
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </div>
+          </a>
+
+          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="21" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M3 27 C3 22 7 19 11 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M29 27 C29 22 25 19 21 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M11 19 H21" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="service-card__body">
+              <h3 class="service-card__title">Choferes para tu evento</h3>
+              <p class="service-card__text">Tienes un matrimonio, fiesta corporativa u otro evento y necesitas un equipo de choferes. Cotiza por WhatsApp.</p>
+              <span class="service-card__cta service-card__cta--wa">
+                Cotizar por WhatsApp
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </div>
+          </a>
+
+        </div>
       </div>
     </section>
 
@@ -294,49 +299,65 @@
           <p class="section-subtitle">98.4% de tasa de recomendación.</p>
         </header>
 
-        <ul class="testimonials__grid" role="list">
-          <li class="testimonial-card reveal reveal--d1">
-            <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-            <blockquote class="testimonial-card__text">
-              "Muy bacán el servicio. El chofer llegó puntual, fue súper amable y llegué sin ningún problema. Los recomiendo con los ojos cerrados."
-            </blockquote>
-            <footer class="testimonial-card__author">
-              <div class="testimonial-card__avatar" aria-hidden="true">JM</div>
-              <div>
-                <cite class="testimonial-card__name">Javier M.</cite>
-                <p class="testimonial-card__role">Santiago, Chile</p>
-              </div>
-            </footer>
-          </li>
+        <!-- Carrusel -->
+        <div class="carousel" aria-label="Testimonios de clientes">
+          <div class="carousel__track" id="carousel-track">
 
-          <li class="testimonial-card testimonial-card--featured reveal reveal--d2">
-            <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-            <blockquote class="testimonial-card__text">
-              "Recomendadísimo. Usé el servicio en el matrimonio de mi primo y fue perfecto. Puntual, seguro y amable. Definitivamente lo vuelvo a usar."
-            </blockquote>
-            <footer class="testimonial-card__author">
-              <div class="testimonial-card__avatar" aria-hidden="true">CP</div>
-              <div>
-                <cite class="testimonial-card__name">Carolina P.</cite>
-                <p class="testimonial-card__role">Las Condes, Chile</p>
-              </div>
-            </footer>
-          </li>
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Muy bacán el servicio. El chofer llegó puntual, fue súper amable y llegué sin ningún problema. Los recomiendo con los ojos cerrados."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">JM</div>
+                <div>
+                  <cite class="testimonial-card__name">Javier M.</cite>
+                  <p class="testimonial-card__role">Santiago, Chile</p>
+                </div>
+              </footer>
+            </div>
 
-          <li class="testimonial-card reveal reveal--d3">
-            <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-            <blockquote class="testimonial-card__text">
-              "Total confianza. Saber que tenía chofer reservado me permitió disfrutar la noche sin preocupaciones. El formulario es súper fácil."
-            </blockquote>
-            <footer class="testimonial-card__author">
-              <div class="testimonial-card__avatar" aria-hidden="true">RF</div>
-              <div>
-                <cite class="testimonial-card__name">Rodrigo F.</cite>
-                <p class="testimonial-card__role">Providencia, Chile</p>
-              </div>
-            </footer>
-          </li>
-        </ul>
+            <div class="testimonial-card testimonial-card--featured carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Recomendadísimo. Usé el servicio en el matrimonio de mi primo y fue perfecto. Puntual, seguro y amable. Definitivamente lo vuelvo a usar."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">CP</div>
+                <div>
+                  <cite class="testimonial-card__name">Carolina P.</cite>
+                  <p class="testimonial-card__role">Las Condes, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Total confianza. Saber que tenía chofer reservado me permitió disfrutar la noche sin preocupaciones. El formulario es súper fácil."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">RF</div>
+                <div>
+                  <cite class="testimonial-card__name">Rodrigo F.</cite>
+                  <p class="testimonial-card__role">Providencia, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+          </div>
+
+          <div class="carousel__controls">
+            <button class="carousel__btn carousel__btn--prev" id="carousel-prev" aria-label="Testimonio anterior">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="carousel__dots" id="carousel-dots" role="tablist" aria-label="Seleccionar testimonio"></div>
+            <button class="carousel__btn carousel__btn--next" id="carousel-next" aria-label="Siguiente testimonio">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -615,11 +636,11 @@
 
         <div class="booking-result booking-result--success" id="result-success" hidden role="status" aria-live="polite">
           <div class="booking-result__icon" aria-hidden="true">✦</div>
-          <h3 class="booking-result__title">¡Reserva confirmada!</h3>
-          <p class="booking-result__text">Revisa tu correo — te enviamos todos los detalles. Nuestro chofer estará puntual en el lugar indicado.</p>
+          <h3 class="booking-result__title">¡Gracias por reservar!</h3>
+          <p class="booking-result__text">Recibimos tu solicitud. En unos momentos te contactaremos por WhatsApp con la cotización y los detalles de tu servicio.</p>
           <div class="booking-result__actions">
             <button class="btn btn--secondary" id="new-booking-btn">Hacer otra reserva</button>
-            <a href="https://wa.me/56954873548" target="_blank" rel="noopener" class="btn btn--primary">Consultar por WhatsApp</a>
+            <a href="https://wa.me/56954873548" target="_blank" rel="noopener" class="btn btn--primary">Escribir por WhatsApp</a>
           </div>
         </div>
 
@@ -655,7 +676,7 @@
     <div class="footer__container">
       <div class="footer__brand">
         <a href="#" class="footer__logo-link" aria-label="TeLlevo — Inicio">
-          <img src="src/assets/logo.png" alt="TeLlevo" class="footer__logo-img" width="120" height="40">
+          <img src="src/assets/logo.png.png" alt="TeLlevo" class="footer__logo-img" width="120" height="40">
         </a>
         <p class="footer__tagline">Llega seguro. Nosotros manejamos.</p>
         <p class="footer__legal">Tellevo servicios SpA · Chile</p>

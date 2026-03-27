@@ -244,41 +244,124 @@ fieldset { border: none; }
 }
 
 /* ==========================================
-   7. BENEFICIOS
+   7. SERVICIOS
 ========================================== */
-.benefits { padding: var(--space-8) 0; background: var(--color-primary-light); }
-.benefits__container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-3); }
-.benefits__header { text-align: center; margin-bottom: var(--space-7); }
-.benefits__header .section-subtitle { margin: 0 auto; }
-.benefits__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
-.benefit-card {
-  position: relative; background: var(--color-surface);
-  border: 1px solid var(--color-primary-mid); border-radius: var(--radius-lg);
+.services { padding: var(--space-8) 0; background: var(--color-primary-light); }
+.services__container { max-width: 900px; margin: 0 auto; padding: 0 var(--space-3); }
+.services__header { text-align: center; margin-bottom: var(--space-7); }
+.services__header .section-subtitle { margin: 0 auto; }
+.services__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+@media (min-width: 640px) { .services__grid { grid-template-columns: repeat(2, 1fr); } }
+
+.service-card {
+  display: flex; flex-direction: column; gap: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid rgba(201,168,76,.2); border-radius: var(--radius-lg);
   padding: var(--space-6) var(--space-5);
+  text-decoration: none; color: inherit;
   transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+  cursor: pointer;
 }
-.benefit-card:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-sm); transform: translateY(-4px); }
-.benefit-card--featured { border-color: var(--color-gold); box-shadow: var(--glow-gold-sm); }
-.benefit-card--featured:hover { box-shadow: var(--glow-gold-md); }
-.benefit-card__badge {
-  position: absolute; top: -13px; left: var(--space-5);
-  background: var(--gradient-gold); color: var(--color-primary);
-  font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  padding: 4px 14px; border-radius: var(--radius-full);
+.service-card:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--glow-gold-md);
+  transform: translateY(-6px);
 }
-.benefit-card__icon { width: 48px; height: 48px; color: var(--color-gold); margin-bottom: var(--space-4); filter: drop-shadow(0 0 6px rgba(201,168,76,.5)); }
-.benefit-card__icon svg { width: 100%; height: 100%; }
-.benefit-card__title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--color-white); margin-bottom: var(--space-3); }
-.benefit-card__text { color: var(--color-text-muted); line-height: 1.7; }
-@media (min-width: 768px) { .benefits__grid { grid-template-columns: repeat(3,1fr); } }
+.service-card--alt { border-color: rgba(37,211,102,.2); }
+.service-card--alt:hover { border-color: #25d366; box-shadow: 0 0 20px rgba(37,211,102,.3); }
+
+.service-card__icon {
+  width: 56px; height: 56px; color: var(--color-gold);
+  filter: drop-shadow(0 0 8px rgba(201,168,76,.5));
+}
+.service-card--alt .service-card__icon { color: #25d366; filter: drop-shadow(0 0 8px rgba(37,211,102,.4)); }
+.service-card__icon svg { width: 100%; height: 100%; }
+
+.service-card__body { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
+.service-card__title {
+  font-family: var(--font-display); font-size: 1.35rem; font-weight: 700;
+  color: var(--color-white);
+}
+.service-card__text { color: var(--color-text-muted); line-height: 1.65; font-size: .9rem; flex: 1; }
+.service-card__cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: var(--space-3);
+  font-weight: 600; font-size: .9rem;
+  color: var(--color-gold);
+  transition: gap var(--transition-fast);
+}
+.service-card:hover .service-card__cta { gap: 10px; }
+.service-card__cta--wa { color: #25d366; }
+
+/* ── Benefit card (kept for scroll-reveal class references) ── */
+.benefit-card { display: none; }
 
 /* ==========================================
-   8. TESTIMONIOS
+   8. TESTIMONIOS — CARRUSEL
 ========================================== */
 .testimonials { padding: var(--space-8) 0; background: var(--color-primary); }
 .testimonials__container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-3); }
 .testimonials__header { text-align: center; margin-bottom: var(--space-7); }
-.testimonials__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+
+/* ── Carrusel base ── */
+.carousel { position: relative; }
+.carousel__track {
+  display: flex;
+  gap: var(--space-4);
+  transition: transform .45s cubic-bezier(.4,0,.2,1);
+}
+.carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* En desktop: mostrar las 3 tarjetas lado a lado sin animar */
+@media (min-width: 768px) {
+  .carousel__track { transform: none !important; }
+  .carousel__slide { flex: 0 0 calc(33.333% - var(--space-3)); }
+  .carousel__controls { display: none; }
+}
+
+/* ── Controles ── */
+.carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+.carousel__btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-primary-mid);
+  background: var(--color-surface);
+  color: var(--color-gold);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+.carousel__btn:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--glow-gold-sm);
+  background: rgba(201,168,76,.08);
+}
+.carousel__dots { display: flex; gap: 8px; }
+.carousel__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary-mid);
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  padding: 0;
+}
+.carousel__dot--active {
+  background: var(--color-gold);
+  transform: scale(1.35);
+  box-shadow: var(--glow-gold-sm);
+}
+
+/* ── Tarjeta ── */
 .testimonial-card {
   background: var(--color-primary-light); border: 1px solid var(--color-primary-mid);
   border-radius: var(--radius-lg); padding: var(--space-5);
@@ -301,7 +384,6 @@ fieldset { border: none; }
 }
 .testimonial-card__name { font-style: normal; font-weight: 600; color: var(--color-white); font-size: .9375rem; }
 .testimonial-card__role { font-size: .8125rem; color: var(--color-text-muted); }
-@media (min-width: 768px) { .testimonials__grid { grid-template-columns: repeat(3,1fr); } }
 
 /* ==========================================
    9. FORMULARIO — BASE
@@ -761,6 +843,19 @@ fieldset { border: none; }
 /* ==========================================
    22. RESPONSIVE MÓVIL — mejoras globales
 ========================================== */
+
+/* Reducir tamaño de texto de párrafos en móvil */
+@media (max-width: 767px) {
+  body { font-size: .9375rem; }
+  .section-subtitle { font-size: .9rem; }
+  .step__text,
+  .service-card__text,
+  .testimonial-card__text,
+  .benefit-card__text,
+  .form-group__hint,
+  .hero__subtitle { font-size: .875rem; }
+  .booking-result__text { font-size: .875rem; }
+}
 
 /* Reducir padding vertical de secciones en móvil */
 @media (max-width: 767px) {
