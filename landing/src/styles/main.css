@@ -114,6 +114,8 @@ fieldset { border: none; }
   height: 130px;
   width: auto;
   object-fit: contain;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px rgba(201,168,76,.4), var(--glow-gold-md);
   animation: logoEntrance .8s cubic-bezier(.22,.61,.36,1) both;
 }
 @keyframes logoEntrance {
@@ -613,6 +615,24 @@ fieldset { border: none; }
 .booking-form__submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 .booking-form__submit { min-width: 200px; }
 
+/* Loading reserva */
+.booking-loading {
+  text-align: center; padding: var(--space-7) var(--space-5);
+  background: var(--color-primary-light); border: 1px solid var(--color-primary-mid); border-radius: var(--radius-lg);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+}
+[hidden].booking-loading { display: none; }
+.booking-loading__logo {
+  height: 90px; width: auto; object-fit: contain;
+  border-radius: var(--radius-full);
+  animation: pulse-gold 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 3px rgba(201,168,76,.5), var(--glow-gold-lg);
+}
+.booking-loading__text {
+  font-family: var(--font-display); font-size: 1.1rem;
+  color: var(--color-gold); letter-spacing: .08em;
+}
+
 /* Resultados */
 .booking-result {
   text-align: center; padding: var(--space-7) var(--space-5);
@@ -638,7 +658,11 @@ fieldset { border: none; }
   max-width: 1200px; margin: 0 auto; padding: var(--space-7) var(--space-3) var(--space-5);
 }
 .footer__logo-link { display: inline-block; margin-bottom: var(--space-3); }
-.footer__logo-img { height: 64px; width: auto; object-fit: contain; }
+.footer__logo-img {
+  height: 64px; width: auto; object-fit: contain;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px rgba(201,168,76,.3), var(--glow-gold-sm);
+}
 .footer__tagline { font-size: .9375rem; color: var(--color-text-muted); }
 .footer__legal { font-size: .8125rem; color: var(--color-text-muted); opacity: .6; margin-top: var(--space-1); }
 .footer__nav-list { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }

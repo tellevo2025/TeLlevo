@@ -376,6 +376,9 @@ const setLoading = (on) => {
   if (!acceptBtn) return;
   acceptBtn.disabled = on;
   acceptBtn.textContent = on ? 'Enviando…' : 'Aceptar y confirmar reserva';
+  document.getElementById('booking-form').hidden = on;
+  document.getElementById('booking-loading').hidden = !on;
+  if (on) document.getElementById('booking-loading').scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 const showResult = (type) => {
@@ -392,6 +395,7 @@ const showResult = (type) => {
 const resetForm = () => {
   document.getElementById('booking-form').reset();
   document.getElementById('booking-form').hidden = false;
+  document.getElementById('booking-loading').hidden = true;
   document.querySelectorAll('.booking-result').forEach(el => { el.hidden = true; });
   document.querySelectorAll('.form-group__input').forEach(el => {
     el.classList.remove('form-group__input--invalid', 'form-group__input--valid');
