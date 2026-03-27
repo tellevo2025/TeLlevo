@@ -1,6 +1,6 @@
 /*
   main.js — TeLlevo Landing Page
-  Navbar · Modal T&C · Calendario personalizado · Formulario 3 pasos · Mapa Leaflet + OSM
+  Navbar · Modal T&C · Calendario personalizado · Formulario 4 pasos · Autocomplete OSM
 */
 
 // Endpoint de reserva: llama directo al AppScript de Google.
@@ -496,6 +496,7 @@ const resetForm = () => {
     paradaCheck.checked = false;
     document.getElementById('paradas-list').innerHTML = '';
     paradaCount = 0;
+    paradaSeq   = 0;
     document.getElementById('paradas').value = '0';
     document.getElementById('paradas-container').hidden = true;
   }
@@ -540,7 +541,8 @@ const initForm = () => {
 };
 
 // ─── PARADAS MÚLTIPLES ────────────────────────────────────────────────────────
-let paradaCount = 0;
+let paradaCount = 0; // cantidad actual de paradas visibles
+let paradaSeq   = 0; // secuencia única para IDs — nunca decrementa
 
 const updateParadasInput = () => {
   document.getElementById('paradas').value = paradaCount;
@@ -567,20 +569,22 @@ const removeParada = (id) => {
 
 const addParada = () => {
   paradaCount++;
+  paradaSeq++;
   updateParadasInput();
-  const idx  = paradaCount;
-  const id   = `parada-${idx}`;
+  const seq    = paradaSeq; // ID único e inmutable para este item
+  const pos    = paradaCount; // posición visual actual
+  const id     = `parada-${seq}`;
   const listId = `${id}-list`;
   const errId  = `${id}-error`;
-  const label  = idx === 1 ? 'Parada 1 (gratis)' : `Parada ${idx} (+$5.000)`;
+  const label  = pos === 1 ? 'Parada 1 (gratis)' : `Parada ${pos} (+$5.000)`;
 
   const item = document.createElement('div');
   item.className = 'parada-item';
-  item.id = `parada-item-${idx}`;
+  item.id = `parada-item-${seq}`;
   item.innerHTML = `
     <div class="parada-item__header">
       <span class="parada-item__label">${label}</span>
-      <button type="button" class="parada-item__remove" aria-label="Eliminar parada ${idx}">
+      <button type="button" class="parada-item__remove" aria-label="Eliminar parada ${pos}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -594,7 +598,7 @@ const addParada = () => {
     <span class="form-group__error" id="${errId}" role="alert" aria-live="polite"></span>
   `;
 
-  item.querySelector('.parada-item__remove').addEventListener('click', () => removeParada(idx));
+  item.querySelector('.parada-item__remove').addEventListener('click', () => removeParada(seq));
 
   document.getElementById('paradas-list').appendChild(item);
 
