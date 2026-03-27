@@ -661,30 +661,34 @@ const initCarousel = () => {
 
   const goTo = (idx) => {
     current = (idx + total) % total;
-    track.style.transform = `translateX(calc(-${current * 100}% - ${current} * var(--space-4, 16px)))`;
+    // Desplazamiento simple: cada slide ocupa exactamente el 100% del wrapper
+    track.style.transform = `translateX(-${current * 100}%)`;
     dotsEl.querySelectorAll('.carousel__dot').forEach((d, i) => {
       d.classList.toggle('carousel__dot--active', i === current);
     });
-    resetAuto();
   };
 
-  const resetAuto = () => {
+  const startAuto = () => {
     clearInterval(autoTimer);
-    autoTimer = setInterval(() => goTo(current + 1), 4500);
+    autoTimer = setInterval(() => goTo(current + 1), 4000);
   };
 
-  document.getElementById('carousel-prev')?.addEventListener('click', () => goTo(current - 1));
-  document.getElementById('carousel-next')?.addEventListener('click', () => goTo(current + 1));
+  document.getElementById('carousel-prev')?.addEventListener('click', () => { goTo(current - 1); startAuto(); });
+  document.getElementById('carousel-next')?.addEventListener('click', () => { goTo(current + 1); startAuto(); });
 
   // Swipe táctil
   let startX = 0;
   track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
   track.addEventListener('touchend', e => {
     const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+    if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); startAuto(); }
   }, { passive: true });
 
-  resetAuto();
+  // Pausar al hacer hover
+  track.addEventListener('mouseenter', () => clearInterval(autoTimer));
+  track.addEventListener('mouseleave', startAuto);
+
+  startAuto();
 };
 
 // ─── SCROLL REVEAL ────────────────────────────────────────────────────────────

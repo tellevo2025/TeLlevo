@@ -110,7 +110,7 @@ fieldset { border: none; }
   max-width: 1200px; margin: 0 auto; padding: 0 var(--space-3); height: var(--navbar-height);
 }
 .navbar__logo { flex-shrink: 0; display: flex; align-items: center; }
-.navbar__logo-img { height: 40px; width: auto; object-fit: contain; }
+.navbar__logo-img { height: 56px; width: auto; object-fit: contain; }
 .navbar__nav { display: none; margin-left: auto; }
 .navbar__list { display: flex; gap: var(--space-5); }
 .navbar__link {
@@ -227,11 +227,14 @@ fieldset { border: none; }
 }
 .step:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-sm); }
 .step__number {
-  font-family: var(--font-display); font-size: 2.5rem; font-weight: 700;
-  color: var(--color-gold); opacity: .4; line-height: 1; flex-shrink: 0;
-  transition: opacity var(--transition-base);
+  font-size: 2.8rem; line-height: 1; flex-shrink: 0;
+  filter: drop-shadow(0 0 10px rgba(201,168,76,.5));
+  transition: filter var(--transition-base), transform var(--transition-base);
 }
-.step:hover .step__number { opacity: 1; }
+.step:hover .step__number {
+  filter: drop-shadow(0 0 18px rgba(201,168,76,.9));
+  transform: scale(1.15);
+}
 .step__title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--color-white); margin-bottom: var(--space-2); }
 .step__text { color: var(--color-text-muted); line-height: 1.7; }
 .steps-section__cta { text-align: center; }
@@ -304,21 +307,24 @@ fieldset { border: none; }
 .testimonials__header { text-align: center; margin-bottom: var(--space-7); }
 
 /* ── Carrusel base ── */
-.carousel { position: relative; }
+.carousel { position: relative; overflow: hidden; }
 .carousel__track {
   display: flex;
-  gap: var(--space-4);
   transition: transform .45s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
 }
 .carousel__slide {
   flex: 0 0 100%;
+  width: 100%;
   min-width: 0;
+  padding: 2px; /* evita que el box-shadow se corte */
 }
 
 /* En desktop: mostrar las 3 tarjetas lado a lado sin animar */
 @media (min-width: 768px) {
-  .carousel__track { transform: none !important; }
-  .carousel__slide { flex: 0 0 calc(33.333% - var(--space-3)); }
+  .carousel { overflow: visible; }
+  .carousel__track { transform: none !important; gap: var(--space-4); }
+  .carousel__slide { flex: 0 0 calc(33.333% - 11px); }
   .carousel__controls { display: none; }
 }
 
@@ -588,7 +594,7 @@ fieldset { border: none; }
   max-width: 1200px; margin: 0 auto; padding: var(--space-7) var(--space-3) var(--space-5);
 }
 .footer__logo-link { display: inline-block; margin-bottom: var(--space-3); }
-.footer__logo-img { height: 36px; width: auto; object-fit: contain; }
+.footer__logo-img { height: 52px; width: auto; object-fit: contain; }
 .footer__tagline { font-size: .9375rem; color: var(--color-text-muted); }
 .footer__legal { font-size: .8125rem; color: var(--color-text-muted); opacity: .6; margin-top: var(--space-1); }
 .footer__nav-list { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
@@ -991,15 +997,6 @@ fieldset { border: none; }
   display: flex; flex-direction: column; align-items: center;
 }
 
-/* ── Steps: número fantasma dramático ── */
-.step__number {
-  font-size: clamp(3.5rem, 5vw, 5.5rem);
-  opacity: .07;
-  letter-spacing: -.04em;
-  line-height: .85;
-  transition: opacity .4s ease;
-}
-.step:hover .step__number { opacity: .45; }
 
 /* ── Steps: conector horizontal en desktop ── */
 @media (min-width: 1024px) {
