@@ -240,9 +240,7 @@ fieldset { border: none; }
 .step__icon-block {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   flex-shrink: 0;
-  transition: transform var(--transition-base);
 }
-.step:hover .step__icon-block { transform: scale(1.08); }
 .step__num {
   position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
   font-family: var(--font-display); font-size: .85rem; font-weight: 800;
