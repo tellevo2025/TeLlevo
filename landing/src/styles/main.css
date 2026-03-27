@@ -278,6 +278,7 @@ fieldset { border: none; }
 .services__header .section-subtitle { margin: 0 auto; }
 .services__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
 @media (min-width: 640px) { .services__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 960px) { .services__grid { grid-template-columns: repeat(3, 1fr); } }
 
 .service-card {
   display: flex; flex-direction: column; gap: var(--space-4);
@@ -296,12 +297,30 @@ fieldset { border: none; }
 .service-card--alt { border-color: rgba(37,211,102,.2); }
 .service-card--alt:hover { border-color: #25d366; box-shadow: 0 0 20px rgba(37,211,102,.3); }
 
+.service-card--wedding {
+  border-color: var(--color-gold);
+  box-shadow: var(--glow-gold-sm);
+  background: linear-gradient(145deg, var(--color-surface) 60%, rgba(201,168,76,.08));
+  animation: pulse-gold 3s ease-in-out infinite;
+}
+.service-card--wedding:hover {
+  border-color: var(--color-gold-bright);
+  box-shadow: var(--glow-gold-lg);
+  transform: translateY(-6px);
+  animation: none;
+}
+
 .service-card__icon {
   width: 56px; height: 56px; color: var(--color-gold);
   filter: drop-shadow(0 0 8px rgba(201,168,76,.5));
 }
 .service-card--alt .service-card__icon { color: #25d366; filter: drop-shadow(0 0 8px rgba(37,211,102,.4)); }
 .service-card__icon svg { width: 100%; height: 100%; }
+.service-card__icon--emoji { display: flex; align-items: center; }
+.service-card__ring {
+  font-size: 2.4rem; line-height: 1;
+  filter: sepia(1) saturate(5) hue-rotate(5deg) drop-shadow(0 0 12px rgba(201,168,76,.9));
+}
 
 .service-card__body { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
 .service-card__title {
