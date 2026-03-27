@@ -622,8 +622,9 @@ fieldset { border: none; }
 [hidden].booking-loading { display: none; }
 .booking-loading__logo {
   height: 90px; width: auto; object-fit: contain;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 3px rgba(201,168,76,.6), var(--glow-gold-lg);
   animation: pulse-gold 1.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 16px rgba(201,168,76,.7));
 }
 .booking-loading__text {
   font-family: var(--font-display); font-size: 1.1rem;
