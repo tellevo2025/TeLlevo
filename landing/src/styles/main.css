@@ -48,6 +48,11 @@ body {
   color: var(--color-text-light);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  animation: pageFadeIn .5s ease both;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
@@ -232,8 +237,8 @@ fieldset { border: none; }
   position: relative;
   display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3);
   background: var(--color-primary-light); border: 1px solid var(--color-primary-mid);
-  border-radius: var(--radius-lg); padding: var(--space-5); padding-top: calc(var(--space-5) + 20px);
-  margin-top: 20px;
+  border-radius: var(--radius-lg); padding: var(--space-5); padding-top: calc(var(--space-5) + 28px);
+  margin-top: 28px;
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 .step:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-sm); }
@@ -242,14 +247,15 @@ fieldset { border: none; }
   flex-shrink: 0;
 }
 .step__num {
-  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-  font-family: var(--font-display); font-size: .85rem; font-weight: 800;
-  letter-spacing: .06em; color: var(--color-primary);
+  position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-display); font-size: 1.4rem; font-weight: 900;
+  letter-spacing: 0; color: var(--color-primary);
   background: var(--gradient-gold);
   border-radius: var(--radius-full);
-  width: 40px; height: 40px;
+  width: 56px; height: 56px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--glow-gold-md);
+  box-shadow: var(--glow-gold-lg);
+  border: 2px solid rgba(255,255,255,.25);
 }
 .step__emoji {
   font-size: 2.4rem; line-height: 1;
@@ -296,15 +302,24 @@ fieldset { border: none; }
 .service-card--alt:hover { border-color: #25d366; box-shadow: 0 0 20px rgba(37,211,102,.3); }
 
 .service-card--wedding {
-  border-color: var(--color-gold);
-  box-shadow: var(--glow-gold-sm);
-  background: linear-gradient(145deg, var(--color-surface) 60%, rgba(201,168,76,.08));
-  animation: pulse-gold 3s ease-in-out infinite;
+  border: 2px solid var(--color-gold);
+  box-shadow: var(--glow-gold-md);
+  background: linear-gradient(145deg, var(--color-surface) 40%, rgba(201,168,76,.14));
+  animation: pulse-gold 2.5s ease-in-out infinite;
+  position: relative;
+}
+.service-card--wedding::before {
+  content: '✨ ESPECIAL';
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  background: var(--gradient-gold); color: var(--color-primary);
+  font-size: .65rem; font-weight: 800; letter-spacing: .12em;
+  padding: 3px 12px; border-radius: var(--radius-full);
+  white-space: nowrap; box-shadow: var(--glow-gold-sm);
 }
 .service-card--wedding:hover {
   border-color: var(--color-gold-bright);
   box-shadow: var(--glow-gold-lg);
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   animation: none;
 }
 
@@ -414,7 +429,8 @@ fieldset { border: none; }
   display: flex; flex-direction: column; gap: var(--space-4);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
-.testimonial-card:hover { border-color: rgba(201,168,76,.3); box-shadow: var(--glow-gold-sm); }
+.testimonial-card { transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base); }
+.testimonial-card:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-md); transform: translateY(-5px); }
 .testimonial-card--featured { border-color: var(--color-gold); box-shadow: var(--glow-gold-sm); }
 .testimonial-card__stars { color: var(--color-gold); font-size: 1rem; letter-spacing: 2px; }
 .testimonial-card__text { color: var(--color-text-light); font-style: italic; line-height: 1.7; flex: 1; }
@@ -518,6 +534,11 @@ fieldset { border: none; }
    11. FORMULARIO — PASOS
 ========================================== */
 .form-step { background: var(--color-primary-light); border: 1px solid var(--color-primary-mid); border-radius: var(--radius-lg); padding: var(--space-5); }
+.form-step--enter { animation: stepEnter .35s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes stepEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
 .form-step__title { font-family: var(--font-display); font-size: 1.375rem; font-weight: 600; color: var(--color-white); margin-bottom: var(--space-5); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-primary-mid); }
 .form-step__nav { display: flex; justify-content: flex-end; margin-top: var(--space-5); }
 .form-step__nav--row { display: flex; justify-content: space-between; gap: var(--space-3); }

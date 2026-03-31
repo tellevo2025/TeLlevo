@@ -291,7 +291,15 @@ const stepValidators = {
 };
 
 const goToStep = (to) => {
-  document.querySelectorAll('.form-step').forEach(s => { s.hidden = parseInt(s.dataset.step) !== to; });
+  document.querySelectorAll('.form-step').forEach(s => {
+    const isTarget = parseInt(s.dataset.step) === to;
+    s.hidden = !isTarget;
+    if (isTarget) {
+      s.classList.remove('form-step--enter');
+      s.offsetHeight;
+      s.classList.add('form-step--enter');
+    }
+  });
 
   document.querySelectorAll('.booking-progress__step').forEach((s, i) => {
     const n = i + 1;
