@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   }
 
   const scriptUrl = process.env.APPSCRIPT_URL
-    || 'https://script.google.com/macros/s/AKfycbxz8ZOyxd9kXeG-c-FqJTPIbI8Phgj2XoHmD1Eo5Aznvb2VoObiiZMgtvZ-ygl-olxe/exec';
+    || 'https://script.google.com/macros/s/AKfycbxlxrSoll8P8Q7GLA-sedpYb4du8k9sUj0D6ZTycoe-_fN5tLmf48TTbaG4dW2Y0kN3/exec';
 
   try {
     const response = await fetch(scriptUrl, {
