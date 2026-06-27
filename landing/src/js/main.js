@@ -676,8 +676,8 @@ const initThemeToggle = () => {
 
   const applyTheme = (isLight) => {
     document.body.classList.toggle('light-mode', isLight);
-    sunIcon.hidden  = isLight;   // sol visible en oscuro, oculto en claro
-    moonIcon.hidden = !isLight;  // luna visible en claro, oculta en oscuro
+    sunIcon.style.display  = isLight ? 'none' : '';
+    moonIcon.style.display = isLight ? '' : 'none';
     btn.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
     localStorage.setItem('tellevo-theme', isLight ? 'light' : 'dark');
   };

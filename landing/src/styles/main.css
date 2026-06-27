@@ -1468,6 +1468,9 @@ body.light-mode .service-card__text  { color: #3D4F6B; }
 body.light-mode .service-card__badge { background: rgba(160,120,48,.15); color: #7A5A1A; }
 body.light-mode .services__divider   { border-color: #B8C0CC; }
 body.light-mode .services__divider-diamond { background: #FFFFFF; color: #A07830; border-color: #B8C0CC; }
+body.light-mode .wedding-hero__badge { background: rgba(139,101,32,.12); border-color: rgba(139,101,32,.4); color: #5C3D00; }
+body.light-mode .wedding-hero__title { color: #0D1526; text-shadow: none; }
+body.light-mode .wedding-hero__text  { color: #3D4F6B; }
 
 /* ── Testimonios ── */
 body.light-mode .testimonial-card {
