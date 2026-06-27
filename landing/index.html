@@ -30,8 +30,14 @@
           <li><a href="#como-funciona" class="navbar__link">Cómo funciona</a></li>
           <li><a href="#beneficios" class="navbar__link">Servicios</a></li>
           <li><a href="#testimonios" class="navbar__link">Testimonios</a></li>
+          <li><a href="#faq" class="navbar__link">FAQ</a></li>
         </ul>
       </nav>
+
+      <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar modo de color" title="Cambiar modo">
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
 
       <a href="#reserva" class="btn btn--primary navbar__cta">Reservar chofer</a>
 
@@ -47,6 +53,7 @@
         <li><a href="#como-funciona" class="navbar__mobile-link">Cómo funciona</a></li>
         <li><a href="#beneficios" class="navbar__mobile-link">Servicios</a></li>
         <li><a href="#testimonios" class="navbar__mobile-link">Testimonios</a></li>
+        <li><a href="#faq" class="navbar__mobile-link">FAQ</a></li>
         <li><a href="#reserva" class="btn btn--primary navbar__mobile-cta">Reservar chofer</a></li>
       </ul>
     </nav>
@@ -143,7 +150,7 @@
       <div class="hero__container">
         <p class="hero__eyebrow">Choferes de Reemplazo · Chile</p>
         <h1 class="hero__title" id="hero-title">
-          ¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em>
+          <span id="hero-rotating-text">¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em></span>
         </h1>
         <p class="hero__subtitle">
           Celebra sin límites. Nosotros manejamos tu auto y te llevamos sano y salvo a casa.
@@ -196,9 +203,15 @@
 
         <ol class="steps" role="list">
           <li class="step reveal reveal--d1">
-            <div class="step__icon-block" aria-hidden="true">
-              <span class="step__num">1</span>
-              <span class="step__emoji">📋</span>
+            <span class="step__num" aria-hidden="true">1</span>
+            <div class="step__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+                <rect x="8" y="4" width="16" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 4v3h8V4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <line x1="11" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="11" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="11" y1="22" x2="17" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
             </div>
             <div class="step__content">
               <h3 class="step__title">Completa el formulario</h3>
@@ -206,9 +219,14 @@
             </div>
           </li>
           <li class="step reveal reveal--d2">
-            <div class="step__icon-block" aria-hidden="true">
-              <span class="step__num">2</span>
-              <span class="step__emoji">💬</span>
+            <span class="step__num" aria-hidden="true">2</span>
+            <div class="step__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+                <path d="M16 4C9.373 4 4 8.925 4 15c0 2.05.6 3.96 1.638 5.574L4 28l7.69-1.6A12.3 12.3 0 0 0 16 26c6.627 0 12-4.925 12-11S22.627 4 16 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="11" cy="15" r="1.2" fill="currentColor"/>
+                <circle cx="16" cy="15" r="1.2" fill="currentColor"/>
+                <circle cx="21" cy="15" r="1.2" fill="currentColor"/>
+              </svg>
             </div>
             <div class="step__content">
               <h3 class="step__title">Recibe tu cotización</h3>
@@ -216,9 +234,13 @@
             </div>
           </li>
           <li class="step reveal reveal--d3">
-            <div class="step__icon-block" aria-hidden="true">
-              <span class="step__num">3</span>
-              <span class="step__emoji">💳</span>
+            <span class="step__num" aria-hidden="true">3</span>
+            <div class="step__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+                <rect x="3" y="8" width="26" height="16" rx="3" stroke="currentColor" stroke-width="2"/>
+                <line x1="3" y1="14" x2="29" y2="14" stroke="currentColor" stroke-width="2"/>
+                <rect x="7" y="18" width="5" height="2.5" rx="1" fill="currentColor"/>
+              </svg>
             </div>
             <div class="step__content">
               <h3 class="step__title">Procede al pago</h3>
@@ -226,9 +248,12 @@
             </div>
           </li>
           <li class="step reveal reveal--d4">
-            <div class="step__icon-block" aria-hidden="true">
-              <span class="step__num">4</span>
-              <span class="step__emoji">🥂</span>
+            <span class="step__num" aria-hidden="true">4</span>
+            <div class="step__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+                <circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="2"/>
+                <polyline points="10 16 14 20 22 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
             <div class="step__content">
               <h3 class="step__title">¡Disfruta al 100%!</h3>
@@ -256,9 +281,9 @@
 
         <div class="services__grid">
 
-          <a href="#reserva" class="service-card reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
+          <a href="#reserva" class="service-card service-card--sm reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
             <div class="service-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
                 <rect x="3" y="13" width="26" height="12" rx="3" stroke="currentColor" stroke-width="2"/>
                 <path d="M6 13 L8 7 H24 L26 13" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                 <circle cx="9" cy="25" r="2" fill="currentColor"/>
@@ -267,49 +292,66 @@
             </div>
             <div class="service-card__body">
               <h3 class="service-card__title">Chofer de reemplazo</h3>
-              <p class="service-card__text">Saliste de fiesta, una celebración o un evento y necesitas llegar a casa en tu propio auto. Reserva online en minutos.</p>
-              <span class="service-card__cta">
-                Reservar ahora
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </span>
+              <p class="service-card__text">Saliste de fiesta y necesitas llegar a casa en tu propio auto. Reserva online en minutos.</p>
+              <span class="service-card__cta">Reservar ahora <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
 
-          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
+          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--sm service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
             <div class="service-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
                 <circle cx="11" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
                 <circle cx="21" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
-                <path d="M3 27 C3 22 7 19 11 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M29 27 C29 22 25 19 21 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M11 19 H21" stroke="currentColor" stroke-width="2"/>
+                <path d="M3 27 C3 22 7 19 11 19 H21 C25 19 29 22 29 27" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </div>
             <div class="service-card__body">
               <h3 class="service-card__title">Choferes para tu evento</h3>
-              <p class="service-card__text">Tienes una fiesta corporativa u otro evento y necesitas un equipo de choferes. Cotiza por WhatsApp.</p>
-              <span class="service-card__cta service-card__cta--wa">
-                Cotizar por WhatsApp
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </span>
+              <p class="service-card__text">Equipo de choferes para eventos corporativos y celebraciones. Cotiza rápido.</p>
+              <span class="service-card__cta service-card__cta--wa">WhatsApp <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
 
-          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20caso%20pronto%20y%20quiero%20conocer%20los%20beneficios%20que%20tienen%20para%20matrimonios.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--wedding reveal reveal--d3" aria-label="Servicio para matrimonios — Contactar por WhatsApp">
-            <div class="service-card__icon service-card__icon--emoji" aria-hidden="true">
-              <span class="service-card__ring">💍</span>
+          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20cotizar%20el%20servicio%20de%20Valet%20Parking.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--sm service-card--alt reveal reveal--d3" aria-label="Valet Parking — Contactar por WhatsApp">
+            <div class="service-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+                <rect x="2" y="10" width="28" height="14" rx="3" stroke="currentColor" stroke-width="2"/>
+                <path d="M6 10 L9 4 H23 L26 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="9" cy="24" r="2.5" fill="currentColor"/>
+                <circle cx="23" cy="24" r="2.5" fill="currentColor"/>
+              </svg>
             </div>
             <div class="service-card__body">
-              <h3 class="service-card__title">¿Te casas?</h3>
-              <p class="service-card__text">Contáctanos y entérate de los beneficios exclusivos que tenemos para tu matrimonio. ¡Te sorprenderás!</p>
-              <span class="service-card__cta">
-                Ver beneficios
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </span>
+              <h3 class="service-card__title">Valet Parking</h3>
+              <p class="service-card__text">Recibimos y estacionamos los autos de tus invitados con total seguridad y profesionalismo.</p>
+              <span class="service-card__cta service-card__cta--wa">WhatsApp <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
 
         </div>
+
+        <!-- Separador -->
+        <div class="services__divider" aria-hidden="true">
+          <span class="services__divider-line"></span>
+          <span class="services__divider-diamond">✦</span>
+          <span class="services__divider-line"></span>
+        </div>
+
+        <!-- Card matrimonio: grande y animada -->
+        <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20caso%20pronto%20y%20quiero%20conocer%20los%20beneficios%20que%20tienen%20para%20matrimonios.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--wedding-hero reveal reveal--d1" aria-label="Servicio para matrimonios — Contactar por WhatsApp">
+          <div class="service-card--wedding-hero__inner">
+            <div class="wedding-hero__badge">💍 Servicio especial</div>
+            <h3 class="wedding-hero__title">¿Te casas?</h3>
+            <p class="wedding-hero__text">Contáctanos y descubre los beneficios exclusivos que tenemos para tu matrimonio. Coordinamos choferes, Valet Parking y transporte grupal para que tú y tus invitados disfruten sin preocupaciones.</p>
+            <ul class="wedding-hero__perks" aria-label="Beneficios">
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Choferes para todos tus invitados</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Valet Parking premium</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Tarifa preferencial</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Coordinación total del evento</li>
+            </ul>
+            <span class="wedding-hero__cta">Ver beneficios exclusivos <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -320,7 +362,7 @@
       <div class="testimonials__container">
         <header class="testimonials__header">
           <p class="section-eyebrow">Testimonios</p>
-          <h2 class="section-title" id="testimonials-title">+250 clientes recomiendan TeLlevo</h2>
+          <h2 class="section-title" id="testimonials-title">+850 clientes recomiendan TeLlevo</h2>
           <p class="section-subtitle">98.4% de tasa de recomendación.</p>
         </header>
 
@@ -366,6 +408,76 @@
                 <div>
                   <cite class="testimonial-card__name">Rodrigo F.</cite>
                   <p class="testimonial-card__role">Providencia, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Lo usé en mi cumpleaños de 30 y fue perfecto. El chofer llegó antes de la hora, muy amable y el proceso de reserva fue rapidísimo. ¡Lo recomiendo con los ojos cerrados!"
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">VS</div>
+                <div>
+                  <cite class="testimonial-card__name">Valentina S.</cite>
+                  <p class="testimonial-card__role">Vitacura, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card testimonial-card--featured carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Contraté TeLlevo para mi matrimonio y fue la mejor decisión. Coordinaron todo el regreso de los invitados sin ningún problema. Todos quedaron felices y seguros."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">MH</div>
+                <div>
+                  <cite class="testimonial-card__name">Matías H.</cite>
+                  <p class="testimonial-card__role">La Reina, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Servicio de primera. El chofer manejó mi auto con mucho cuidado. Lo que más me gustó fue que llegan donde estás, no al revés. Muy profesional todo."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">FT</div>
+                <div>
+                  <cite class="testimonial-card__name">Francisca T.</cite>
+                  <p class="testimonial-card__role">Lo Barnechea, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Increíble servicio. Usé TeLlevo después de una cena de empresa y el chofer fue súper puntual y profesional. Ya lo tengo agendado para el próximo evento."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">DM</div>
+                <div>
+                  <cite class="testimonial-card__name">Diego M.</cite>
+                  <p class="testimonial-card__role">Ñuñoa, Chile</p>
+                </div>
+              </footer>
+            </div>
+
+            <div class="testimonial-card carousel__slide">
+              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
+              <blockquote class="testimonial-card__text">
+                "Muy bacán poder irme tranquila de la fiesta sabiendo que mi auto también llegaba sano y salvo. El servicio es cómodo, rápido y muy confiable."
+              </blockquote>
+              <footer class="testimonial-card__author">
+                <div class="testimonial-card__avatar" aria-hidden="true">CR</div>
+                <div>
+                  <cite class="testimonial-card__name">Camila R.</cite>
+                  <p class="testimonial-card__role">Las Condes, Chile</p>
                 </div>
               </footer>
             </div>
@@ -689,6 +801,123 @@
       </div>
     </section>
 
+    <!-- ==========================================
+       FAQ
+    ========================================== -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="faq__container">
+        <header class="faq__header">
+          <p class="section-eyebrow">Preguntas frecuentes</p>
+          <h2 class="section-title" id="faq-title">Todo lo que necesitas saber</h2>
+          <p class="section-subtitle">Resolvemos tus dudas antes de que las tengas.</p>
+        </header>
+
+        <div class="faq__list" role="list">
+
+          <div class="faq__item reveal reveal--d1" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Cómo reservo un chofer?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Puedes reservar directamente desde el formulario en esta página o escribirnos por WhatsApp. Solo necesitas indicar fecha, hora, dirección de origen y destino. En pocos minutos recibirás confirmación.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d2" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Cuánto cuesta el servicio?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>El valor depende de la distancia del recorrido. Tras completar el formulario o contactarnos por WhatsApp, te enviamos una cotización exacta. No hay cargos ocultos ni sorpresas.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d3" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿El chofer maneja mi propio auto?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Exacto. Nuestro chofer se desplaza hasta donde estás, toma el volante de tu vehículo y te lleva a tu destino. Tanto tú como tu auto llegan seguros a casa.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d4" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿En qué comunas operan?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Cubrimos toda la Región Metropolitana, con mayor presencia en Las Condes, Vitacura, Providencia, Ñuñoa, La Reina, Lo Barnechea y Chicureo. ¿Tu comuna no está aquí? Escríbenos igual, probablemente podemos ayudarte.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d1" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Operan de madrugada y fines de semana?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Sí, operamos las 24 horas, los 7 días de la semana, incluyendo festivos. Los viernes y sábados de noche son nuestra hora peak, por lo que recomendamos reservar con anticipación.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d2" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Puedo cancelar mi reserva?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Sí. Cancelaciones con más de 24 horas de anticipación tienen reembolso total. Entre 12 y 24 horas, reembolso del 50%. Con menos de 12 horas, no hay reembolso. Revisa nuestros Términos y Condiciones para todos los detalles.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d3" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Qué pasa si el chofer tiene un accidente?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>En caso de siniestro imputable al conductor, TeLlevo cubre el deducible de tu seguro, siempre que tu vehículo cuente con póliza vigente. Por eso pedimos ese dato al momento de la reserva.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d4" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Cómo sé que el chofer es confiable?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Todos nuestros choferes pasan por un proceso de verificación de antecedentes antes de integrarse al equipo. Además, somos más de 850 clientes satisfechos con una calificación promedio de 4.87★.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d1" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Qué incluye el servicio de Valet Parking?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Enviamos un equipo de choferes a tu evento para recibir y estacionar los autos de tus invitados de forma organizada. Ideal para matrimonios, fiestas privadas y eventos corporativos. Cotiza por WhatsApp según el tamaño del evento.</p>
+            </div>
+          </div>
+
+          <div class="faq__item reveal reveal--d2" role="listitem">
+            <button class="faq__question" aria-expanded="false">
+              ¿Mi auto es mecánico, ¿pueden manejarlo?
+              <span class="faq__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq__answer" hidden>
+              <p>Sí, tenemos choferes entrenados para vehículos mecánicos y automáticos. Solo indícalo en el formulario o al momento de reservar para asignarte el conductor correcto.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ==========================================
@@ -728,10 +957,11 @@
 
   <!-- WhatsApp flotante -->
   <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20obtener%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios.%20%C2%BFPodr%C3%ADan%20ayudarme%3F" class="whatsapp-fab" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
       <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.118 1.522 5.847L.057 23.882l6.189-1.438A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.663-.494-5.2-1.357l-.373-.22-3.876.9.96-3.773-.242-.388A9.951 9.951 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
     </svg>
+    <span class="whatsapp-fab__label">CONVERSEMOS</span>
   </a>
 
   <script src="src/js/main.js" defer></script>

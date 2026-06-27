@@ -617,6 +617,79 @@ const initReveal = () => {
   els.forEach(el => observer.observe(el));
 };
 
+// ─── FAQ ACCORDION ────────────────────────────────────────────────────────────
+const initFAQ = () => {
+  document.querySelectorAll('.faq__question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer  = btn.nextElementSibling;
+      const isOpen  = btn.getAttribute('aria-expanded') === 'true';
+
+      // Cierra todos primero
+      document.querySelectorAll('.faq__question').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        b.nextElementSibling.hidden = true;
+      });
+
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        answer.hidden = false;
+      }
+    });
+  });
+};
+
+// ─── HERO TEXT ROTATOR ────────────────────────────────────────────────────────
+const initHeroRotator = () => {
+  const el = document.getElementById('hero-rotating-text');
+  if (!el) return;
+
+  const phrases = [
+    '¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em>',
+    '¿<em class="hero__title-accent">Te casas?</em> Tenemos el plan perfecto.',
+    '<em class="hero__title-accent">Valet Parking</em> para tu evento.',
+    'Celebra sin límites. <em class="hero__title-accent">Nosotros manejamos.</em>',
+  ];
+
+  let current = 0;
+
+  const rotate = () => {
+    el.classList.add('hero-rotate-out');
+    setTimeout(() => {
+      current = (current + 1) % phrases.length;
+      el.innerHTML = phrases[current];
+      el.classList.remove('hero-rotate-out');
+      el.classList.add('hero-rotate-in');
+      setTimeout(() => el.classList.remove('hero-rotate-in'), 450);
+    }, 350);
+  };
+
+  setInterval(rotate, 3500);
+};
+
+// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
+const initThemeToggle = () => {
+  const btn  = document.getElementById('theme-toggle');
+  if (!btn) return;
+
+  const moonIcon = btn.querySelector('.theme-toggle__icon--moon');
+  const sunIcon  = btn.querySelector('.theme-toggle__icon--sun');
+
+  const applyTheme = (isLight) => {
+    document.body.classList.toggle('light-mode', isLight);
+    moonIcon.hidden = isLight;
+    sunIcon.hidden  = !isLight;
+    btn.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+    localStorage.setItem('tellevo-theme', isLight ? 'light' : 'dark');
+  };
+
+  const saved = localStorage.getItem('tellevo-theme');
+  if (saved === 'light') applyTheme(true);
+
+  btn.addEventListener('click', () => {
+    applyTheme(!document.body.classList.contains('light-mode'));
+  });
+};
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
@@ -629,4 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initForm();
   initCarousel();
   initReveal();
+  initHeroRotator();
+  initThemeToggle();
+  initFAQ();
 });
