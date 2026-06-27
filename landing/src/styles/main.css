@@ -274,8 +274,37 @@ fieldset { border: none; }
 .services__header { text-align: center; margin-bottom: var(--space-7); }
 .services__header .section-subtitle { margin: 0 auto; }
 .services__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
-@media (max-width: 639px) { .services__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-2); } }
 @media (min-width: 1200px) { .services__grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ── Móvil: cards horizontales, los 3 visibles a la vez ── */
+@media (max-width: 639px) {
+  .services__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+  .service-card--sm {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+  .service-card--sm .service-card__icon {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .service-card--sm .service-card__icon svg { width: 22px; height: 22px; }
+  .service-card--sm .service-card__body { gap: 3px; }
+  .service-card--sm .service-card__title { font-size: .9rem; }
+  .service-card--sm .service-card__text {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    font-size: .8rem;
+    line-height: 1.5;
+  }
+  .service-card--sm .service-card__cta { font-size: .75rem; margin-top: 4px; }
+}
 
 /* Divisor entre servicios compactos y tarjeta matrimonio */
 .services__divider {
