@@ -1,0 +1,12 @@
+# Secretos — nunca subir al repositorio
+landing/.env
+landing/.env.local
+landing/.env.*.local
+
+# Dependencias (si se agregan en el futuro)
+node_modules/
+landing/node_modules/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
