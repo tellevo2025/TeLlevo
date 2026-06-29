@@ -632,33 +632,6 @@
               <span class="form-group__error" id="destino-error" role="alert" aria-live="polite"></span>
             </div>
 
-            <!-- Bloque de cotización — aparece al seleccionar ambas direcciones -->
-            <div class="cotizacion-block" id="cotizacion-block" hidden aria-live="polite">
-              <p class="cotizacion-block__title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Cotización estimada
-              </p>
-              <div class="cotizacion-block__row">
-                <span>Distancia real</span>
-                <span id="quote-km">—</span>
-              </div>
-              <div class="cotizacion-block__row">
-                <span>Precio base</span>
-                <span id="quote-base">—</span>
-              </div>
-              <div class="cotizacion-block__row cotizacion-block__row--discount" id="quote-discount-row" hidden>
-                <span>Descuento alianza (10%)</span>
-                <span id="quote-discount">—</span>
-              </div>
-              <div class="cotizacion-block__row">
-                <span>Paradas adicionales</span>
-                <span id="quote-stops">—</span>
-              </div>
-              <div class="cotizacion-block__row cotizacion-block__row--total">
-                <span>Total estimado</span>
-                <span id="quote-total">—</span>
-              </div>
-            </div>
             <input type="hidden" id="cotizacion-data" name="cotizacionData">
 
             <!-- Paradas — aparecen tras calcular distancia con info de paradas gratis -->
@@ -802,7 +775,29 @@
         <div class="booking-result booking-result--success" id="result-success" hidden role="status" aria-live="polite">
           <div class="booking-result__icon" aria-hidden="true">✦</div>
           <h3 class="booking-result__title">¡Gracias por reservar!</h3>
-          <p class="booking-result__text">Recibimos tu solicitud. En unos momentos te contactaremos por WhatsApp con la cotización y los detalles de tu servicio.</p>
+          <p class="booking-result__text">Recibimos tu solicitud. En unos momentos te contactaremos por WhatsApp con los detalles de tu servicio.</p>
+
+          <!-- Desglose de cotización — visible solo tras confirmar reserva -->
+          <div class="result-quote" id="result-quote" hidden>
+            <p class="result-quote__title">Resumen de tu cotización estimada</p>
+            <div class="result-quote__row">
+              <span>Distancia real</span><span id="rq-km">—</span>
+            </div>
+            <div class="result-quote__row">
+              <span>Precio base</span><span id="rq-base">—</span>
+            </div>
+            <div class="result-quote__row result-quote__row--discount" id="rq-discount-row" hidden>
+              <span>Descuento alianza (10%)</span><span id="rq-discount">—</span>
+            </div>
+            <div class="result-quote__row">
+              <span>Paradas adicionales</span><span id="rq-stops">—</span>
+            </div>
+            <div class="result-quote__row result-quote__row--total">
+              <span>Total estimado</span><span id="rq-total">—</span>
+            </div>
+            <p class="result-quote__note">* Valor referencial, sujeto a confirmación por nuestro equipo.</p>
+          </div>
+
           <div class="booking-result__actions">
             <button class="btn btn--secondary" id="new-booking-btn">Hacer otra reserva</button>
             <a href="https://wa.me/56954873548" target="_blank" rel="noopener" class="btn btn--primary">Escribir por WhatsApp</a>

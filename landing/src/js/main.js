@@ -394,10 +394,35 @@ const showResult = (type) => {
   ['success', 'full', 'error'].forEach(t => {
     document.getElementById(`result-${t}`).hidden = t !== type;
   });
-  const resultEl = document.getElementById(`result-${type}`);
-  if (resultEl) {
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  if (type === 'success') {
+    try {
+      const q = JSON.parse(document.getElementById('cotizacion-data').value || '{}');
+      const quoteEl = document.getElementById('result-quote');
+      if (q.total && quoteEl) {
+        const fmt = n => '$' + Number(n).toLocaleString('es-CL');
+        document.getElementById('rq-km').textContent    = `${q.distanciaKm} km`;
+        document.getElementById('rq-base').textContent  = fmt(q.precioBase);
+
+        const discRow = document.getElementById('rq-discount-row');
+        discRow.hidden = !q.descuento;
+        if (q.descuento) document.getElementById('rq-discount').textContent = `-${fmt(q.descuento)}`;
+
+        const stopsEl = document.getElementById('rq-stops');
+        if (q.paradasPagas === 0) {
+          stopsEl.textContent = q.paradasGratis === 1 ? 'Incluida (1 gratis)' : 'Incluidas (2 gratis)';
+        } else {
+          stopsEl.textContent = `${fmt(q.costoParadas)} (${q.paradasPagas} extra)`;
+        }
+
+        document.getElementById('rq-total').textContent = fmt(q.total);
+        quoteEl.hidden = false;
+      }
+    } catch {}
   }
+
+  const resultEl = document.getElementById(`result-${type}`);
+  if (resultEl) resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 const resetForm = () => {
@@ -454,6 +479,7 @@ const initForm = () => {
       patente:      document.getElementById('patente').value.trim().toUpperCase(),
       transmision:  document.getElementById('transmision').value,
       seguro:       document.getElementById('seguro').value,
+      cotizacionData: document.getElementById('cotizacion-data').value,
     });
     setLoading(false);
     showResult(result === '✅' ? 'success' : result === '⛔' ? 'full' : 'error');
@@ -696,25 +722,7 @@ const initCotizador = () => {
     const discountAmt  = hasDiscount ? Math.round(subtotal * ALLIANCE_DISCOUNT) : 0;
     const total        = subtotal - discountAmt;
 
-    // Actualiza UI
-    document.getElementById('quote-km').textContent   = `${distanceKm} km`;
-    document.getElementById('quote-base').textContent = fmt(basePrice);
-
-    const stopsEl = document.getElementById('quote-stops');
-    if (paidStops === 0) {
-      stopsEl.textContent = freeStops === 1 ? 'Incluida (1 gratis)' : 'Incluidas (2 gratis)';
-    } else {
-      stopsEl.textContent = `${fmt(stopsCost)} (${paidStops} parada${paidStops > 1 ? 's' : ''} extra)`;
-    }
-
-    const discountRow = document.getElementById('quote-discount-row');
-    discountRow.hidden = !hasDiscount;
-    if (hasDiscount) document.getElementById('quote-discount').textContent = `-${fmt(discountAmt)}`;
-
-    document.getElementById('quote-total').textContent = fmt(total);
-    document.getElementById('cotizacion-block').hidden = false;
-
-    // Serializa datos para el submit
+    // Solo serializa — el desglose se muestra en la pantalla de confirmación
     document.getElementById('cotizacion-data').value = JSON.stringify({
       origen:            originPlace?.formatted_address || originInput.value,
       destino:           destPlace?.formatted_address   || destInput.value,

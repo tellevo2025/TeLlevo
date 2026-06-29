@@ -1481,6 +1481,53 @@ body.light-mode .cotizacion-block__row--discount span { color: #166534 !importan
 body.light-mode .cotizacion-block__row--total { background: #F0F3F8; border-top-color: #A8B2C4; }
 body.light-mode .cotizacion-block__row--total span:last-child { color: #7A5518 !important; }
 
+/* Desglose de cotización en pantalla de confirmación */
+.result-quote {
+  width: 100%; margin: var(--space-4) 0;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(201,168,76,.4);
+  background: var(--color-primary-light);
+  overflow: hidden; text-align: left;
+  box-shadow: var(--glow-gold-sm);
+}
+.result-quote__title {
+  padding: var(--space-3) var(--space-4);
+  background: rgba(201,168,76,.1);
+  border-bottom: 1px solid rgba(201,168,76,.25);
+  font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--color-gold);
+}
+.result-quote__row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: .9rem; color: var(--color-text-light);
+}
+.result-quote__row:last-of-type { border-bottom: none; }
+.result-quote__row span:last-child { font-weight: 600; color: var(--color-white); }
+.result-quote__row--discount { background: rgba(74,222,128,.06); }
+.result-quote__row--discount span { color: #4ade80 !important; }
+.result-quote__row--total {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid rgba(201,168,76,.35);
+  background: rgba(201,168,76,.07);
+  font-size: 1rem; font-weight: 700;
+}
+.result-quote__row--total span:last-child { color: var(--color-gold) !important; font-size: 1.1rem; }
+.result-quote__note {
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  font-size: .75rem; color: var(--color-text-muted); font-style: italic;
+}
+
+body.light-mode .result-quote { background: #fff; border-color: #A8B2C4; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+body.light-mode .result-quote__title { background: #F0F3F8; color: #7A5518; border-bottom-color: #A8B2C4; }
+body.light-mode .result-quote__row { color: #162036; border-bottom-color: #E4E8F0; }
+body.light-mode .result-quote__row span:last-child { color: #060C18; }
+body.light-mode .result-quote__row--discount { background: rgba(21,128,61,.06); }
+body.light-mode .result-quote__row--discount span { color: #166534 !important; }
+body.light-mode .result-quote__row--total { background: #F0F3F8; border-top-color: #A8B2C4; }
+body.light-mode .result-quote__row--total span:last-child { color: #7A5518 !important; }
+
 /* ==========================================
    21. MODO CLARO (LIGHT MODE)
    Texto de alto contraste: casi negro sobre blanco
