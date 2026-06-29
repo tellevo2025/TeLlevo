@@ -196,14 +196,38 @@ const initCalendar = () => {
 
 // ─── HORAS ────────────────────────────────────────────────────────────────────
 const initHoras = () => {
-  document.querySelectorAll('.hora-btn').forEach(btn => {
+  const track   = document.getElementById('hora-track');
+  const upBtn   = document.getElementById('hora-up');
+  const downBtn = document.getElementById('hora-down');
+  if (!track || !upBtn || !downBtn) return;
+
+  const btns    = [...track.querySelectorAll('.hora-btn')];
+  const VISIBLE = 3;
+  const ITEM_H  = 52; // 44px altura + 8px gap
+
+  let offset = 0;
+
+  const scrollTo = (idx) => {
+    offset = Math.max(0, Math.min(idx, btns.length - VISIBLE));
+    track.style.transform = `translateY(${-offset * ITEM_H}px)`;
+    upBtn.disabled   = offset === 0;
+    downBtn.disabled = offset >= btns.length - VISIBLE;
+  };
+
+  upBtn.addEventListener('click',   () => scrollTo(offset - 1));
+  downBtn.addEventListener('click', () => scrollTo(offset + 1));
+
+  btns.forEach((btn, i) => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.hora-btn').forEach(b => b.classList.remove('hora-btn--active'));
+      btns.forEach(b => b.classList.remove('hora-btn--active'));
       btn.classList.add('hora-btn--active');
       document.getElementById('horaViaje').value = btn.dataset.hora;
       document.getElementById('horaViaje-error').textContent = '';
+      scrollTo(Math.max(0, i - 1));
     });
   });
+
+  scrollTo(0);
 };
 
 

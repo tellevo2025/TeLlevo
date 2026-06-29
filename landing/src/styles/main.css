@@ -206,7 +206,11 @@ fieldset { border: none; }
 }
 .hero__subtitle {
   font-size: clamp(1rem, 2vw, 1.2rem); color: var(--color-text-muted);
-  max-width: 600px; margin: 0 auto var(--space-5); line-height: 1.7;
+  max-width: 600px; margin: 0 auto var(--space-3); line-height: 1.7;
+}
+.hero__quote-hint {
+  font-size: .8rem; color: var(--color-gold); letter-spacing: .06em;
+  opacity: .85; margin: 0 auto var(--space-5); text-align: center;
 }
 .hero__actions {
   display: flex; flex-wrap: wrap; gap: var(--space-3);
@@ -487,7 +491,11 @@ fieldset { border: none; }
 .booking { padding: var(--space-8) 0; background: var(--gradient-dark); }
 .booking__container { max-width: 780px; margin: 0 auto; padding: 0 var(--space-3); }
 .booking__header { text-align: center; margin-bottom: var(--space-6); }
-.booking__header .section-subtitle { margin: 0 auto; }
+.booking__header .section-subtitle { margin: 0 auto var(--space-2); }
+.booking__quote-hint {
+  font-size: .78rem; color: var(--color-gold); letter-spacing: .06em;
+  opacity: .85; margin: 0 auto;
+}
 
 /* Grupos de campo */
 .form-group { display: flex; flex-direction: column; gap: var(--space-1); margin-bottom: var(--space-4); }
@@ -585,13 +593,34 @@ fieldset { border: none; }
   font-size: .875rem; font-weight: 500; color: var(--color-text-light);
   margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-1);
 }
-.hora-grid {
-  display: grid; grid-template-columns: repeat(3,1fr);
-  gap: var(--space-2); margin-bottom: var(--space-2);
+/* Carrusel vertical de horas */
+.hora-carousel {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-2); margin-bottom: var(--space-3);
 }
-@media (min-width: 480px) { .hora-grid { grid-template-columns: repeat(5,1fr); } }
+.hora-carousel__window {
+  width: 100%; overflow: hidden;
+  height: calc(3 * 44px + 2 * 8px); /* 3 ítems visibles */
+}
+.hora-carousel__track {
+  display: flex; flex-direction: column; gap: 8px;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+.hora-carousel__arrow {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 32px; border-radius: var(--radius-md);
+  background: var(--color-surface); border: 1.5px solid var(--color-primary-mid);
+  color: var(--color-gold); cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.hora-carousel__arrow:hover:not(:disabled) {
+  border-color: rgba(201,168,76,.5); box-shadow: var(--glow-gold-sm);
+}
+.hora-carousel__arrow:disabled { opacity: .3; cursor: not-allowed; }
+
 .hora-btn {
-  padding: 11px 8px; border-radius: var(--radius-md); font-size: .9rem; font-weight: 600;
+  height: 44px; width: 100%;
+  padding: 0 8px; border-radius: var(--radius-md); font-size: .95rem; font-weight: 600;
   color: var(--color-text-muted); background: var(--color-surface);
   border: 1.5px solid var(--color-primary-mid);
   transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
@@ -604,10 +633,19 @@ fieldset { border: none; }
   background: var(--gradient-gold) !important; color: var(--color-primary) !important;
   border-color: var(--color-gold) !important; box-shadow: var(--glow-gold-sm) !important;
 }
-.hora-btn:disabled {
-  opacity: .35; cursor: not-allowed;
-  text-decoration: line-through;
+.hora-btn:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+
+/* Aviso OJO */
+.hora-section__ojo {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin: var(--space-3) 0 var(--space-2);
+  padding: var(--space-3);
+  background: rgba(201,168,76,.07);
+  border: 1px solid rgba(201,168,76,.25);
+  border-radius: var(--radius-md);
+  font-size: .8rem; color: var(--color-text-light); line-height: 1.5;
 }
+.hora-section__ojo svg { flex-shrink: 0; color: var(--color-gold); margin-top: 2px; }
 
 /* ==========================================
    13. FORMULARIO — AUTOCOMPLETE
@@ -1045,7 +1083,7 @@ fieldset { border: none; }
 
 /* Pantallas muy pequeñas (< 380px) */
 @media (max-width: 379px) {
-  .hora-grid { grid-template-columns: repeat(3, 1fr); }
+  /* hora-grid reemplazado por hora-carousel */
   .booking-progress__label { display: none; }
   .form-step { padding: var(--space-3); }
   .booking-result { padding: var(--space-5) var(--space-4); }
