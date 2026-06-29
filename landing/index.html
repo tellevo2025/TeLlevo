@@ -605,7 +605,7 @@
                 <option value="Casa Parque Loreto">Casa Parque Loreto</option>
                 <option value="Diario para una novia">Diario para una novia</option>
               </select>
-              <span class="form-group__hint">Si vienes de un evento asociado, selecciónalo para aplicar el descuento.</span>
+              <span class="form-group__hint">Si vienes de un evento asociado, selecciónalo para aplicar el descuento automáticamente.</span>
             </div>
 
             <div class="form-group">
@@ -614,31 +614,11 @@
               </label>
               <input class="form-group__input" type="text" id="centroEvento" name="centroEvento"
                 placeholder="Ej: Av. Apoquindo 1234, Las Condes"
-                required aria-required="true"
+                required aria-required="true" autocomplete="off"
                 aria-describedby="centroEvento-error">
               <span class="form-group__hint">Lugar donde inicia el viaje (evento, salón, etc.)</span>
               <span class="form-group__error" id="centroEvento-error" role="alert" aria-live="polite"></span>
             </div>
-
-            <!-- Paradas extras -->
-            <div class="form-group">
-              <label class="parada-toggle" for="parada-check">
-                <input type="checkbox" id="parada-check" class="parada-toggle__check">
-                <span class="parada-toggle__box" aria-hidden="true"></span>
-                <span class="parada-toggle__text">
-                  ¿Necesitas paradas en el camino?
-                  <span class="parada-toggle__hint">1ª parada gratis · $5.000 por cada parada adicional</span>
-                </span>
-              </label>
-            </div>
-            <div id="paradas-container" hidden>
-              <div id="paradas-list"></div>
-              <button type="button" class="btn btn--secondary btn--sm paradas-add-btn" id="add-parada-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Añadir otra parada <span class="paradas-add-btn__cost">(+$5.000)</span>
-              </button>
-            </div>
-            <input type="hidden" id="paradas" name="paradas" value="0">
 
             <div class="form-group">
               <label class="form-group__label" for="destino">
@@ -646,10 +626,61 @@
               </label>
               <input class="form-group__input" type="text" id="destino" name="destino"
                 placeholder="Ej: Las Condes 4567, Santiago"
-                required aria-required="true"
+                required aria-required="true" autocomplete="off"
                 aria-describedby="destino-error">
               <span class="form-group__hint">Tu hogar o destino final del viaje.</span>
               <span class="form-group__error" id="destino-error" role="alert" aria-live="polite"></span>
+            </div>
+
+            <!-- Bloque de cotización — aparece al seleccionar ambas direcciones -->
+            <div class="cotizacion-block" id="cotizacion-block" hidden aria-live="polite">
+              <p class="cotizacion-block__title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Cotización estimada
+              </p>
+              <div class="cotizacion-block__row">
+                <span>Distancia real</span>
+                <span id="quote-km">—</span>
+              </div>
+              <div class="cotizacion-block__row">
+                <span>Precio base</span>
+                <span id="quote-base">—</span>
+              </div>
+              <div class="cotizacion-block__row cotizacion-block__row--discount" id="quote-discount-row" hidden>
+                <span>Descuento alianza (10%)</span>
+                <span id="quote-discount">—</span>
+              </div>
+              <div class="cotizacion-block__row">
+                <span>Paradas adicionales</span>
+                <span id="quote-stops">—</span>
+              </div>
+              <div class="cotizacion-block__row cotizacion-block__row--total">
+                <span>Total estimado</span>
+                <span id="quote-total">—</span>
+              </div>
+            </div>
+            <input type="hidden" id="cotizacion-data" name="cotizacionData">
+
+            <!-- Paradas — aparecen tras calcular distancia con info de paradas gratis -->
+            <div class="parada-section" id="parada-section" hidden>
+              <div class="form-group">
+                <label class="parada-toggle" for="parada-check">
+                  <input type="checkbox" id="parada-check" class="parada-toggle__check">
+                  <span class="parada-toggle__box" aria-hidden="true"></span>
+                  <span class="parada-toggle__text">
+                    ¿Necesitas paradas en el camino?
+                    <span class="parada-toggle__hint" id="parada-hint">1ª parada gratis · $5.000 por cada parada adicional</span>
+                  </span>
+                </label>
+              </div>
+              <div id="paradas-container" hidden>
+                <div id="paradas-list"></div>
+                <button type="button" class="btn btn--secondary btn--sm paradas-add-btn" id="add-parada-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Añadir otra parada <span class="paradas-add-btn__cost">(+$5.000)</span>
+                </button>
+              </div>
+              <input type="hidden" id="paradas" name="paradas" value="0">
             </div>
 
             <div class="form-step__nav form-step__nav--row">
@@ -965,5 +996,6 @@
   </a>
 
   <script src="src/js/main.js" defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAt7n_SeBZDtbvBA1My7VQCq1VwxfKnuuw&libraries=places&callback=initGoogleMaps" async defer></script>
 </body>
 </html>

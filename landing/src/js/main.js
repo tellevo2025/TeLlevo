@@ -469,7 +469,9 @@ let paradaCount = 0; // cantidad actual de paradas visibles
 let paradaSeq   = 0; // secuencia única para IDs — nunca decrementa
 
 const updateParadasInput = () => {
-  document.getElementById('paradas').value = paradaCount;
+  const el = document.getElementById('paradas');
+  el.value = paradaCount;
+  el.dispatchEvent(new Event('change'));
 };
 
 const removeParada = (id) => {
@@ -637,6 +639,144 @@ const initFAQ = () => {
     });
   });
 };
+
+// ─── COTIZADOR CON GOOGLE MAPS ────────────────────────────────────────────────
+const initCotizador = () => {
+  const originInput = document.getElementById('centroEvento');
+  const destInput   = document.getElementById('destino');
+  if (!originInput || !destInput || typeof google === 'undefined') return;
+
+  const PRICE_TABLE = [
+    { max: 19, price: 35000 },
+    { max: 34, price: 45000 },
+    { max: 44, price: 55000 },
+    { max: 54, price: 60000 },
+    { max: 64, price: 68000 },
+    { max: 70, price: 75000 },
+  ];
+  const STOP_COST = 5000;
+  const ALLIANCE_DISCOUNT = 0.10;
+  const ALLIANCE_VALUES   = ['Casa Parque Loreto', 'Diario para una novia'];
+
+  const placesOpts = {
+    componentRestrictions: { country: 'cl' },
+    fields: ['formatted_address', 'geometry'],
+  };
+
+  const originAC = new google.maps.places.Autocomplete(originInput, placesOpts);
+  const destAC   = new google.maps.places.Autocomplete(destInput,   placesOpts);
+
+  let originPlace = null;
+  let destPlace   = null;
+  let distanceKm  = null;
+
+  const fmt = (n) => '$' + n.toLocaleString('es-CL');
+
+  const getBasePrice = (km) => {
+    for (const r of PRICE_TABLE) if (km <= r.max) return r.price;
+    return null;
+  };
+
+  const getFreeStops = (km) => (km < 35 ? 1 : 2);
+
+  const updateQuote = () => {
+    if (distanceKm === null) return;
+
+    const basePrice  = getBasePrice(distanceKm);
+    if (!basePrice) return;
+
+    const freeStops  = getFreeStops(distanceKm);
+    const totalStops = parseInt(document.getElementById('paradas').value) || 0;
+    const paidStops  = Math.max(0, totalStops - freeStops);
+    const stopsCost  = paidStops * STOP_COST;
+    const subtotal   = basePrice + stopsCost;
+
+    const alianza      = document.getElementById('alianza')?.value || 'Ninguno';
+    const hasDiscount  = ALLIANCE_VALUES.includes(alianza);
+    const discountAmt  = hasDiscount ? Math.round(subtotal * ALLIANCE_DISCOUNT) : 0;
+    const total        = subtotal - discountAmt;
+
+    // Actualiza UI
+    document.getElementById('quote-km').textContent   = `${distanceKm} km`;
+    document.getElementById('quote-base').textContent = fmt(basePrice);
+
+    const stopsEl = document.getElementById('quote-stops');
+    if (paidStops === 0) {
+      stopsEl.textContent = freeStops === 1 ? 'Incluida (1 gratis)' : 'Incluidas (2 gratis)';
+    } else {
+      stopsEl.textContent = `${fmt(stopsCost)} (${paidStops} parada${paidStops > 1 ? 's' : ''} extra)`;
+    }
+
+    const discountRow = document.getElementById('quote-discount-row');
+    discountRow.hidden = !hasDiscount;
+    if (hasDiscount) document.getElementById('quote-discount').textContent = `-${fmt(discountAmt)}`;
+
+    document.getElementById('quote-total').textContent = fmt(total);
+    document.getElementById('cotizacion-block').hidden = false;
+
+    // Serializa datos para el submit
+    document.getElementById('cotizacion-data').value = JSON.stringify({
+      origen:            originPlace?.formatted_address || originInput.value,
+      destino:           destPlace?.formatted_address   || destInput.value,
+      distanciaKm:       distanceKm,
+      precioBase:        basePrice,
+      paradasGratis:     freeStops,
+      paradasPagas:      paidStops,
+      costoParadas:      stopsCost,
+      alianza:           alianza,
+      descuento:         discountAmt,
+      total:             total,
+    });
+  };
+
+  const calculateDistance = () => {
+    if (!originPlace?.geometry || !destPlace?.geometry) return;
+
+    const svc = new google.maps.DistanceMatrixService();
+    svc.getDistanceMatrix({
+      origins:      [originPlace.geometry.location],
+      destinations: [destPlace.geometry.location],
+      travelMode:   google.maps.TravelMode.DRIVING,
+      unitSystem:   google.maps.UnitSystem.METRIC,
+    }, (response, status) => {
+      if (status !== 'OK') return;
+      const el = response.rows[0].elements[0];
+      if (el.status !== 'OK') return;
+
+      distanceKm = Math.round(el.distance.value / 1000);
+
+      // Actualiza hint de paradas y muestra la sección
+      const freeStops = getFreeStops(distanceKm);
+      const hintEl = document.getElementById('parada-hint');
+      if (hintEl) {
+        hintEl.textContent = freeStops === 1
+          ? '1ª parada gratis · $5.000 por cada parada adicional'
+          : '2 primeras paradas gratis · $5.000 por cada parada adicional';
+      }
+      const paradaSection = document.getElementById('parada-section');
+      if (paradaSection) paradaSection.hidden = false;
+
+      updateQuote();
+    });
+  };
+
+  originAC.addListener('place_changed', () => {
+    originPlace = originAC.getPlace();
+    if (destPlace?.geometry) calculateDistance();
+  });
+
+  destAC.addListener('place_changed', () => {
+    destPlace = destAC.getPlace();
+    if (originPlace?.geometry) calculateDistance();
+  });
+
+  // Recalcula cuando cambian paradas o alianza
+  document.getElementById('paradas')?.addEventListener('change', updateQuote);
+  document.getElementById('alianza')?.addEventListener('change', updateQuote);
+};
+
+// Callback invocado por el script de Google Maps una vez cargado
+window.initGoogleMaps = () => { initCotizador(); };
 
 // ─── HERO TEXT ROTATOR ────────────────────────────────────────────────────────
 const initHeroRotator = () => {
