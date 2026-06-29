@@ -1430,129 +1430,137 @@ fieldset { border: none; }
 
 /* ==========================================
    20. MODO CLARO (LIGHT MODE)
-   Paleta: blanco puro de fondo, gris medio para cards, texto casi negro
+   Texto de alto contraste: casi negro sobre blanco
 ========================================== */
+
+/* Colores de texto en modo claro:
+   #060C18 — títulos (máximo contraste)
+   #162036 — cuerpo de texto
+   #243650 — texto secundario / muted
+   #405070 — texto muy secundario (hints, copyright) */
+
 body.light-mode {
-  --color-primary:       #FFFFFF;   /* fondo de página */
-  --color-primary-light: #E4E8F0;   /* fondo de cards — gris azulado visible */
-  --color-primary-mid:   #B8C0CC;   /* bordes de cards */
-  --color-white:         #0D1526;   /* texto principal (invertido) */
-  --color-text-light:    #1C2A44;   /* texto de párrafos */
-  --color-text-muted:    #3D4F6B;   /* texto secundario */
-  --color-surface:       #D8DDE8;   /* superficie más oscura */
+  --color-primary:       #FFFFFF;
+  --color-primary-light: #E4E8F0;
+  --color-primary-mid:   #A8B2C4;
+  --color-white:         #060C18;
+  --color-text-light:    #162036;
+  --color-text-muted:    #243650;
+  --color-surface:       #D4DAE6;
   --gradient-dark:       linear-gradient(180deg,#F2F4F8 0%,#E4E8F0 100%);
   --gradient-hero:       #FFFFFF;
   --glow-gold-sm: 0 2px 6px rgba(0,0,0,.12);
   --glow-gold-md: 0 4px 12px rgba(0,0,0,.16);
   --glow-gold-lg: 0 6px 20px rgba(0,0,0,.18);
 }
-body.light-mode { background: #FFFFFF; color: #1C2A44; }
+body.light-mode { background: #FFFFFF; color: #162036; }
 
 /* ── Navbar ── */
 body.light-mode .navbar { background: rgba(255,255,255,.96); }
 body.light-mode .navbar--scrolled {
   background: rgba(255,255,255,.99);
-  box-shadow: 0 1px 0 #B8C0CC, 0 2px 12px rgba(0,0,0,.08);
+  box-shadow: 0 1px 0 #A8B2C4, 0 2px 12px rgba(0,0,0,.08);
 }
-body.light-mode .navbar__link       { color: #1C2A44; }
-body.light-mode .navbar__link:hover { color: #A07830; }
-body.light-mode .navbar__mobile { background: #F2F4F8; border-top: 1px solid #B8C0CC; }
-body.light-mode .navbar__mobile-link { color: #1C2A44; }
+body.light-mode .navbar__link       { color: #162036; }
+body.light-mode .navbar__link:hover { color: #8B6520; }
+body.light-mode .navbar__mobile { background: #F2F4F8; border-top: 1px solid #A8B2C4; }
+body.light-mode .navbar__mobile-link { color: #162036; }
 
 /* ── Tipografía sin sombras ── */
-body.light-mode .section-title      { color: #0D1526; text-shadow: none; }
-body.light-mode .section-eyebrow    { color: #A07830; }
-body.light-mode .section-subtitle   { color: #3D4F6B; }
-body.light-mode .hero__title        { color: #0D1526; text-shadow: none; }
-body.light-mode .hero__title-accent { color: #8B6520; text-shadow: none; }
-body.light-mode .hero__subtitle     { color: #3D4F6B; }
+body.light-mode .section-title      { color: #060C18; text-shadow: none; }
+body.light-mode .section-eyebrow    { color: #8B6520; }
+body.light-mode .section-subtitle   { color: #243650; }
+body.light-mode .hero__title        { color: #060C18; text-shadow: none; }
+body.light-mode .hero__title-accent { color: #7A5518; text-shadow: none; }
+body.light-mode .hero__subtitle     { color: #243650; }
 
-/* ── Secciones (fondos alternados) ── */
-body.light-mode .steps-section { background: #F2F4F8; }
+/* ── Secciones alternadas ── */
+body.light-mode .steps-section { background: #F0F3F8; }
 body.light-mode .services       { background: #FFFFFF; }
-body.light-mode .testimonials   { background: #F2F4F8; }
+body.light-mode .testimonials   { background: #F0F3F8; }
 body.light-mode .benefits       { background: #FFFFFF; }
-body.light-mode .faq            { background: #F2F4F8; }
+body.light-mode .faq            { background: #F0F3F8; }
 body.light-mode .booking        { background: #FFFFFF; }
 
 /* ── Steps ── */
 body.light-mode .step {
-  background: #FFFFFF; border: 1.5px solid #B8C0CC;
+  background: #FFFFFF; border: 1.5px solid #A8B2C4;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
-body.light-mode .step:hover { border-color: #A07830; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+body.light-mode .step:hover { border-color: #8B6520; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
 body.light-mode .step__num   { background: linear-gradient(135deg,#C9A84C,#A07830); color: #FFFFFF; box-shadow: none; }
-body.light-mode .step__icon  { color: #A07830; }
-body.light-mode .step__title { color: #0D1526; }
-body.light-mode .step__text  { color: #3D4F6B; }
+body.light-mode .step__icon  { color: #8B6520; }
+body.light-mode .step__title { color: #060C18; }
+body.light-mode .step__text  { color: #243650; }
 
 /* ── Servicios ── */
 body.light-mode .service-card {
-  background: #FFFFFF; border: 1.5px solid #B8C0CC; color: #0D1526;
+  background: #FFFFFF; border: 1.5px solid #A8B2C4; color: #162036;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
-body.light-mode .service-card:hover { border-color: #A07830; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
-body.light-mode .service-card__title { color: #0D1526; text-shadow: none; }
-body.light-mode .service-card__text  { color: #3D4F6B; }
-body.light-mode .service-card__badge { background: rgba(160,120,48,.15); color: #7A5A1A; }
-body.light-mode .services__divider   { border-color: #B8C0CC; }
-body.light-mode .services__divider-diamond { background: #FFFFFF; color: #A07830; border-color: #B8C0CC; }
-body.light-mode .wedding-hero__badge { background: rgba(139,101,32,.12); border-color: rgba(139,101,32,.4); color: #5C3D00; }
-body.light-mode .wedding-hero__title { color: #0D1526; text-shadow: none; }
-body.light-mode .wedding-hero__text  { color: #3D4F6B; }
+body.light-mode .service-card:hover { border-color: #8B6520; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+body.light-mode .service-card__title { color: #060C18; text-shadow: none; }
+body.light-mode .service-card__text  { color: #243650; }
+body.light-mode .service-card__cta   { color: #8B6520; }
+body.light-mode .service-card__badge { background: rgba(139,101,32,.12); color: #5C3D00; }
+body.light-mode .services__divider   { border-color: #A8B2C4; }
+body.light-mode .services__divider-diamond { background: #FFFFFF; color: #8B6520; border-color: #A8B2C4; }
+body.light-mode .wedding-hero__badge { background: rgba(139,101,32,.12); border-color: rgba(139,101,32,.4); color: #4A2E00; }
+body.light-mode .wedding-hero__title { color: #060C18; text-shadow: none; }
+body.light-mode .wedding-hero__text  { color: #243650; }
 
 /* ── Testimonios ── */
 body.light-mode .testimonial-card {
-  background: #FFFFFF; border: 1.5px solid #B8C0CC;
+  background: #FFFFFF; border: 1.5px solid #A8B2C4;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
-body.light-mode .testimonial-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); border-color: #A07830; }
-body.light-mode .testimonial-card__text   { color: #1C2A44; }
-body.light-mode .testimonial-card__name   { color: #0D1526; }
-body.light-mode .testimonial-card__role   { color: #3D4F6B; }
-body.light-mode .testimonial-card__author { border-top-color: #B8C0CC; }
-body.light-mode .testimonial-card__avatar { background: #D8DDE8; border-color: #A07830; }
-body.light-mode .carousel__btn  { background: #FFFFFF; border-color: #B8C0CC; color: #A07830; }
-body.light-mode .carousel__dot  { background: #B8C0CC; }
-body.light-mode .carousel__dot--active { background: #A07830; }
+body.light-mode .testimonial-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); border-color: #8B6520; }
+body.light-mode .testimonial-card__text   { color: #162036; }
+body.light-mode .testimonial-card__name   { color: #060C18; }
+body.light-mode .testimonial-card__role   { color: #243650; }
+body.light-mode .testimonial-card__author { border-top-color: #A8B2C4; }
+body.light-mode .testimonial-card__avatar { background: #D4DAE6; border-color: #8B6520; color: #5C3D00; }
+body.light-mode .carousel__btn  { background: #FFFFFF; border-color: #A8B2C4; color: #8B6520; }
+body.light-mode .carousel__dot  { background: #A8B2C4; }
+body.light-mode .carousel__dot--active { background: #8B6520; }
 
 /* ── FAQ ── */
-body.light-mode .faq__item          { border-color: #B8C0CC; }
-body.light-mode .faq__question      { background: #FFFFFF; color: #0D1526; border: none; }
-body.light-mode .faq__question:hover { color: #A07830; background: #F2F4F8; }
-body.light-mode .faq__question[aria-expanded="true"] { background: #E4E8F0; color: #A07830; }
-body.light-mode .faq__icon          { color: #A07830; }
-body.light-mode .faq__answer        { background: #F8F9FB; }
-body.light-mode .faq__answer p      { color: #3D4F6B; }
+body.light-mode .faq__item          { border-color: #A8B2C4; }
+body.light-mode .faq__question      { background: #FFFFFF; color: #060C18; border: none; }
+body.light-mode .faq__question:hover { color: #8B6520; background: #F0F3F8; }
+body.light-mode .faq__question[aria-expanded="true"] { background: #E4E8F0; color: #8B6520; }
+body.light-mode .faq__icon          { color: #8B6520; }
+body.light-mode .faq__answer        { background: #F8F9FC; }
+body.light-mode .faq__answer p      { color: #243650; }
 
 /* ── Formulario ── */
 body.light-mode .booking-form__input,
 body.light-mode .booking-form__select,
 body.light-mode .booking-form__textarea {
-  background: #F2F4F8; border-color: #B8C0CC; color: #0D1526;
+  background: #F0F3F8; border-color: #A8B2C4; color: #060C18;
 }
-body.light-mode .booking-form__label { color: #0D1526; }
-body.light-mode .booking-form__hint  { color: #3D4F6B; }
+body.light-mode .booking-form__label { color: #060C18; }
+body.light-mode .booking-form__hint  { color: #243650; }
 
 /* ── Footer ── */
-body.light-mode .footer            { background: #E4E8F0; border-top: 1.5px solid #B8C0CC; }
-body.light-mode .footer__title     { color: #0D1526; }
-body.light-mode .footer__text      { color: #3D4F6B; }
-body.light-mode .footer__link      { color: #3D4F6B; }
-body.light-mode .footer__link:hover{ color: #A07830; }
-body.light-mode .footer__copy { color: #5A6B80; }
+body.light-mode .footer            { background: #E4E8F0; border-top: 1.5px solid #A8B2C4; }
+body.light-mode .footer__title     { color: #060C18; }
+body.light-mode .footer__text      { color: #243650; }
+body.light-mode .footer__link      { color: #243650; }
+body.light-mode .footer__link:hover{ color: #8B6520; }
+body.light-mode .footer__copy      { color: #405070; }
 
-/* ── Hero stats en modo claro ── */
+/* ── Hero stats ── */
 body.light-mode .hero__stats {
   background: #FFFFFF;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1.5px solid #B8C0CC;
+  border: 1.5px solid #A8B2C4;
   box-shadow: 0 2px 10px rgba(0,0,0,.10);
 }
-body.light-mode .hero__stat-number  { color: #8B6520; }
-body.light-mode .hero__stat-label   { color: #3D4F6B; }
-body.light-mode .hero__stat-divider { background: #B8C0CC; }
+body.light-mode .hero__stat-number  { color: #7A5518; }
+body.light-mode .hero__stat-label   { color: #243650; }
+body.light-mode .hero__stat-divider { background: #A8B2C4; }
 
 /* ==========================================
    19. THEME TOGGLE
