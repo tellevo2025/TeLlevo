@@ -1,0 +1,5 @@
+{
+  "buildCommand": "node landing/scripts/inject-env.js",
+  "outputDirectory": "landing",
+  "installCommand": ""
+}
