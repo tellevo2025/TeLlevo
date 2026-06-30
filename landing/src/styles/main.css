@@ -209,8 +209,9 @@ fieldset { border: none; }
   max-width: 600px; margin: 0 auto var(--space-3); line-height: 1.7;
 }
 .hero__quote-hint {
-  font-size: .8rem; color: var(--color-gold); letter-spacing: .06em;
-  opacity: .85; margin: 0 auto var(--space-5); text-align: center;
+  font-size: .82rem; font-weight: 500; letter-spacing: .06em;
+  color: var(--color-gold); opacity: 1;
+  margin: 0 auto var(--space-5); text-align: center;
 }
 .hero__actions {
   display: flex; flex-wrap: wrap; gap: var(--space-3);
@@ -493,8 +494,8 @@ fieldset { border: none; }
 .booking__header { text-align: center; margin-bottom: var(--space-6); }
 .booking__header .section-subtitle { margin: 0 auto var(--space-2); }
 .booking__quote-hint {
-  font-size: .78rem; color: var(--color-gold); letter-spacing: .06em;
-  opacity: .85; margin: 0 auto;
+  font-size: .82rem; font-weight: 500; letter-spacing: .06em;
+  color: var(--color-gold); opacity: 1; margin: 0 auto;
 }
 
 /* Grupos de campo */
@@ -1611,6 +1612,13 @@ body.light-mode .section-subtitle   { color: #243650; }
 body.light-mode .hero__title        { color: #060C18; text-shadow: none; }
 body.light-mode .hero__title-accent { color: #7A5518; text-shadow: none; }
 body.light-mode .hero__subtitle     { color: #243650; }
+body.light-mode .hero__quote-hint,
+body.light-mode .booking__quote-hint {
+  color: #7A5518;
+  background: rgba(122,85,24,.08);
+  padding: 4px 12px; border-radius: 20px;
+  display: inline-block;
+}
 
 /* ── Secciones alternadas ── */
 body.light-mode .steps-section { background: #F0F3F8; }

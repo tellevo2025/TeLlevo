@@ -576,10 +576,6 @@
                 </button>
                 <div class="hora-carousel__window">
                   <div class="hora-carousel__track" id="hora-track">
-                    <button type="button" class="hora-btn" data-hora="22:00">22:00</button>
-                    <button type="button" class="hora-btn" data-hora="22:30">22:30</button>
-                    <button type="button" class="hora-btn" data-hora="23:00">23:00</button>
-                    <button type="button" class="hora-btn" data-hora="23:30">23:30</button>
                     <button type="button" class="hora-btn" data-hora="00:00">00:00</button>
                     <button type="button" class="hora-btn" data-hora="00:30">00:30</button>
                     <button type="button" class="hora-btn" data-hora="01:00">01:00</button>
@@ -591,6 +587,43 @@
                     <button type="button" class="hora-btn" data-hora="04:00">04:00</button>
                     <button type="button" class="hora-btn" data-hora="04:30">04:30</button>
                     <button type="button" class="hora-btn" data-hora="05:00">05:00</button>
+                    <button type="button" class="hora-btn" data-hora="05:30">05:30</button>
+                    <button type="button" class="hora-btn" data-hora="06:00">06:00</button>
+                    <button type="button" class="hora-btn" data-hora="06:30">06:30</button>
+                    <button type="button" class="hora-btn" data-hora="07:00">07:00</button>
+                    <button type="button" class="hora-btn" data-hora="07:30">07:30</button>
+                    <button type="button" class="hora-btn" data-hora="08:00">08:00</button>
+                    <button type="button" class="hora-btn" data-hora="08:30">08:30</button>
+                    <button type="button" class="hora-btn" data-hora="09:00">09:00</button>
+                    <button type="button" class="hora-btn" data-hora="09:30">09:30</button>
+                    <button type="button" class="hora-btn" data-hora="10:00">10:00</button>
+                    <button type="button" class="hora-btn" data-hora="10:30">10:30</button>
+                    <button type="button" class="hora-btn" data-hora="11:00">11:00</button>
+                    <button type="button" class="hora-btn" data-hora="11:30">11:30</button>
+                    <button type="button" class="hora-btn" data-hora="12:00">12:00</button>
+                    <button type="button" class="hora-btn" data-hora="12:30">12:30</button>
+                    <button type="button" class="hora-btn" data-hora="13:00">13:00</button>
+                    <button type="button" class="hora-btn" data-hora="13:30">13:30</button>
+                    <button type="button" class="hora-btn" data-hora="14:00">14:00</button>
+                    <button type="button" class="hora-btn" data-hora="14:30">14:30</button>
+                    <button type="button" class="hora-btn" data-hora="15:00">15:00</button>
+                    <button type="button" class="hora-btn" data-hora="15:30">15:30</button>
+                    <button type="button" class="hora-btn" data-hora="16:00">16:00</button>
+                    <button type="button" class="hora-btn" data-hora="16:30">16:30</button>
+                    <button type="button" class="hora-btn" data-hora="17:00">17:00</button>
+                    <button type="button" class="hora-btn" data-hora="17:30">17:30</button>
+                    <button type="button" class="hora-btn" data-hora="18:00">18:00</button>
+                    <button type="button" class="hora-btn" data-hora="18:30">18:30</button>
+                    <button type="button" class="hora-btn" data-hora="19:00">19:00</button>
+                    <button type="button" class="hora-btn" data-hora="19:30">19:30</button>
+                    <button type="button" class="hora-btn" data-hora="20:00">20:00</button>
+                    <button type="button" class="hora-btn" data-hora="20:30">20:30</button>
+                    <button type="button" class="hora-btn" data-hora="21:00">21:00</button>
+                    <button type="button" class="hora-btn" data-hora="21:30">21:30</button>
+                    <button type="button" class="hora-btn" data-hora="22:00">22:00</button>
+                    <button type="button" class="hora-btn" data-hora="22:30">22:30</button>
+                    <button type="button" class="hora-btn" data-hora="23:00">23:00</button>
+                    <button type="button" class="hora-btn" data-hora="23:30">23:30</button>
                   </div>
                 </div>
                 <button type="button" class="hora-carousel__arrow" id="hora-down" aria-label="Hora siguiente">
@@ -622,6 +655,19 @@
                 <option value="Diario para una novia">Diario para una novia</option>
               </select>
               <span class="form-group__hint">Si vienes de un evento asociado, selecciónalo para aplicar el descuento automáticamente.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-group__label" for="codigoDescuento">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Código de descuento
+              </label>
+              <input class="form-group__input" type="text" id="codigoDescuento" name="codigoDescuento"
+                placeholder="Ej: MATEO&amp;LEONOR"
+                autocomplete="off" spellcheck="false"
+                style="text-transform:uppercase">
+              <span class="form-group__hint">Si tienes un código especial de tu matrimonio, ingrésalo aquí.</span>
+              <span class="form-group__error" id="codigoDescuento-error" role="alert" aria-live="polite"></span>
             </div>
 
             <div class="form-group">

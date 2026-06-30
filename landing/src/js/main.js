@@ -482,6 +482,7 @@ const initForm = () => {
     setLoading(true);
     const result = await sendReservation({
       alianza:      document.getElementById('alianza').value || 'Ninguno',
+      codigoDescuento: (document.getElementById('codigoDescuento')?.value || '').trim().toUpperCase(),
       fechaViaje:   document.getElementById('fechaViaje').value,
       horaViaje:    document.getElementById('horaViaje').value,
       nombre:       document.getElementById('nombre').value.trim(),
