@@ -202,7 +202,7 @@ const initHoras = () => {
   if (!track || !upBtn || !downBtn) return;
 
   const btns    = [...track.querySelectorAll('.hora-btn')];
-  const VISIBLE = 3;
+  const VISIBLE = 2;
   const ITEM_H  = 52; // 44px altura + 8px gap
 
   let offset = 0;
@@ -430,7 +430,11 @@ const showResult = (type) => {
 
         const discRow = document.getElementById('rq-discount-row');
         discRow.hidden = !q.descuento;
-        if (q.descuento) document.getElementById('rq-discount').textContent = `-${fmt(q.descuento)}`;
+        if (q.descuento) {
+          document.getElementById('rq-discount').textContent = `-${fmt(q.descuento)}`;
+          const lbl = document.getElementById('rq-discount-label');
+          if (lbl) lbl.textContent = `Descuento código${q.descuentoPct ? ` (${q.descuentoPct}%)` : ''}`;
+        }
 
         const stopsEl = document.getElementById('rq-stops');
         if (q.paradasPagas === 0) {
@@ -481,7 +485,6 @@ const initForm = () => {
     e.preventDefault();
     setLoading(true);
     const result = await sendReservation({
-      alianza:      document.getElementById('alianza').value || 'Ninguno',
       codigoDescuento: (document.getElementById('codigoDescuento')?.value || '').trim().toUpperCase(),
       fechaViaje:   document.getElementById('fechaViaje').value,
       horaViaje:    document.getElementById('horaViaje').value,
@@ -691,6 +694,14 @@ const initFAQ = () => {
   });
 };
 
+// ─── CÓDIGOS DE DESCUENTO ─────────────────────────────────────────────────────
+// Para agregar un código: 'CODIGO': porcentaje  (ej. 'MATEO&LEONOR': 15)
+const DISCOUNT_CODES = {
+  'CASAPARQUELORETO':  10,   // Casa Parque Loreto  — 10%
+  'DIARIOPARAUNANOVIA': 10,  // Diario para una novia — 10%
+};
+const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
+
 // ─── COTIZADOR CON GOOGLE MAPS ────────────────────────────────────────────────
 const initCotizador = () => {
   const originInput = document.getElementById('centroEvento');
@@ -706,8 +717,6 @@ const initCotizador = () => {
     { max: 70, price: 75000 },
   ];
   const STOP_COST = 5000;
-  const ALLIANCE_DISCOUNT = 0.10;
-  const ALLIANCE_VALUES   = ['Casa Parque Loreto', 'Diario para una novia'];
 
   const placesOpts = {
     componentRestrictions: { country: 'cl' },
@@ -742,24 +751,40 @@ const initCotizador = () => {
     const stopsCost  = paidStops * STOP_COST;
     const subtotal   = basePrice + stopsCost;
 
-    const alianza      = document.getElementById('alianza')?.value || 'Ninguno';
-    const hasDiscount  = ALLIANCE_VALUES.includes(alianza);
-    const discountAmt  = hasDiscount ? Math.round(subtotal * ALLIANCE_DISCOUNT) : 0;
-    const total        = subtotal - discountAmt;
+    const rawCode     = document.getElementById('codigoDescuento')?.value || '';
+    const discountPct = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
+    const discountAmt = discountPct > 0 ? Math.round(subtotal * discountPct / 100) : 0;
+    const total       = subtotal - discountAmt;
 
     // Solo serializa — el desglose se muestra en la pantalla de confirmación
     document.getElementById('cotizacion-data').value = JSON.stringify({
-      origen:            originPlace?.formatted_address || originInput.value,
-      destino:           destPlace?.formatted_address   || destInput.value,
-      distanciaKm:       distanceKm,
-      precioBase:        basePrice,
-      paradasGratis:     freeStops,
-      paradasPagas:      paidStops,
-      costoParadas:      stopsCost,
-      alianza:           alianza,
-      descuento:         discountAmt,
-      total:             total,
+      origen:        originPlace?.formatted_address || originInput.value,
+      destino:       destPlace?.formatted_address   || destInput.value,
+      distanciaKm:   distanceKm,
+      precioBase:    basePrice,
+      paradasGratis: freeStops,
+      paradasPagas:  paidStops,
+      costoParadas:  stopsCost,
+      codigoCupon:   rawCode.trim().toUpperCase(),
+      descuentoPct:  discountPct,
+      descuento:     discountAmt,
+      total:         total,
     });
+
+    // Feedback visual del código en el Step 2
+    const feedbackEl = document.getElementById('codigoDescuento-feedback');
+    if (feedbackEl) {
+      if (rawCode.trim() && discountPct > 0) {
+        feedbackEl.textContent = `✓ Código válido — ${discountPct}% de descuento aplicado`;
+        feedbackEl.className = 'codigo-feedback codigo-feedback--valid';
+      } else if (rawCode.trim()) {
+        feedbackEl.textContent = 'Código no reconocido';
+        feedbackEl.className = 'codigo-feedback codigo-feedback--invalid';
+      } else {
+        feedbackEl.textContent = '';
+        feedbackEl.className = 'codigo-feedback';
+      }
+    }
   };
 
   const calculateDistance = () => {
@@ -803,9 +828,9 @@ const initCotizador = () => {
     if (originPlace?.geometry) calculateDistance();
   });
 
-  // Recalcula cuando cambian paradas o alianza
+  // Recalcula cuando cambian paradas o código de descuento
   document.getElementById('paradas')?.addEventListener('change', updateQuote);
-  document.getElementById('alianza')?.addEventListener('change', updateQuote);
+  document.getElementById('codigoDescuento')?.addEventListener('input', updateQuote);
 };
 
 // Callback invocado por el script de Google Maps una vez cargado

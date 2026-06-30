@@ -648,16 +648,6 @@
             <h3 class="form-step__title">Detalles del viaje</h3>
 
             <div class="form-group">
-              <label class="form-group__label" for="alianza">Descuento por alianza</label>
-              <select class="form-group__input form-group__input--select" id="alianza" name="alianza">
-                <option value="Ninguno">Ninguno</option>
-                <option value="Casa Parque Loreto">Casa Parque Loreto</option>
-                <option value="Diario para una novia">Diario para una novia</option>
-              </select>
-              <span class="form-group__hint">Si vienes de un evento asociado, selecciónalo para aplicar el descuento automáticamente.</span>
-            </div>
-
-            <div class="form-group">
               <label class="form-group__label" for="codigoDescuento">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                 Código de descuento
@@ -666,8 +656,8 @@
                 placeholder="Ej: MATEO&amp;LEONOR"
                 autocomplete="off" spellcheck="false"
                 style="text-transform:uppercase">
-              <span class="form-group__hint">Si tienes un código especial de tu matrimonio, ingrésalo aquí.</span>
-              <span class="form-group__error" id="codigoDescuento-error" role="alert" aria-live="polite"></span>
+              <span class="form-group__hint">Si tienes un código especial (ej. de tu alianza o matrimonio), ingrésalo aquí.</span>
+              <span class="codigo-feedback" id="codigoDescuento-feedback" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
@@ -849,7 +839,7 @@
               <span>Precio base</span><span id="rq-base">—</span>
             </div>
             <div class="result-quote__row result-quote__row--discount" id="rq-discount-row" hidden>
-              <span>Descuento alianza (10%)</span><span id="rq-discount">—</span>
+              <span id="rq-discount-label">Descuento código</span><span id="rq-discount">—</span>
             </div>
             <div class="result-quote__row">
               <span>Paradas adicionales</span><span id="rq-stops">—</span>

@@ -601,7 +601,7 @@ fieldset { border: none; }
 }
 .hora-carousel__window {
   width: 100%; overflow: hidden;
-  height: calc(3 * 44px + 2 * 8px); /* 3 ítems visibles */
+  height: calc(2 * 44px + 1 * 8px); /* 2 ítems visibles */
 }
 .hora-carousel__track {
   display: flex; flex-direction: column; gap: 8px;
@@ -609,15 +609,23 @@ fieldset { border: none; }
 }
 .hora-carousel__arrow {
   display: flex; align-items: center; justify-content: center;
-  width: 40px; height: 32px; border-radius: var(--radius-md);
+  width: 100%; height: 40px; border-radius: var(--radius-md);
   background: var(--color-surface); border: 1.5px solid var(--color-primary-mid);
   color: var(--color-gold); cursor: pointer;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
+.hora-carousel__arrow svg { width: 24px; height: 24px; }
 .hora-carousel__arrow:hover:not(:disabled) {
   border-color: rgba(201,168,76,.5); box-shadow: var(--glow-gold-sm);
 }
 .hora-carousel__arrow:disabled { opacity: .3; cursor: not-allowed; }
+
+/* Feedback código de descuento */
+.codigo-feedback { display: block; margin-top: var(--space-2); font-size: .82rem; font-weight: 500; }
+.codigo-feedback--valid   { color: #4ade80; }
+.codigo-feedback--invalid { color: var(--color-text-muted); }
+body.light-mode .codigo-feedback--valid   { color: #166534; }
+body.light-mode .codigo-feedback--invalid { color: #64748B; }
 
 .hora-btn {
   height: 44px; width: 100%;
