@@ -798,6 +798,8 @@ const initCotizador = () => {
       if (distanceKm > 70) {
         // Viaje largo: formulario continúa con normalidad, sin precio automático
         if (paradaSection) paradaSection.hidden = false;
+        const hintLong = document.getElementById('parada-hint');
+        if (hintLong) hintLong.textContent = '2 primeras paradas gratis · $5.000 por cada parada adicional';
         document.getElementById('cotizacion-data').value = JSON.stringify({
           sinCobertura: true,
           distanciaKm:  distanceKm,
