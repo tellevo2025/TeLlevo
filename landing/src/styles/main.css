@@ -601,10 +601,10 @@ fieldset { border: none; }
 }
 .hora-carousel__window {
   width: 100%; overflow: hidden;
-  height: calc(2 * 44px + 1 * 8px); /* 2 ítems visibles */
+  height: calc(3 * 44px + 2 * 8px); /* 3 filas × 2 columnas = 6 visibles */
 }
 .hora-carousel__track {
-  display: flex; flex-direction: column; gap: 8px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
   transition: transform .3s cubic-bezier(.4,0,.2,1);
 }
 .hora-carousel__arrow {

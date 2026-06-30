@@ -201,21 +201,23 @@ const initHoras = () => {
   const downBtn = document.getElementById('hora-down');
   if (!track || !upBtn || !downBtn) return;
 
-  const btns    = [...track.querySelectorAll('.hora-btn')];
-  const VISIBLE = 2;
-  const ITEM_H  = 52; // 44px altura + 8px gap
+  const btns         = [...track.querySelectorAll('.hora-btn')];
+  const COLS         = 2;
+  const VISIBLE_ROWS = 3;
+  const ROW_H        = 52; // 44px altura + 8px gap
+  const totalRows    = Math.ceil(btns.length / COLS);
 
-  let offset = 0;
+  let offset = 0; // fila superior visible
 
-  const scrollTo = (idx) => {
-    offset = Math.max(0, Math.min(idx, btns.length - VISIBLE));
-    track.style.transform = `translateY(${-offset * ITEM_H}px)`;
+  const scrollTo = (rowIdx) => {
+    offset = Math.max(0, Math.min(rowIdx, totalRows - VISIBLE_ROWS));
+    track.style.transform = `translateY(${-offset * ROW_H}px)`;
     upBtn.disabled   = offset === 0;
-    downBtn.disabled = offset >= btns.length - VISIBLE;
+    downBtn.disabled = offset >= totalRows - VISIBLE_ROWS;
   };
 
-  upBtn.addEventListener('click',   () => scrollTo(offset - 2));
-  downBtn.addEventListener('click', () => scrollTo(offset + 2));
+  upBtn.addEventListener('click',   () => scrollTo(offset - 1));
+  downBtn.addEventListener('click', () => scrollTo(offset + 1));
 
   btns.forEach((btn, i) => {
     btn.addEventListener('click', () => {
@@ -223,7 +225,8 @@ const initHoras = () => {
       btn.classList.add('hora-btn--active');
       document.getElementById('horaViaje').value = btn.dataset.hora;
       document.getElementById('horaViaje-error').textContent = '';
-      scrollTo(Math.floor(i / 2) * 2);
+      const row = Math.floor(i / COLS);
+      scrollTo(Math.max(0, row - 1));
     });
   });
 
