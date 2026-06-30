@@ -594,31 +594,29 @@ fieldset { border: none; }
   font-size: .875rem; font-weight: 500; color: var(--color-text-light);
   margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-1);
 }
-/* Carrusel vertical de horas */
-.hora-carousel {
-  display: flex; flex-direction: column; align-items: center;
-  gap: var(--space-2); margin-bottom: var(--space-3);
-}
+/* Selector de horas con scroll */
+.hora-carousel { margin-bottom: var(--space-3); }
 .hora-carousel__window {
-  width: 100%; overflow: hidden;
-  height: calc(3 * 44px + 2 * 8px); /* 3 filas × 2 columnas = 6 visibles */
+  width: 100%;
+  height: calc(3 * 44px + 2 * 8px); /* 3 filas visibles = 148px */
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* momentum scroll en iOS */
+  border-radius: var(--radius-md);
+  /* Scrollbar Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) var(--color-primary-light);
 }
+/* Scrollbar Webkit (Chrome, Safari, Edge) */
+.hora-carousel__window::-webkit-scrollbar        { width: 6px; }
+.hora-carousel__window::-webkit-scrollbar-track  { background: var(--color-primary-light); border-radius: 3px; }
+.hora-carousel__window::-webkit-scrollbar-thumb  { background: var(--color-gold); border-radius: 3px; }
+.hora-carousel__window::-webkit-scrollbar-thumb:hover { background: var(--color-gold-bright); }
+
 .hora-carousel__track {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  padding-right: 8px; /* espacio para la barra */
 }
-.hora-carousel__arrow {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 40px; border-radius: var(--radius-md);
-  background: var(--color-surface); border: 1.5px solid var(--color-primary-mid);
-  color: var(--color-gold); cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-.hora-carousel__arrow svg { width: 24px; height: 24px; }
-.hora-carousel__arrow:hover:not(:disabled) {
-  border-color: rgba(201,168,76,.5); box-shadow: var(--glow-gold-sm);
-}
-.hora-carousel__arrow:disabled { opacity: .3; cursor: not-allowed; }
 
 /* Feedback código de descuento */
 .codigo-feedback { display: block; margin-top: var(--space-2); font-size: .82rem; font-weight: 500; }
