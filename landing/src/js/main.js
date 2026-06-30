@@ -793,16 +793,11 @@ const initCotizador = () => {
 
       distanceKm = Math.round(el.distance.value / 1000);
 
-      const fueraEl    = document.getElementById('fuera-cobertura');
       const paradaSection = document.getElementById('parada-section');
 
       if (distanceKm > 70) {
-        // Viaje fuera de tabla — ocultar paradas, mostrar aviso
-        if (paradaSection) paradaSection.hidden = true;
-        if (fueraEl) {
-          document.getElementById('fuera-km').textContent = `${distanceKm} km`;
-          fueraEl.hidden = false;
-        }
+        // Viaje largo: formulario continúa con normalidad, sin precio automático
+        if (paradaSection) paradaSection.hidden = false;
         document.getElementById('cotizacion-data').value = JSON.stringify({
           sinCobertura: true,
           distanciaKm:  distanceKm,
@@ -811,9 +806,6 @@ const initCotizador = () => {
         });
         return;
       }
-
-      // Viaje dentro de cobertura — ocultar aviso, mostrar paradas
-      if (fueraEl) fueraEl.hidden = true;
 
       const freeStops = getFreeStops(distanceKm);
       const hintEl = document.getElementById('parada-hint');

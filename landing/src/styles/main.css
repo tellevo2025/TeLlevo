@@ -1578,18 +1578,6 @@ body.light-mode .cotizacion-block__row--total span:last-child { color: #7A5518 !
   font-size: .75rem; color: var(--color-text-muted); font-style: italic;
 }
 
-/* Aviso viaje largo en el formulario (>70 km) */
-.fuera-cobertura {
-  display: flex; align-items: flex-start; gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.35);
-  border-radius: var(--radius-md); color: var(--color-text-light);
-  font-size: .875rem; line-height: 1.5; margin-bottom: var(--space-4);
-}
-.fuera-cobertura svg { flex-shrink: 0; color: var(--color-gold); margin-top: 2px; }
-.fuera-cobertura strong { color: var(--color-gold); display: block; margin-bottom: 2px; }
-.fuera-cobertura p { margin: 0; }
-
 /* Mensaje larga distancia en pantalla de éxito */
 .result-quote__long-distance {
   display: flex; align-items: flex-start; gap: var(--space-3);
@@ -1600,8 +1588,6 @@ body.light-mode .cotizacion-block__row--total span:last-child { color: #7A5518 !
 .result-quote__long-distance p { margin: 0; }
 .result-quote__long-distance strong { color: var(--color-gold); }
 
-body.light-mode .fuera-cobertura { background: rgba(201,168,76,.06); border-color: rgba(122,85,24,.3); color: #162036; }
-body.light-mode .fuera-cobertura strong { color: #7A5518; }
 body.light-mode .result-quote__long-distance { color: #162036; }
 body.light-mode .result-quote__long-distance strong { color: #7A5518; }
 
