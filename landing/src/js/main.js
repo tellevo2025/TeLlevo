@@ -214,8 +214,8 @@ const initHoras = () => {
     downBtn.disabled = offset >= btns.length - VISIBLE;
   };
 
-  upBtn.addEventListener('click',   () => scrollTo(offset - 1));
-  downBtn.addEventListener('click', () => scrollTo(offset + 1));
+  upBtn.addEventListener('click',   () => scrollTo(offset - 2));
+  downBtn.addEventListener('click', () => scrollTo(offset + 2));
 
   btns.forEach((btn, i) => {
     btn.addEventListener('click', () => {
@@ -223,7 +223,7 @@ const initHoras = () => {
       btn.classList.add('hora-btn--active');
       document.getElementById('horaViaje').value = btn.dataset.hora;
       document.getElementById('horaViaje-error').textContent = '';
-      scrollTo(Math.max(0, i - 1));
+      scrollTo(Math.floor(i / 2) * 2);
     });
   });
 
