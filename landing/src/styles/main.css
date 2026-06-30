@@ -208,10 +208,24 @@ fieldset { border: none; }
   font-size: clamp(1rem, 2vw, 1.2rem); color: var(--color-text-muted);
   max-width: 600px; margin: 0 auto var(--space-3); line-height: 1.7;
 }
-.hero__quote-hint {
-  font-size: .82rem; font-weight: 500; letter-spacing: .06em;
-  color: var(--color-gold); opacity: 1;
+@keyframes heroBubble {
+  0%   { opacity: 0; transform: translateY(10px) scale(.85); }
+  12%  { opacity: 1; transform: translateY(-4px) scale(1.04); }
+  20%  { transform: translateY(0) scale(1); }
+  72%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-8px) scale(.9); }
+}
+.hero__quote-bubble {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 18px;
+  background: var(--gradient-gold);
+  color: var(--color-primary);
+  border-radius: 24px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+  box-shadow: 0 4px 20px rgba(201,168,76,.45), var(--glow-gold-sm);
   margin: 0 auto var(--space-5); text-align: center;
+  animation: heroBubble 5s cubic-bezier(.4,0,.2,1) forwards;
+  cursor: default;
 }
 .hero__actions {
   display: flex; flex-wrap: wrap; gap: var(--space-3);
