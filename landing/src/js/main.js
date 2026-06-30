@@ -402,7 +402,18 @@ const showResult = (type) => {
     try {
       const q = JSON.parse(document.getElementById('cotizacion-data').value || '{}');
       const quoteEl = document.getElementById('result-quote');
-      if (q.total && quoteEl) {
+      if (!quoteEl) return;
+
+      if (q.sinCobertura) {
+        // Viaje largo: mostrar aviso personalizado
+        quoteEl.innerHTML = `
+          <p class="result-quote__title">Viaje de larga distancia</p>
+          <div class="result-quote__long-distance">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/><path d="M12 8v4l3 3"/></svg>
+            <p>Tu viaje es de <strong>${q.distanciaKm} km</strong>. Nuestro equipo te contactará a la brevedad para entregarte una cotización personalizada.</p>
+          </div>`;
+        quoteEl.hidden = false;
+      } else if (q.total) {
         const fmt = n => '$' + Number(n).toLocaleString('es-CL');
         document.getElementById('rq-km').textContent    = `${q.distanciaKm} km`;
         document.getElementById('rq-base').textContent  = fmt(q.precioBase);
@@ -782,7 +793,28 @@ const initCotizador = () => {
 
       distanceKm = Math.round(el.distance.value / 1000);
 
-      // Actualiza hint de paradas y muestra la sección
+      const fueraEl    = document.getElementById('fuera-cobertura');
+      const paradaSection = document.getElementById('parada-section');
+
+      if (distanceKm > 70) {
+        // Viaje fuera de tabla — ocultar paradas, mostrar aviso
+        if (paradaSection) paradaSection.hidden = true;
+        if (fueraEl) {
+          document.getElementById('fuera-km').textContent = `${distanceKm} km`;
+          fueraEl.hidden = false;
+        }
+        document.getElementById('cotizacion-data').value = JSON.stringify({
+          sinCobertura: true,
+          distanciaKm:  distanceKm,
+          origen:  originPlace?.formatted_address || originInput.value,
+          destino: destPlace?.formatted_address   || destInput.value,
+        });
+        return;
+      }
+
+      // Viaje dentro de cobertura — ocultar aviso, mostrar paradas
+      if (fueraEl) fueraEl.hidden = true;
+
       const freeStops = getFreeStops(distanceKm);
       const hintEl = document.getElementById('parada-hint');
       if (hintEl) {
@@ -790,7 +822,6 @@ const initCotizador = () => {
           ? '1ª parada gratis · $5.000 por cada parada adicional'
           : '2 primeras paradas gratis · $5.000 por cada parada adicional';
       }
-      const paradaSection = document.getElementById('parada-section');
       if (paradaSection) paradaSection.hidden = false;
 
       updateQuote();
