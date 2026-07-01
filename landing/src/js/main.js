@@ -782,10 +782,17 @@ const initCotizador = () => {
   const calculateDistance = () => {
     if (!originPlace?.geometry || !destPlace?.geometry) return;
 
+    const origin = originPlace.place_id
+      ? { placeId: originPlace.place_id }
+      : originPlace.geometry.location;
+    const dest = destPlace.place_id
+      ? { placeId: destPlace.place_id }
+      : destPlace.geometry.location;
+
     const svc = new google.maps.DistanceMatrixService();
     svc.getDistanceMatrix({
-      origins:      [originPlace.geometry.location],
-      destinations: [destPlace.geometry.location],
+      origins:      [origin],
+      destinations: [dest],
       travelMode:   google.maps.TravelMode.DRIVING,
       unitSystem:   google.maps.UnitSystem.METRIC,
     }, (response, status) => {
