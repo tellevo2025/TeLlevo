@@ -782,9 +782,6 @@ const initCotizador = () => {
   const calculateDistance = () => {
     if (!originPlace?.geometry || !destPlace?.geometry) return;
 
-    console.log('ORIGEN:', originPlace.formatted_address, '| place_id:', originPlace.place_id, '| coords:', originPlace.geometry.location.toString());
-    console.log('DESTINO:', destPlace.formatted_address, '| place_id:', destPlace.place_id, '| coords:', destPlace.geometry.location.toString());
-
     const origin = originPlace.place_id
       ? { placeId: originPlace.place_id }
       : originPlace.geometry.location;
@@ -792,18 +789,17 @@ const initCotizador = () => {
       ? { placeId: destPlace.place_id }
       : destPlace.geometry.location;
 
-    const svc = new google.maps.DistanceMatrixService();
-    svc.getDistanceMatrix({
-      origins:      [origin],
-      destinations: [dest],
-      travelMode:   google.maps.TravelMode.DRIVING,
-      unitSystem:   google.maps.UnitSystem.METRIC,
+    const svc = new google.maps.DirectionsService();
+    svc.route({
+      origin,
+      destination: dest,
+      travelMode: google.maps.TravelMode.DRIVING,
     }, (response, status) => {
       if (status !== 'OK') return;
-      const el = response.rows[0].elements[0];
-      if (el.status !== 'OK') return;
+      const leg = response.routes[0]?.legs[0];
+      if (!leg) return;
 
-      distanceKm = Math.round(el.distance.value / 1000);
+      distanceKm = Math.round(leg.distance.value / 1000);
 
       const paradaSection = document.getElementById('parada-section');
 
