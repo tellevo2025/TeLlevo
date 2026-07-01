@@ -712,7 +712,7 @@ const initCotizador = () => {
 
   const placesOpts = {
     componentRestrictions: { country: 'cl' },
-    fields: ['formatted_address', 'geometry'],
+    fields: ['formatted_address', 'geometry', 'place_id'],
   };
 
   const originAC = new google.maps.places.Autocomplete(originInput, placesOpts);
