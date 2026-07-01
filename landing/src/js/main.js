@@ -836,7 +836,24 @@ const initCotizador = () => {
 
   // Recalcula cuando cambian paradas o código de descuento
   document.getElementById('paradas')?.addEventListener('change', updateQuote);
-  document.getElementById('codigoDescuento')?.addEventListener('input', updateQuote);
+  document.getElementById('codigoDescuento')?.addEventListener('input', () => {
+    const rawCode  = document.getElementById('codigoDescuento')?.value || '';
+    const pct      = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
+    const feedback = document.getElementById('codigoDescuento-feedback');
+    if (feedback) {
+      if (rawCode.trim() && pct > 0) {
+        feedback.textContent = `✓ Código válido — ${pct}% de descuento aplicado`;
+        feedback.className   = 'codigo-feedback codigo-feedback--valid';
+      } else if (rawCode.trim()) {
+        feedback.textContent = 'Código no reconocido';
+        feedback.className   = 'codigo-feedback codigo-feedback--invalid';
+      } else {
+        feedback.textContent = '';
+        feedback.className   = 'codigo-feedback';
+      }
+    }
+    if (distanceKm !== null) updateQuote();
+  });
 };
 
 // Callback invocado por el script de Google Maps una vez cargado
