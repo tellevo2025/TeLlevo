@@ -782,6 +782,9 @@ const initCotizador = () => {
   const calculateDistance = () => {
     if (!originPlace?.geometry || !destPlace?.geometry) return;
 
+    console.log('ORIGEN:', originPlace.formatted_address, '| place_id:', originPlace.place_id, '| coords:', originPlace.geometry.location.toString());
+    console.log('DESTINO:', destPlace.formatted_address, '| place_id:', destPlace.place_id, '| coords:', destPlace.geometry.location.toString());
+
     const origin = originPlace.place_id
       ? { placeId: originPlace.place_id }
       : originPlace.geometry.location;
