@@ -280,19 +280,27 @@
     }
 
     /* ─── LIGHT MODE ────────────────────────────── */
-    body.light-mode .tj-hero { background: linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%); }
-    body.light-mode .tj-section { background: #fff; border-color: #D1D9E6; }
+    body.light-mode .tj-hero {
+      background: linear-gradient(135deg, #EEF2F8 0%, #DDE5F2 100%);
+    }
+    body.light-mode .tj-hero::after {
+      background: linear-gradient(to bottom, transparent, #F5F7FA);
+    }
+    body.light-mode .tj-hero__title { color: #7A5518; text-shadow: none; }
+    body.light-mode .tj-hero__sub   { color: #2C3E57; opacity: 1; }
+    body.light-mode .tj-back        { color: #7A5518; }
+    body.light-mode .tj-section     { background: #fff; border-color: #D1D9E6; }
     body.light-mode .tj-section__icon { background: rgba(201,168,76,.1); }
-    body.light-mode .tj-divider { background: #E4EAF2; }
-    body.light-mode .tj-req-item { border-bottom-color: #EEF0F5; }
-    body.light-mode .tj-req-text { color: #1A2840; }
-    body.light-mode .tj-step { border-bottom-color: #EEF0F5; }
-    body.light-mode .tj-step__text { color: #1A2840; }
-    body.light-mode .tj-plus { background: #fff; border-color: rgba(201,168,76,.35); }
-    body.light-mode .tj-plus__text { color: #1A2840; }
-    body.light-mode .tj-cta-hint { color: #6B7A90; }
-    body.light-mode .tj-cta-sub { color: #6B7A90; }
-    body.light-mode .tj-back { color: #7A5518; }
+    body.light-mode .tj-divider     { background: #E4EAF2; }
+    body.light-mode .tj-req-item    { border-bottom-color: #EEF0F5; }
+    body.light-mode .tj-req-text    { color: #1A2840; }
+    body.light-mode .tj-step        { border-bottom-color: #EEF0F5; }
+    body.light-mode .tj-step__text  { color: #1A2840; }
+    body.light-mode .tj-plus        { background: #fff; border-color: rgba(201,168,76,.35); }
+    body.light-mode .tj-plus__title { color: #7A5518; }
+    body.light-mode .tj-plus__text  { color: #1A2840; }
+    body.light-mode .tj-cta-hint   { color: #6B7A90; }
+    body.light-mode .tj-cta-sub    { color: #6B7A90; }
 
     /* ─── DESKTOP ───────────────────────────────── */
     @media (min-width: 640px) {
