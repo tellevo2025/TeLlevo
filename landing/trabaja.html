@@ -11,26 +11,60 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/main.css">
   <style>
+    /* ── Hero ── */
     .trabaja-hero {
-      min-height: 38vh;
+      position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
+      min-height: 46vh;
       text-align: center;
       background: var(--gradient-hero);
-      padding: calc(80px + var(--space-8)) var(--space-4) var(--space-8);
+      padding: calc(80px + var(--space-5)) var(--space-5) var(--space-9);
+      overflow: hidden;
     }
-    .trabaja-hero__eyebrow {
-      font-size: .8rem;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
+    .trabaja-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 120%, rgba(201,168,76,.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .trabaja-back {
+      position: absolute;
+      top: calc(72px + var(--space-3));
+      left: var(--space-5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       color: var(--color-gold);
-      margin-bottom: var(--space-3);
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: .04em;
+      opacity: .85;
+      transition: opacity .2s ease, gap .2s ease;
+      z-index: 2;
+    }
+    .trabaja-back:hover { opacity: 1; gap: 10px; }
+
+    .trabaja-hero__inner { position: relative; z-index: 1; }
+    .trabaja-hero__eyebrow {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--gradient-gold);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: var(--space-4);
     }
     .trabaja-hero__title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: clamp(1.9rem, 6vw, 3.2rem);
       font-weight: 700;
       color: var(--color-gold);
       text-shadow: var(--glow-gold-md);
@@ -38,29 +72,35 @@
       line-height: 1.2;
     }
     .trabaja-hero__subtitle {
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-size: clamp(.92rem, 2.5vw, 1.1rem);
       color: var(--color-text-light);
-      max-width: 560px;
+      max-width: 520px;
       margin: 0 auto;
-      line-height: 1.6;
+      line-height: 1.65;
+      opacity: .9;
     }
 
+    /* ── Content ── */
     .trabaja-content {
-      max-width: 760px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: var(--space-8) var(--space-4) var(--space-10);
+      padding: var(--space-7) var(--space-4) var(--space-10);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
     }
 
+    /* ── Requisitos card ── */
     .trabaja-card {
       background: var(--color-primary-light);
       border: 1px solid var(--color-primary-mid);
+      border-left: 3px solid var(--color-gold);
       border-radius: var(--radius-lg);
-      padding: var(--space-6) var(--space-6);
-      margin-bottom: var(--space-5);
+      padding: var(--space-5) var(--space-5);
     }
     .trabaja-card__title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       color: var(--color-gold);
       margin-bottom: var(--space-4);
       display: flex;
@@ -82,135 +122,151 @@
       align-items: flex-start;
       gap: var(--space-3);
       color: var(--color-text-light);
-      font-size: .95rem;
-      line-height: 1.55;
+      font-size: .93rem;
+      line-height: 1.6;
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid rgba(255,255,255,.05);
     }
-    .trabaja-requisitos__icon {
+    .trabaja-requisitos li:last-child { border-bottom: none; padding-bottom: 0; }
+    .trabaja-requisitos__check {
       flex-shrink: 0;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       background: var(--gradient-gold);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 2px;
+      margin-top: 1px;
+      box-shadow: var(--glow-gold-sm);
     }
-    .trabaja-requisitos__icon svg { color: var(--color-primary); }
+    .trabaja-requisitos__check svg { color: var(--color-primary); }
 
+    /* ── Plus badge ── */
     .trabaja-plus {
       display: flex;
-      align-items: flex-start;
-      gap: var(--space-3);
-      padding: var(--space-4);
-      background: rgba(201,168,76,.08);
-      border: 1px solid rgba(201,168,76,.3);
+      flex-direction: column;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-4);
+      background: rgba(201,168,76,.07);
+      border: 1px solid rgba(201,168,76,.28);
       border-radius: var(--radius-md);
       margin-top: var(--space-4);
     }
+    .trabaja-plus__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
     .trabaja-plus__badge {
-      flex-shrink: 0;
       background: var(--gradient-gold);
       color: var(--color-primary);
-      font-size: .7rem;
-      font-weight: 700;
-      letter-spacing: .08em;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .1em;
       text-transform: uppercase;
       padding: 3px 10px;
       border-radius: 20px;
-      margin-top: 2px;
+    }
+    .trabaja-plus__label {
+      color: var(--color-gold);
+      font-size: .85rem;
+      font-weight: 600;
     }
     .trabaja-plus p {
       margin: 0;
       color: var(--color-text-light);
-      font-size: .92rem;
-      line-height: 1.55;
+      font-size: .9rem;
+      line-height: 1.6;
+      opacity: .9;
     }
 
+    /* ── CTA ── */
     .trabaja-cta {
       background: var(--color-primary-light);
       border: 1px solid var(--color-primary-mid);
       border-radius: var(--radius-lg);
-      padding: var(--space-6);
+      padding: var(--space-6) var(--space-5);
       text-align: center;
     }
     .trabaja-cta__title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: var(--color-gold);
       margin-bottom: var(--space-3);
     }
     .trabaja-cta__desc {
       color: var(--color-text-light);
-      font-size: .95rem;
-      line-height: 1.6;
-      margin-bottom: var(--space-5);
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      font-size: .92rem;
+      line-height: 1.65;
+      margin-bottom: var(--space-4);
+      opacity: .9;
     }
     .trabaja-cta__items {
       list-style: none;
       padding: 0;
-      margin: 0 auto var(--space-5);
+      margin: 0 auto var(--space-6);
       display: flex;
       flex-direction: column;
       gap: var(--space-2);
-      max-width: 380px;
       text-align: left;
+      max-width: 360px;
     }
     .trabaja-cta__items li {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: var(--space-2);
       color: var(--color-text-muted);
-      font-size: .9rem;
+      font-size: .88rem;
+      line-height: 1.5;
     }
     .trabaja-cta__items li::before {
       content: '✦';
       color: var(--color-gold);
-      font-size: .7rem;
+      font-size: .65rem;
       flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .trabaja-cta__btn-wrap {
+      display: flex;
+      justify-content: center;
     }
     .trabaja-cta__email {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: var(--space-2);
       background: var(--gradient-gold);
       color: var(--color-primary);
       font-weight: 700;
-      font-size: 1rem;
-      padding: var(--space-3) var(--space-6);
+      font-size: .95rem;
+      padding: var(--space-4) var(--space-6);
       border-radius: var(--radius-full);
       text-decoration: none;
       box-shadow: var(--glow-gold-sm);
       transition: box-shadow .25s ease, transform .2s ease;
+      width: 100%;
+      max-width: 360px;
     }
     .trabaja-cta__email:hover {
       box-shadow: var(--glow-gold-md);
       transform: translateY(-2px);
     }
-    .trabaja-back {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      color: var(--color-gold);
-      font-size: .9rem;
-      font-weight: 500;
-      text-decoration: none;
-      margin-bottom: var(--space-6);
-      transition: gap .2s ease;
-    }
-    .trabaja-back:hover { gap: var(--space-3); }
 
-    body.light-mode .trabaja-card { background: #fff; border-color: #A8B2C4; }
-    body.light-mode .trabaja-cta  { background: #fff; border-color: #A8B2C4; }
-    body.light-mode .trabaja-requisitos li { color: #162036; }
-    body.light-mode .trabaja-plus  { background: rgba(201,168,76,.06); }
+    /* ── Light mode ── */
+    body.light-mode .trabaja-card  { background: #fff; border-color: #A8B2C4; border-left-color: #C9A84C; }
+    body.light-mode .trabaja-cta   { background: #fff; border-color: #A8B2C4; }
+    body.light-mode .trabaja-requisitos li { color: #162036; border-bottom-color: rgba(0,0,0,.06); }
+    body.light-mode .trabaja-plus  { background: rgba(201,168,76,.06); border-color: rgba(122,85,24,.25); }
     body.light-mode .trabaja-plus p { color: #162036; }
     body.light-mode .trabaja-cta__desc { color: #162036; }
-    body.light-mode .trabaja-cta__items li { color: #3A4A60; }
-    body.light-mode .trabaja-back { color: #7A5518; }
+    body.light-mode .trabaja-cta__items li { color: #4A5568; }
+    body.light-mode .trabaja-back  { color: #7A5518; }
+
+    /* ── Desktop tweaks ── */
+    @media (min-width: 640px) {
+      .trabaja-cta__email { width: auto; }
+    }
   </style>
 </head>
 <body>
@@ -254,40 +310,40 @@
 
   <main>
     <section class="trabaja-hero">
-      <div>
-        <p class="trabaja-hero__eyebrow">Únete al equipo</p>
+      <a href="/" class="trabaja-back" aria-label="Volver al inicio">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </a>
+      <div class="trabaja-hero__inner">
+        <span class="trabaja-hero__eyebrow">Únete al equipo</span>
         <h1 class="trabaja-hero__title">Sé chofer de reemplazo<br>y gana dinero extra</h1>
         <p class="trabaja-hero__subtitle">Trabaja con flexibilidad, en los horarios que tú eliges, conduciendo el auto de tus clientes de forma segura y profesional.</p>
       </div>
     </section>
 
     <div class="trabaja-content">
-      <a href="/" class="trabaja-back">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Volver al inicio
-      </a>
 
       <!-- Requisitos -->
       <div class="trabaja-card">
         <h2 class="trabaja-card__title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Requisitos
         </h2>
         <ul class="trabaja-requisitos">
           <li>
-            <div class="trabaja-requisitos__icon">
+            <div class="trabaja-requisitos__check">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
             </div>
             <span>Licencia de conducir clase B con <strong>mínimo 2 años de antigüedad</strong></span>
           </li>
           <li>
-            <div class="trabaja-requisitos__icon">
+            <div class="trabaja-requisitos__check">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
             </div>
             <span>Certificado de antecedentes automovilísticos <strong>sin infracciones graves</strong></span>
           </li>
           <li>
-            <div class="trabaja-requisitos__icon">
+            <div class="trabaja-requisitos__check">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
             </div>
             <span>Actitud responsable, puntual y orientada al servicio al cliente</span>
@@ -295,30 +351,35 @@
         </ul>
 
         <div class="trabaja-plus">
-          <span class="trabaja-plus__badge">✦ Plus</span>
-          <p>Si eres <strong>estudiante universitario</strong>, tienes un punto extra a tu favor. Valoramos la responsabilidad y el compromiso que conlleva estudiar mientras trabajas.</p>
+          <div class="trabaja-plus__header">
+            <span class="trabaja-plus__badge">✦ Plus</span>
+            <span class="trabaja-plus__label">Estudiante universitario</span>
+          </div>
+          <p>Si estás cursando una carrera universitaria, tienes un punto extra a tu favor. Valoramos la responsabilidad y el compromiso que conlleva estudiar mientras trabajas.</p>
         </div>
       </div>
 
       <!-- Cómo postular -->
       <div class="trabaja-cta">
         <h2 class="trabaja-cta__title">¿Cómo postular?</h2>
-        <p class="trabaja-cta__desc">Envíanos un correo a la dirección de abajo con los siguientes documentos adjuntos:</p>
+        <p class="trabaja-cta__desc">Envíanos un correo con los siguientes documentos adjuntos y te contactaremos a la brevedad:</p>
         <ul class="trabaja-cta__items">
           <li>Foto o escaneo de tu licencia de conducir</li>
           <li>Certificado de antecedentes automovilísticos</li>
           <li>Breve texto contando quién eres y por qué quieres ser chofer TeLlevo</li>
         </ul>
-        <a href="mailto:contacto@tellevoatucasa.cl?subject=Postulación%20Chofer%20TeLlevo" class="trabaja-cta__email">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          contacto@tellevoatucasa.cl
-        </a>
+        <div class="trabaja-cta__btn-wrap">
+          <a href="mailto:contacto@tellevoatucasa.cl?subject=Postulación%20Chofer%20TeLlevo" class="trabaja-cta__email">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Postular ahora
+          </a>
+        </div>
       </div>
+
     </div>
   </main>
 
   <script>
-    // Navbar toggle
     const toggle = document.querySelector('.navbar__toggle');
     const menu   = document.getElementById('mobile-menu');
     if (toggle && menu) {
@@ -329,25 +390,22 @@
         menu.hidden = open;
       });
     }
-    // Scroll navbar
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('navbar--scrolled', window.scrollY > 20);
     }, { passive: true });
-    // Theme toggle
     const themeBtn = document.getElementById('theme-toggle');
-    const sun = themeBtn?.querySelector('.theme-toggle__icon--sun');
+    const sun  = themeBtn?.querySelector('.theme-toggle__icon--sun');
     const moon = themeBtn?.querySelector('.theme-toggle__icon--moon');
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
+    if (localStorage.getItem('theme') === 'light') {
       document.body.classList.add('light-mode');
-      if (sun) sun.style.display = 'none';
+      if (sun)  sun.style.display  = 'none';
       if (moon) moon.style.display = '';
     }
     themeBtn?.addEventListener('click', () => {
       const isLight = document.body.classList.toggle('light-mode');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      if (sun) sun.style.display = isLight ? 'none' : '';
+      if (sun)  sun.style.display  = isLight ? 'none' : '';
       if (moon) moon.style.display = isLight ? '' : 'none';
     });
   </script>
