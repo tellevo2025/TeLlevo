@@ -702,11 +702,11 @@ const initCotizador = () => {
 
   const PRICE_TABLE = [
     { max: 19, price: 35000 },
-    { max: 34, price: 45000 },
-    { max: 44, price: 55000 },
-    { max: 54, price: 60000 },
-    { max: 64, price: 68000 },
-    { max: 70, price: 75000 },
+    { max: 34, price: 41000 },
+    { max: 44, price: 51000 },
+    { max: 54, price: 56000 },
+    { max: 64, price: 62000 },
+    { max: 70, price: 68000 },
   ];
   const STOP_COST = 5000;
 
