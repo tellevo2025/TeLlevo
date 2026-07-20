@@ -689,8 +689,9 @@ const initFAQ = () => {
 const DISCOUNT_CODES = {
   'CASAPARQUELORETO':  10,   // Casa Parque Loreto  — 10%
   'DIARIOPARAUNANOVIA': 10,  // Diario para una novia — 10%
-  'IBANDRA&CRISTOBAL': 15,
-  'MIMATRIMONIO': 30,
+  'IBANDRA&CRISTOBAL':       15,
+  'MIMATRIMONIO':            30,
+  'MATRIMONIOSPORMANCAVADA': 15,
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
