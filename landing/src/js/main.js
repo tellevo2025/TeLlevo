@@ -692,6 +692,7 @@ const DISCOUNT_CODES = {
   'IBANDRA&CRISTOBAL':       15,
   'MIMATRIMONIO':            30,
   'MATRIMONIOSPORMANCAVADA': 15,
+  'MATRIMONIOJESU&ALEX':    15,
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
