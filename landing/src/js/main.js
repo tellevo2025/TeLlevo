@@ -5,7 +5,7 @@
 
 // Endpoint de reserva: llama directo al AppScript de Google.
 // En producción con Netlify se puede usar '/.netlify/functions/reserva' como proxy.
-const SUBMIT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbztsumZG3dqedxZsateHQx3cKnf8t6CKm0qtYtjAbRXcbIrnUssIzSedD44kkK9az5o/exec';
+const SUBMIT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwF2yM80mDIwnEv_fLiz35fvKSl4KgF2og5QU4zRA11kN7Ou0Mu7BeYCL__6FpUYqzG/exec';
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
 const initNavbar = () => {
