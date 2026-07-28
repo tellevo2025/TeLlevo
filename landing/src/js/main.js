@@ -709,6 +709,9 @@ const initCotizador = () => {
     { max: 54, price: 55000 },
     { max: 64, price: 62000 },
     { max: 70, price: 68000 },
+    { max: 75, price: 73000 },
+    { max: 80, price: 77000 },
+    { max: 85, price: 80000 },
   ];
   const STOP_COST = 5000;
 
@@ -805,7 +808,7 @@ const initCotizador = () => {
 
       const paradaSection = document.getElementById('parada-section');
 
-      if (distanceKm > 70) {
+      if (distanceKm > 85) {
         // Viaje largo: formulario continúa con normalidad, sin precio automático
         if (paradaSection) paradaSection.hidden = false;
         const hintLong = document.getElementById('parada-hint');
