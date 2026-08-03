@@ -26,7 +26,7 @@ const RATE_MAX       = 5;               // máx 5 reservas por IP por hora
 
 const normalizeCode = (c) => (c || '').toUpperCase().replace(/\s+/g, '');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
   }
