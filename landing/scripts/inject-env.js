@@ -15,25 +15,28 @@ if (fs.existsSync(envFile)) {
   });
 }
 
-// Diagnóstico — ayuda a detectar por qué falta la variable en CI
-console.log('Variables disponibles:', Object.keys(process.env)
-  .filter(k => !k.startsWith('npm_') && !k.startsWith('PATH') && !k.startsWith('NODE'))
-  .join(', '));
+const mapsKey   = process.env.GOOGLE_MAPS_KEY;
+const formToken = process.env.FORM_TOKEN;
 
-const key = process.env.GOOGLE_MAPS_KEY;
-if (!key) {
-  console.error('ERROR: GOOGLE_MAPS_KEY no está definida.');
-  console.error('Agrégala en Vercel → Project Settings → Environment Variables (scope: Production)');
+if (!mapsKey) {
+  console.error('ERROR: GOOGLE_MAPS_KEY no está definida en las variables de entorno de Netlify.');
+  process.exit(1);
+}
+if (!formToken) {
+  console.error('ERROR: FORM_TOKEN no está definida en las variables de entorno de Netlify.');
   process.exit(1);
 }
 
+// Inyectar en index.html
 const indexPath = path.join(__dirname, '..', 'index.html');
 let html = fs.readFileSync(indexPath, 'utf8');
-
-if (!html.includes('%%GOOGLE_MAPS_KEY%%')) {
-  console.log('Advertencia: el placeholder %%GOOGLE_MAPS_KEY%% no se encontró en index.html.');
-  process.exit(0);
-}
-
-fs.writeFileSync(indexPath, html.replaceAll('%%GOOGLE_MAPS_KEY%%', key));
+html = html.replaceAll('%%GOOGLE_MAPS_KEY%%', mapsKey);
+fs.writeFileSync(indexPath, html);
 console.log('OK: GOOGLE_MAPS_KEY inyectada en index.html');
+
+// Inyectar en main.js
+const jsPath = path.join(__dirname, '..', 'src', 'js', 'main.js');
+let js = fs.readFileSync(jsPath, 'utf8');
+js = js.replaceAll('%%FORM_TOKEN%%', formToken);
+fs.writeFileSync(jsPath, js);
+console.log('OK: FORM_TOKEN inyectado en main.js');

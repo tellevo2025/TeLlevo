@@ -3,9 +3,9 @@
   Navbar · Modal T&C · Calendario personalizado · Formulario 4 pasos · Autocomplete OSM
 */
 
-// Endpoint de reserva: llama directo al AppScript de Google.
-// En producción con Netlify se puede usar '/.netlify/functions/reserva' como proxy.
-const SUBMIT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwF2yM80mDIwnEv_fLiz35fvKSl4KgF2og5QU4zRA11kN7Ou0Mu7BeYCL__6FpUYqzG/exec';
+// Endpoint de reserva: proxy Netlify (oculta la URL del AppScript al cliente).
+const SUBMIT_ENDPOINT = '/.netlify/functions/reserva';
+const FORM_TOKEN = '%%FORM_TOKEN%%'; // inyectado en build desde variable de entorno
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
 const initNavbar = () => {
@@ -474,7 +474,15 @@ const initForm = () => {
   document.getElementById('booking-form').addEventListener('submit', async e => {
     e.preventDefault();
     setLoading(true);
+    // Honeypot: si está lleno, es un bot — no enviar
+    if (document.getElementById('_hp')?.value) {
+      setLoading(false);
+      showResult('success'); // hacemos creer al bot que tuvo éxito
+      return;
+    }
+
     const result = await sendReservation({
+      _token:       FORM_TOKEN,
       codigoDescuento: (document.getElementById('codigoDescuento')?.value || '').trim().toUpperCase(),
       fechaViaje:   document.getElementById('fechaViaje').value,
       horaViaje:    document.getElementById('horaViaje').value,
@@ -685,15 +693,8 @@ const initFAQ = () => {
 };
 
 // ─── CÓDIGOS DE DESCUENTO ─────────────────────────────────────────────────────
-// Para agregar un código: 'CODIGO': porcentaje  (ej. 'MATEO&LEONOR': 15)
-const DISCOUNT_CODES = {
-  'CASAPARQUELORETO':  10,   // Casa Parque Loreto  — 10%
-  'DIARIOPARAUNANOVIA': 10,  // Diario para una novia — 10%
-  'IBANDRA&CRISTOBAL':       15,
-  'MIMATRIMONIO':            30,
-  'MATRIMONIOSPORMANCAVADA': 15,
-  'MATRIMONIOJESU&ALEX':    15,
-};
+// Los códigos se validan en el servidor (netlify/functions/reserva.js).
+// El cliente solo muestra feedback visual una vez que el servidor confirma.
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
 // ─── COTIZADOR CON GOOGLE MAPS ────────────────────────────────────────────────
@@ -748,12 +749,9 @@ const initCotizador = () => {
     const stopsCost  = paidStops * STOP_COST;
     const subtotal   = basePrice + stopsCost;
 
-    const rawCode     = document.getElementById('codigoDescuento')?.value || '';
-    const discountPct = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
-    const discountAmt = discountPct > 0 ? Math.round(subtotal * discountPct / 100) : 0;
-    const total       = subtotal - discountAmt;
+    const rawCode = document.getElementById('codigoDescuento')?.value || '';
 
-    // Solo serializa — el desglose se muestra en la pantalla de confirmación
+    // El servidor aplica el descuento real — aquí solo guardamos los datos del viaje.
     document.getElementById('cotizacion-data').value = JSON.stringify({
       origen:        originPlace?.formatted_address || originInput.value,
       destino:       destPlace?.formatted_address   || destInput.value,
@@ -762,26 +760,8 @@ const initCotizador = () => {
       paradasGratis: freeStops,
       paradasPagas:  paidStops,
       costoParadas:  stopsCost,
-      codigoCupon:   rawCode.trim().toUpperCase(),
-      descuentoPct:  discountPct,
-      descuento:     discountAmt,
-      total:         total,
+      total:         subtotal,
     });
-
-    // Feedback visual del código en el Step 2
-    const feedbackEl = document.getElementById('codigoDescuento-feedback');
-    if (feedbackEl) {
-      if (rawCode.trim() && discountPct > 0) {
-        feedbackEl.textContent = `✓ Código válido — ${discountPct}% de descuento aplicado`;
-        feedbackEl.className = 'codigo-feedback codigo-feedback--valid';
-      } else if (rawCode.trim()) {
-        feedbackEl.textContent = 'Código no reconocido';
-        feedbackEl.className = 'codigo-feedback codigo-feedback--invalid';
-      } else {
-        feedbackEl.textContent = '';
-        feedbackEl.className = 'codigo-feedback';
-      }
-    }
   };
 
   const calculateDistance = () => {
@@ -849,15 +829,11 @@ const initCotizador = () => {
   document.getElementById('paradas')?.addEventListener('change', updateQuote);
   document.getElementById('codigoDescuento')?.addEventListener('input', () => {
     const rawCode  = document.getElementById('codigoDescuento')?.value || '';
-    const pct      = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
     const feedback = document.getElementById('codigoDescuento-feedback');
     if (feedback) {
-      if (rawCode.trim() && pct > 0) {
-        feedback.textContent = `✓ Código válido — ${pct}% de descuento aplicado`;
+      if (rawCode.trim()) {
+        feedback.textContent = 'Código guardado — se verificará al confirmar la reserva';
         feedback.className   = 'codigo-feedback codigo-feedback--valid';
-      } else if (rawCode.trim()) {
-        feedback.textContent = 'Código no reconocido';
-        feedback.className   = 'codigo-feedback codigo-feedback--invalid';
       } else {
         feedback.textContent = '';
         feedback.className   = 'codigo-feedback';

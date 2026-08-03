@@ -545,6 +545,12 @@
 
         <form class="booking-form" id="booking-form" novalidate>
 
+          <!-- Honeypot anti-bots: los humanos no ven ni llenan este campo -->
+          <div aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;left:-9999px;top:-9999px;">
+            <label for="_hp">Dejar en blanco</label>
+            <input type="text" id="_hp" name="_hp" tabindex="-1" autocomplete="off">
+          </div>
+
           <!-- ── PASO 1 ── -->
           <div class="form-step form-step--active" data-step="1">
             <h3 class="form-step__title">¿Cuándo necesitas el servicio?</h3>
