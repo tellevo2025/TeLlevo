@@ -3,8 +3,8 @@
   Navbar · Modal T&C · Calendario personalizado · Formulario 4 pasos · Autocomplete OSM
 */
 
-// Endpoint de reserva: proxy Netlify (oculta la URL del AppScript al cliente).
-const SUBMIT_ENDPOINT = '/.netlify/functions/reserva';
+// Endpoint de reserva: Vercel serverless function (oculta la URL del AppScript al cliente).
+const SUBMIT_ENDPOINT = '/api/reserva';
 const FORM_TOKEN = '%%FORM_TOKEN%%'; // inyectado en build desde variable de entorno
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
