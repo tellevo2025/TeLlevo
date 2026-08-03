@@ -85,8 +85,11 @@ module.exports = async function handler(req, res) {
       redirect: 'follow',
     });
 
-    const text = await response.text();
-    return res.status(200).setHeader('Content-Type', 'text/plain').send(text.trim());
+    const text = (await response.text()).trim();
+    // El AppScript guarda los datos antes de cualquier error secundario.
+    // Solo ⛔ indica rechazo real (sin cupo). Todo lo demás es éxito.
+    const result = text.startsWith('⛔') ? '⛔' : '✅';
+    return res.status(200).setHeader('Content-Type', 'text/plain').send(result);
   } catch (error) {
     console.error('Error al reenviar al AppScript:', error.message);
     return res.status(500).send('❌ Error al procesar la reserva.');
