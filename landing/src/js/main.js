@@ -693,8 +693,16 @@ const initFAQ = () => {
 };
 
 // ─── CÓDIGOS DE DESCUENTO ─────────────────────────────────────────────────────
-// Los códigos se validan en el servidor (netlify/functions/reserva.js).
-// El cliente solo muestra feedback visual una vez que el servidor confirma.
+// Usados para la vista previa de la cotización. El servidor los valida
+// de forma independiente antes de procesar la reserva.
+const DISCOUNT_CODES = {
+  'CASAPARQUELORETO':        10,
+  'DIARIOPARAUNANOVIA':      10,
+  'IBANDRA&CRISTOBAL':       15,
+  'MIMATRIMONIO':            30,
+  'MATRIMONIOSPORMANCAVADA': 15,
+  'MATRIMONIOJESU&ALEX':     15,
+};
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
 // ─── COTIZADOR CON GOOGLE MAPS ────────────────────────────────────────────────
@@ -749,9 +757,11 @@ const initCotizador = () => {
     const stopsCost  = paidStops * STOP_COST;
     const subtotal   = basePrice + stopsCost;
 
-    const rawCode = document.getElementById('codigoDescuento')?.value || '';
+    const rawCode     = document.getElementById('codigoDescuento')?.value || '';
+    const discountPct = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
+    const discountAmt = discountPct > 0 ? Math.round(subtotal * discountPct / 100) : 0;
+    const total       = subtotal - discountAmt;
 
-    // El servidor aplica el descuento real — aquí solo guardamos los datos del viaje.
     document.getElementById('cotizacion-data').value = JSON.stringify({
       origen:        originPlace?.formatted_address || originInput.value,
       destino:       destPlace?.formatted_address   || destInput.value,
@@ -760,7 +770,10 @@ const initCotizador = () => {
       paradasGratis: freeStops,
       paradasPagas:  paidStops,
       costoParadas:  stopsCost,
-      total:         subtotal,
+      codigoCupon:   rawCode.trim().toUpperCase(),
+      descuentoPct:  discountPct,
+      descuento:     discountAmt,
+      total:         total,
     });
   };
 
@@ -829,11 +842,15 @@ const initCotizador = () => {
   document.getElementById('paradas')?.addEventListener('change', updateQuote);
   document.getElementById('codigoDescuento')?.addEventListener('input', () => {
     const rawCode  = document.getElementById('codigoDescuento')?.value || '';
+    const pct      = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
     const feedback = document.getElementById('codigoDescuento-feedback');
     if (feedback) {
-      if (rawCode.trim()) {
-        feedback.textContent = 'Código guardado — se verificará al confirmar la reserva';
+      if (rawCode.trim() && pct > 0) {
+        feedback.textContent = `✓ Código válido — ${pct}% de descuento aplicado`;
         feedback.className   = 'codigo-feedback codigo-feedback--valid';
+      } else if (rawCode.trim()) {
+        feedback.textContent = 'Código no reconocido';
+        feedback.className   = 'codigo-feedback codigo-feedback--invalid';
       } else {
         feedback.textContent = '';
         feedback.className   = 'codigo-feedback';
