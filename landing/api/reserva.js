@@ -16,7 +16,7 @@ const DISCOUNT_CODES = {
   'IBANDRA&CRISTOBAL':       15,
   'MIMATRIMONIO':            30,
   'MATRIMONIOSPORMANCAVADA': 15,
-  'MATRIMONIOJESU&ALEX':     15,
+  'MATRIFRAN&FABRI':         10,
 };
 
 // Rate limiting en memoria (suficiente para Vercel serverless)
