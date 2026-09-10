@@ -702,6 +702,7 @@ const DISCOUNT_CODES = {
   'MIMATRIMONIO':            30,
   'MATRIMONIOSPORMANCAVADA': 15,
   'MATRIFRAN&FABRI':         10,
+  'MATRIMACA&JOACO':         15,
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
