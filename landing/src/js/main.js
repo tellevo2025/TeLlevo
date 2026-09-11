@@ -703,6 +703,7 @@ const DISCOUNT_CODES = {
   'MATRIMONIOSPORMANCAVADA': 15,
   'MATRIFRAN&FABRI':         10,
   'MATRIMACA&JOACO':         15,
+  'MATRIV&V':                10,
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
