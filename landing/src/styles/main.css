@@ -608,28 +608,28 @@ fieldset { border: none; }
   font-size: .875rem; font-weight: 500; color: var(--color-text-light);
   margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-1);
 }
-/* Selector de horas con scroll */
-.hora-carousel { margin-bottom: var(--space-3); }
+/* Selector de horas en grilla — sin scroll atrapado */
+.hora-grid { margin-bottom: var(--space-3); }
+.hora-grid__group { margin-bottom: var(--space-4); }
+.hora-grid__label {
+  font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--color-gold);
+  margin: 0 0 8px;
+}
+.hora-grid__row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+
+/* Mantener por compatibilidad si algún estilo legacy lo referencia */
 .hora-carousel__window {
   width: 100%;
-  height: calc(3 * 44px + 2 * 8px); /* 3 filas visibles = 148px */
-  overflow-y: scroll;
+  overflow-y: hidden;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch; /* momentum scroll en iOS */
   border-radius: var(--radius-md);
   /* Scrollbar Firefox */
   scrollbar-width: thin;
-  scrollbar-color: var(--color-gold) var(--color-primary-light);
-}
-/* Scrollbar Webkit (Chrome, Safari, Edge) */
-.hora-carousel__window::-webkit-scrollbar        { width: 6px; }
-.hora-carousel__window::-webkit-scrollbar-track  { background: var(--color-primary-light); border-radius: 3px; }
-.hora-carousel__window::-webkit-scrollbar-thumb  { background: var(--color-gold); border-radius: 3px; }
-.hora-carousel__window::-webkit-scrollbar-thumb:hover { background: var(--color-gold-bright); }
-
-.hora-carousel__track {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  padding-right: 8px; /* espacio para la barra */
+  scrollbar-color: transparent transparent;
 }
 
 /* Feedback código de descuento */
