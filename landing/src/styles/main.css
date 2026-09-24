@@ -608,30 +608,6 @@ fieldset { border: none; }
   font-size: .875rem; font-weight: 500; color: var(--color-text-light);
   margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-1);
 }
-/* Selector de horas en grilla — sin scroll atrapado */
-.hora-grid { margin-bottom: var(--space-3); }
-.hora-grid__group { margin-bottom: var(--space-4); }
-.hora-grid__label {
-  font-size: .7rem; font-weight: 700; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--color-gold);
-  margin: 0 0 8px;
-}
-.hora-grid__row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-}
-
-/* Mantener por compatibilidad si algún estilo legacy lo referencia */
-.hora-carousel__window {
-  width: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch; /* momentum scroll en iOS */
-  border-radius: var(--radius-md);
-  /* Scrollbar Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
 /* Feedback código de descuento */
 .codigo-feedback { display: block; margin-top: var(--space-2); font-size: .82rem; font-weight: 500; }
 .codigo-feedback--valid   { color: #4ade80; }
@@ -639,22 +615,6 @@ fieldset { border: none; }
 body.light-mode .codigo-feedback--valid   { color: #166534; }
 body.light-mode .codigo-feedback--invalid { color: #64748B; }
 
-.hora-btn {
-  height: 44px; width: 100%;
-  padding: 0 8px; border-radius: var(--radius-md); font-size: .95rem; font-weight: 600;
-  color: var(--color-text-muted); background: var(--color-surface);
-  border: 1.5px solid var(--color-primary-mid);
-  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
-}
-.hora-btn:hover:not(:disabled) {
-  border-color: rgba(201,168,76,.5); color: var(--color-gold);
-  background: rgba(201,168,76,.06);
-}
-.hora-btn--active {
-  background: var(--gradient-gold) !important; color: var(--color-primary) !important;
-  border-color: var(--color-gold) !important; box-shadow: var(--glow-gold-sm) !important;
-}
-.hora-btn:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
 
 /* Aviso OJO */
 .hora-section__ojo {

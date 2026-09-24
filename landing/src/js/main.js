@@ -162,7 +162,6 @@ const initCalendar = () => {
           const horaSection = document.getElementById('hora-section');
           horaSection.hidden = false;
           document.getElementById('horaViaje').value = '';
-          document.querySelectorAll('.hora-btn').forEach(b => b.classList.remove('hora-btn--active'));
 
           // Actualizar texto de fecha seleccionada
           const [y, m, dd2] = dateStr.split('-');
@@ -196,16 +195,10 @@ const initCalendar = () => {
 
 // ─── HORAS ────────────────────────────────────────────────────────────────────
 const initHoras = () => {
-  const track = document.getElementById('hora-track');
-  if (!track) return;
-
-  track.querySelectorAll('.hora-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      track.querySelectorAll('.hora-btn').forEach(b => b.classList.remove('hora-btn--active'));
-      btn.classList.add('hora-btn--active');
-      document.getElementById('horaViaje').value = btn.dataset.hora;
-      document.getElementById('horaViaje-error').textContent = '';
-    });
+  const select = document.getElementById('horaViaje');
+  if (!select) return;
+  select.addEventListener('change', () => {
+    document.getElementById('horaViaje-error').textContent = '';
   });
 };
 
@@ -456,7 +449,6 @@ const resetForm = () => {
   document.getElementById('horaViaje').value = '';
   document.getElementById('fechaViaje').value = '';
   document.getElementById('cal-selected').textContent = '';
-  document.querySelectorAll('.hora-btn').forEach(b => b.classList.remove('hora-btn--active'));
   document.querySelectorAll('.calendar-day--selected').forEach(b => b.classList.remove('calendar-day--selected'));
   const paradaCheck = document.getElementById('parada-check');
   if (paradaCheck) {

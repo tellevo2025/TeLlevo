@@ -580,86 +580,52 @@
 
             <!-- Horas — aparecen al elegir fecha -->
             <div class="hora-section" id="hora-section" hidden>
-              <p class="hora-section__label">
-                Selecciona la hora de recogida
-                <span class="form-group__required" aria-hidden="true">*</span>
-              </p>
-              <div class="hora-grid" id="hora-track" role="group" aria-label="Horarios disponibles">
-                <div class="hora-grid__group">
-                  <p class="hora-grid__label">Madrugada</p>
-                  <div class="hora-grid__row">
-                    <button type="button" class="hora-btn" data-hora="00:00">00:00</button>
-                    <button type="button" class="hora-btn" data-hora="00:30">00:30</button>
-                    <button type="button" class="hora-btn" data-hora="01:00">01:00</button>
-                    <button type="button" class="hora-btn" data-hora="01:30">01:30</button>
-                    <button type="button" class="hora-btn" data-hora="02:00">02:00</button>
-                    <button type="button" class="hora-btn" data-hora="02:30">02:30</button>
-                    <button type="button" class="hora-btn" data-hora="03:00">03:00</button>
-                    <button type="button" class="hora-btn" data-hora="03:30">03:30</button>
-                    <button type="button" class="hora-btn" data-hora="04:00">04:00</button>
-                    <button type="button" class="hora-btn" data-hora="04:30">04:30</button>
-                    <button type="button" class="hora-btn" data-hora="05:00">05:00</button>
-                    <button type="button" class="hora-btn" data-hora="05:30">05:30</button>
-                  </div>
-                </div>
-                <div class="hora-grid__group">
-                  <p class="hora-grid__label">Mañana</p>
-                  <div class="hora-grid__row">
-                    <button type="button" class="hora-btn" data-hora="06:00">06:00</button>
-                    <button type="button" class="hora-btn" data-hora="06:30">06:30</button>
-                    <button type="button" class="hora-btn" data-hora="07:00">07:00</button>
-                    <button type="button" class="hora-btn" data-hora="07:30">07:30</button>
-                    <button type="button" class="hora-btn" data-hora="08:00">08:00</button>
-                    <button type="button" class="hora-btn" data-hora="08:30">08:30</button>
-                    <button type="button" class="hora-btn" data-hora="09:00">09:00</button>
-                    <button type="button" class="hora-btn" data-hora="09:30">09:30</button>
-                    <button type="button" class="hora-btn" data-hora="10:00">10:00</button>
-                    <button type="button" class="hora-btn" data-hora="10:30">10:30</button>
-                    <button type="button" class="hora-btn" data-hora="11:00">11:00</button>
-                    <button type="button" class="hora-btn" data-hora="11:30">11:30</button>
-                  </div>
-                </div>
-                <div class="hora-grid__group">
-                  <p class="hora-grid__label">Tarde</p>
-                  <div class="hora-grid__row">
-                    <button type="button" class="hora-btn" data-hora="12:00">12:00</button>
-                    <button type="button" class="hora-btn" data-hora="12:30">12:30</button>
-                    <button type="button" class="hora-btn" data-hora="13:00">13:00</button>
-                    <button type="button" class="hora-btn" data-hora="13:30">13:30</button>
-                    <button type="button" class="hora-btn" data-hora="14:00">14:00</button>
-                    <button type="button" class="hora-btn" data-hora="14:30">14:30</button>
-                    <button type="button" class="hora-btn" data-hora="15:00">15:00</button>
-                    <button type="button" class="hora-btn" data-hora="15:30">15:30</button>
-                    <button type="button" class="hora-btn" data-hora="16:00">16:00</button>
-                    <button type="button" class="hora-btn" data-hora="16:30">16:30</button>
-                    <button type="button" class="hora-btn" data-hora="17:00">17:00</button>
-                    <button type="button" class="hora-btn" data-hora="17:30">17:30</button>
-                  </div>
-                </div>
-                <div class="hora-grid__group">
-                  <p class="hora-grid__label">Noche</p>
-                  <div class="hora-grid__row">
-                    <button type="button" class="hora-btn" data-hora="18:00">18:00</button>
-                    <button type="button" class="hora-btn" data-hora="18:30">18:30</button>
-                    <button type="button" class="hora-btn" data-hora="19:00">19:00</button>
-                    <button type="button" class="hora-btn" data-hora="19:30">19:30</button>
-                    <button type="button" class="hora-btn" data-hora="20:00">20:00</button>
-                    <button type="button" class="hora-btn" data-hora="20:30">20:30</button>
-                    <button type="button" class="hora-btn" data-hora="21:00">21:00</button>
-                    <button type="button" class="hora-btn" data-hora="21:30">21:30</button>
-                    <button type="button" class="hora-btn" data-hora="22:00">22:00</button>
-                    <button type="button" class="hora-btn" data-hora="22:30">22:30</button>
-                    <button type="button" class="hora-btn" data-hora="23:00">23:00</button>
-                    <button type="button" class="hora-btn" data-hora="23:30">23:30</button>
-                  </div>
-                </div>
+              <div class="form-group">
+                <label class="form-group__label" for="horaViaje">
+                  Hora de recogida
+                  <span class="form-group__required" aria-hidden="true">*</span>
+                </label>
+                <select class="form-group__input form-group__input--select" id="horaViaje" name="horaViaje">
+                  <option value="" disabled selected>Selecciona una hora</option>
+                  <optgroup label="Madrugada">
+                    <option value="00:00">00:00</option><option value="00:30">00:30</option>
+                    <option value="01:00">01:00</option><option value="01:30">01:30</option>
+                    <option value="02:00">02:00</option><option value="02:30">02:30</option>
+                    <option value="03:00">03:00</option><option value="03:30">03:30</option>
+                    <option value="04:00">04:00</option><option value="04:30">04:30</option>
+                    <option value="05:00">05:00</option><option value="05:30">05:30</option>
+                  </optgroup>
+                  <optgroup label="Mañana">
+                    <option value="06:00">06:00</option><option value="06:30">06:30</option>
+                    <option value="07:00">07:00</option><option value="07:30">07:30</option>
+                    <option value="08:00">08:00</option><option value="08:30">08:30</option>
+                    <option value="09:00">09:00</option><option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option><option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option><option value="11:30">11:30</option>
+                  </optgroup>
+                  <optgroup label="Tarde">
+                    <option value="12:00">12:00</option><option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option><option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option><option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option><option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option><option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option><option value="17:30">17:30</option>
+                  </optgroup>
+                  <optgroup label="Noche">
+                    <option value="18:00">18:00</option><option value="18:30">18:30</option>
+                    <option value="19:00">19:00</option><option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option><option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option><option value="21:30">21:30</option>
+                    <option value="22:00">22:00</option><option value="22:30">22:30</option>
+                    <option value="23:00">23:00</option><option value="23:30">23:30</option>
+                  </optgroup>
+                </select>
+                <span class="form-group__error" id="horaViaje-error" role="alert" aria-live="polite"></span>
               </div>
               <p class="hora-section__ojo">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span><strong>OJO:</strong> Si tu viaje es de madrugada (ej. viernes por la noche hacia el sábado), selecciona el día <strong>sábado</strong> con la hora correcta. Ejemplo: sábado 02:00.</span>
               </p>
-              <span class="form-group__error" id="horaViaje-error" role="alert" aria-live="polite"></span>
-              <input type="hidden" id="horaViaje" name="horaViaje">
             </div>
 
             <div class="form-step__nav">
