@@ -40,3 +40,21 @@ if (formToken) {
   console.warn('AVISO: FORM_TOKEN no definida — token dejado vacío');
 }
 fs.writeFileSync(jsPath, js);
+
+// Inyectar config Firebase en admin/index.html
+const adminPath = path.join(__dirname, '..', 'admin', 'index.html');
+if (fs.existsSync(adminPath)) {
+  let adminHtml = fs.readFileSync(adminPath, 'utf8');
+  const firebaseVars = {
+    '%%FIREBASE_API_KEY%%':           process.env.FIREBASE_API_KEY           || '',
+    '%%FIREBASE_AUTH_DOMAIN%%':       process.env.FIREBASE_AUTH_DOMAIN       || '',
+    '%%FIREBASE_PROJECT_ID%%':        process.env.FIREBASE_PROJECT_ID        || '',
+    '%%FIREBASE_APP_ID%%':            process.env.FIREBASE_APP_ID            || '',
+    '%%FIREBASE_MESSAGING_SENDER_ID%%': process.env.FIREBASE_MESSAGING_SENDER_ID || '',
+  };
+  for (const [k, v] of Object.entries(firebaseVars)) {
+    adminHtml = adminHtml.replaceAll(k, v);
+  }
+  fs.writeFileSync(adminPath, adminHtml);
+  console.log('OK: Config Firebase inyectada en admin/index.html');
+}
