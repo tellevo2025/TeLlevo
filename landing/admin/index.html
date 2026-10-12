@@ -376,9 +376,37 @@ el('login-form').addEventListener('submit', async (e) => {
   btn.textContent = 'Ingresando…';
   errEl.hidden = true;
   try {
-    await signInWithEmailAndPassword(auth, el('login-email').value.trim(), el('login-pwd').value);
+    const timeout = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error('timeout: Firebase SDK no responde — usando REST')), 8000)
+    );
+    await Promise.race([
+      signInWithEmailAndPassword(auth, el('login-email').value.trim(), el('login-pwd').value),
+      timeout,
+    ]);
   } catch (err) {
-    errEl.textContent = err.code ? `Error: ${err.code}` : (err.message || 'Error al iniciar sesión');
+    // Si es timeout, intentar login directo vía REST API
+    if (err.message?.startsWith('timeout')) {
+      try {
+        const r = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseConfig.apiKey}`,
+          { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ email: el('login-email').value.trim(), password: el('login-pwd').value, returnSecureToken: true }) }
+        );
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error?.message || 'Credenciales inválidas');
+        // Login exitoso vía REST: guardar token y mostrar app
+        window._fbToken = data.idToken;
+        window._fbUserId = data.localId;
+        el('login-screen').hidden = true;
+        el('app').hidden = false;
+        startListenersREST(data.idToken);
+        return;
+      } catch (restErr) {
+        errEl.textContent = 'Error: ' + (restErr.message || 'Credenciales inválidas');
+      }
+    } else {
+      errEl.textContent = err.code ? `Error: ${err.code}` : (err.message || 'Error al iniciar sesión');
+    }
     errEl.hidden = false;
     btn.disabled = false;
     btn.textContent = 'Ingresar';
@@ -397,6 +425,106 @@ document.querySelectorAll('.header__nav-btn').forEach(btn => {
     el('view-drivers').hidden      = view !== 'drivers';
   });
 });
+
+// ── Firestore REST helpers (fallback when SDK auth hangs) ─────────────────
+function _fsDocToObj(doc) {
+  const id = (doc.name || '').split('/').pop();
+  const obj = { id };
+  function parseVal(v) {
+    if ('stringValue'    in v) return v.stringValue;
+    if ('integerValue'   in v) return parseInt(v.integerValue);
+    if ('doubleValue'    in v) return v.doubleValue;
+    if ('booleanValue'   in v) return v.booleanValue;
+    if ('nullValue'      in v) return null;
+    if ('timestampValue' in v) return new Date(v.timestampValue);
+    if ('mapValue'       in v) {
+      const m = {};
+      for (const [k2, v2] of Object.entries(v.mapValue.fields || {})) m[k2] = parseVal(v2);
+      return m;
+    }
+    return null;
+  }
+  for (const [k, v] of Object.entries(doc.fields || {})) obj[k] = parseVal(v);
+  return obj;
+}
+function _fsToVal(val) {
+  if (val === null || val === undefined) return { nullValue: null };
+  if (typeof val === 'boolean') return { booleanValue: val };
+  if (typeof val === 'number') return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
+  if (typeof val === 'string') return { stringValue: val };
+  if (val instanceof Date) return { timestampValue: val.toISOString() };
+  if (typeof val === 'object') return { mapValue: { fields: Object.fromEntries(Object.entries(val).map(([k, v]) => [k, _fsToVal(v)])) } };
+  return { stringValue: String(val) };
+}
+const _fsBase = () => `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+async function _fsQuery(coll, token) {
+  const r = await fetch(`${_fsBase()}:runQuery`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: coll }],
+      orderBy: [{ field: { fieldPath: coll === 'reservations' ? 'createdAt' : 'nombre' }, direction: coll === 'reservations' ? 'DESCENDING' : 'ASCENDING' }], limit: 500 } })
+  });
+  const data = await r.json();
+  return Array.isArray(data) ? data.filter(d => d.document).map(d => _fsDocToObj(d.document)) : [];
+}
+async function _fsUpdate(coll, docId, fields, token) {
+  const mask = Object.keys(fields).map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
+  await fetch(`${_fsBase()}/${coll}/${docId}?${mask}`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, _fsToVal(v)])) })
+  });
+}
+async function _fsAdd(coll, data, token) {
+  const r = await fetch(`${_fsBase()}/${coll}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, _fsToVal(v)])) })
+  });
+  return ((await r.json()).name || '').split('/').pop();
+}
+async function _fsDel(coll, docId, token) {
+  await fetch(`${_fsBase()}/${coll}/${docId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+}
+
+// Unified wrappers — dispatch to SDK or REST depending on auth mode
+async function dbUpdate(coll, docId, fields) {
+  if (window._restMode) { await _fsUpdate(coll, docId, fields, window._fbToken); await _restRefresh(); }
+  else await updateDoc(doc(db, coll, docId), fields);
+}
+async function dbAdd(coll, data) {
+  if (window._restMode) { return await _fsAdd(coll, data, window._fbToken); }
+  else { const ref = await addDoc(collection(db, coll), data); return ref.id; }
+}
+async function dbDel(coll, docId) {
+  if (window._restMode) { await _fsDel(coll, docId, window._fbToken); await _restRefresh(); }
+  else await deleteDoc(doc(db, coll, docId));
+}
+
+let _restPoll = null;
+async function _restRefresh() {
+  const token = window._fbToken;
+  if (!token) return;
+  try {
+    const [resArr, drvArr] = await Promise.all([
+      fetch(`${_fsBase()}:runQuery`, { method:'POST', headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+        body: JSON.stringify({ structuredQuery:{ from:[{collectionId:'reservations'}], orderBy:[{field:{fieldPath:'createdAt'},direction:'DESCENDING'}], limit:500 }}) })
+        .then(r => r.json()).then(d => Array.isArray(d) ? d.filter(x => x.document).map(x => _fsDocToObj(x.document)) : []),
+      fetch(`${_fsBase()}/drivers`, { headers:{'Authorization':`Bearer ${token}`} })
+        .then(r => r.json()).then(d => (d.documents || []).map(_fsDocToObj)),
+    ]);
+    reservations = {};  resArr.forEach(r => { reservations[r.id] = r; });
+    drivers = {};       drvArr.forEach(d => { drivers[d.id] = d; });
+    renderReservations(); updateBadges(); renderDrivers();
+    if (selectedId && reservations[selectedId]) renderDetail(reservations[selectedId]);
+  } catch (e) { console.error('REST refresh error:', e); }
+}
+function startListenersREST(idToken) {
+  window._fbToken  = idToken;
+  window._restMode = true;
+  _restRefresh();
+  _restPoll = setInterval(_restRefresh, 30000);
+}
 
 // ── Firestore listeners ────────────────────────────────────────────────────
 function startListeners() {
@@ -597,9 +725,9 @@ function renderDetail(r) {
   el('action-confirm')?.addEventListener('click', async () => {
     const dId = el('detail-driver-select')?.value || '';
     const driver = dId ? drivers[dId] : null;
-    await updateDoc(doc(db, 'reservations', r.id), {
+    await dbUpdate('reservations', r.id, {
       status: 'confirmed',
-      driverId:   driver?.id   || null,
+      driverId:   driver?.id     || null,
       driverName: driver?.nombre || null,
     });
   });
@@ -607,19 +735,19 @@ function renderDetail(r) {
   el('action-assign')?.addEventListener('click', async () => {
     const dId = el('detail-driver-select')?.value || '';
     const driver = dId ? drivers[dId] : null;
-    await updateDoc(doc(db, 'reservations', r.id), {
+    await dbUpdate('reservations', r.id, {
       driverId:   driver?.id     || null,
       driverName: driver?.nombre || null,
     });
   });
 
   el('action-complete')?.addEventListener('click', async () => {
-    await updateDoc(doc(db, 'reservations', r.id), { status: 'completed' });
+    await dbUpdate('reservations', r.id, { status: 'completed' });
   });
 
   el('action-cancel')?.addEventListener('click', async () => {
     if (!confirm('¿Cancelar esta reserva?')) return;
-    await updateDoc(doc(db, 'reservations', r.id), { status: 'cancelled', driverId: null, driverName: null });
+    await dbUpdate('reservations', r.id, { status: 'cancelled', driverId: null, driverName: null });
   });
 }
 
@@ -628,11 +756,10 @@ el('add-driver-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nombre = el('driver-name-input').value.trim();
   if (!nombre) return;
-  await addDoc(collection(db, 'drivers'), {
+  await dbAdd('drivers', {
     nombre,
     telefono: el('driver-phone-input').value.trim(),
     activo:   true,
-    createdAt: serverTimestamp(),
   });
   el('driver-name-input').value  = '';
   el('driver-phone-input').value = '';
@@ -663,13 +790,13 @@ function renderDrivers() {
   list.querySelectorAll('.driver-toggle').forEach(btn => {
     btn.addEventListener('click', async () => {
       const d = drivers[btn.dataset.id];
-      if (d) await updateDoc(doc(db, 'drivers', btn.dataset.id), { activo: !d.activo });
+      if (d) await dbUpdate('drivers', btn.dataset.id, { activo: !d.activo });
     });
   });
   list.querySelectorAll('.driver-delete').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('¿Eliminar este chofer?')) return;
-      await deleteDoc(doc(db, 'drivers', btn.dataset.id));
+      await dbDel('drivers', btn.dataset.id);
     });
   });
 }
