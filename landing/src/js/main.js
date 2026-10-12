@@ -968,7 +968,8 @@ const initCotizadorWidget = () => {
       <div class="cotizador__result-row cotizador__result-row--total"><span>Total estimado</span><span>${fmt(q.total)}</span></div>
       <p class="cotizador__result-note">* Valor referencial, sujeto a confirmación por nuestro equipo.</p>
       <button type="button" class="btn btn--primary btn--lg cotizador__continue" id="cot-continue">
-        Me interesa — continuar reserva
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        Me interesa — Reservar ahora
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>`;
     document.getElementById('cot-continue')?.addEventListener('click', continueToReservation);
@@ -1050,6 +1051,7 @@ const initCotizadorWidget = () => {
             </div>
             <p class="cotizador__result-note">Tu viaje es de <strong>${cotDistKm} km</strong>. Nuestro equipo te contactará con una cotización personalizada.</p>
             <button type="button" class="btn btn--primary btn--lg cotizador__continue" id="cot-continue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
               Continuar a la reserva
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>`;
@@ -1068,11 +1070,9 @@ const initCotizadorWidget = () => {
 
   originAC.addListener('place_changed', () => {
     originPlace = originAC.getPlace();
-    if (destInput.value.trim()) runDistanceCalc();
   });
   destAC.addListener('place_changed', () => {
     destPlace = destAC.getPlace();
-    if (originInput.value.trim()) runDistanceCalc();
   });
 
   calcBtn?.addEventListener('click', runDistanceCalc);
@@ -1096,6 +1096,18 @@ const initCotizadorWidget = () => {
   const continueToReservation = () => {
     if (!cotQuoteData) return;
 
+    // 1. Feedback visual inmediato en el botón y la tarjeta
+    const btn  = document.getElementById('cot-continue');
+    const card = document.querySelector('#cotizar .cotizador__card');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        ¡Listo! Cargando tu reserva…`;
+    }
+    if (card) card.classList.add('cotizador__card--done');
+
+    // 2. Prefill del formulario
     const origenEl  = document.getElementById('centroEvento');
     const destinoEl = document.getElementById('destino');
     const codigoEl  = document.getElementById('codigoDescuento');
@@ -1107,7 +1119,6 @@ const initCotizadorWidget = () => {
     if (codigoEl)  codigoEl.value  = cotQuoteData.codigoCupon || '';
     if (cotDataEl) cotDataEl.value = JSON.stringify(cotQuoteData);
 
-    // Mostrar sección de paradas en el formulario con el hint correcto
     const paradaSectionForm = document.getElementById('parada-section');
     if (paradaSectionForm && cotQuoteData.distanciaKm) {
       paradaSectionForm.hidden = false;
@@ -1120,7 +1131,6 @@ const initCotizadorWidget = () => {
       }
     }
 
-    // Prefill paradas del formulario desde el widget
     if (cotParadaCount > 0) {
       const paradaCheck     = document.getElementById('parada-check');
       const paradasContainer = document.getElementById('paradas-container');
@@ -1141,14 +1151,32 @@ const initCotizadorWidget = () => {
       }
     }
     if (paradasEl) { paradasEl.value = cotParadaCount; paradasEl.dispatchEvent(new Event('change')); }
-
     codigoEl?.dispatchEvent(new Event('input'));
 
-    goToStep(1);
-    window.scrollTo({
-      top: document.getElementById('reserva').getBoundingClientRect().top + window.scrollY - 80,
-      behavior: 'smooth',
-    });
+    // 3. Después de un breve delay, ir al formulario con efecto visual
+    setTimeout(() => {
+      goToStep(1);
+      const reservaEl = document.getElementById('reserva');
+      if (reservaEl) {
+        window.scrollTo({
+          top: reservaEl.getBoundingClientRect().top + window.scrollY - 72,
+          behavior: 'smooth',
+        });
+        // Flash de bienvenida en la sección de reserva
+        reservaEl.classList.add('booking--flash');
+        setTimeout(() => reservaEl.classList.remove('booking--flash'), 1600);
+      }
+      // Mostrar aviso de cotización precargada
+      const notice = document.getElementById('booking-prefill-notice');
+      if (notice) {
+        notice.hidden = false;
+        setTimeout(() => {
+          notice.style.transition = 'opacity .5s ease';
+          notice.style.opacity = '0';
+          setTimeout(() => { notice.hidden = true; notice.style.opacity = ''; notice.style.transition = ''; }, 520);
+        }, 4000);
+      }
+    }, 650);
   };
 };
 

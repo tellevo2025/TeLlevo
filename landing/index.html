@@ -601,6 +601,12 @@
     <section class="booking" id="reserva" aria-labelledby="booking-title">
       <div class="booking__container">
 
+        <!-- Aviso de cotización precargada (solo visible al venir desde el cotizador) -->
+        <div class="booking__prefill-notice" id="booking-prefill-notice" hidden aria-live="polite">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          Cotización precargada — ya tienes origen, destino y precio guardados. Solo falta fecha, hora y tus datos.
+        </div>
+
         <header class="booking__header">
           <p class="section-eyebrow">Reservas</p>
           <h2 class="section-title" id="booking-title">Reserva tu chofer ahora</h2>
