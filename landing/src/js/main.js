@@ -1117,6 +1117,16 @@ const initCotizadorWidget = () => {
     if (origenEl)  origenEl.value  = cotQuoteData.origen  || '';
     if (destinoEl) destinoEl.value = cotQuoteData.destino || '';
     if (codigoEl)  codigoEl.value  = cotQuoteData.codigoCupon || '';
+
+    // Bloquear origen y destino — el usuario ya los definió en la cotización
+    [origenEl, destinoEl].forEach(el => {
+      if (!el) return;
+      el.setAttribute('readonly', '');
+      el.closest('.form-group')?.classList.add('form-group--locked');
+      const hint = el.closest('.form-group')?.querySelector('.form-group__hint');
+      if (hint) hint.innerHTML =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Precargado desde tu cotización';
+    });
     if (cotDataEl) cotDataEl.value = JSON.stringify(cotQuoteData);
 
     const paradaSectionForm = document.getElementById('parada-section');

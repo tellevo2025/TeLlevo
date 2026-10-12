@@ -1916,6 +1916,23 @@ body.light-mode .hero__stat-divider { background: #A8B2C4; }
   color: var(--color-gold);
 }
 
+/* Campos bloqueados al venir del cotizador */
+.form-group--locked .form-group__input[readonly] {
+  background: rgba(201, 168, 76, .06);
+  border-color: rgba(201, 168, 76, .35);
+  color: var(--color-text-light);
+  cursor: default;
+  opacity: .9;
+}
+
+.form-group--locked .form-group__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-gold);
+  font-size: .78rem;
+}
+
 /* Navbar highlight para "Cotizar precio" */
 .navbar__link--highlight {
   color: var(--color-gold) !important;
