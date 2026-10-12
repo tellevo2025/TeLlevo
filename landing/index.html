@@ -34,6 +34,7 @@
           <li><a href="#beneficios" class="navbar__link">Servicios</a></li>
           <li><a href="#testimonios" class="navbar__link">Testimonios</a></li>
           <li><a href="#faq" class="navbar__link">FAQ</a></li>
+          <li><a href="#cotizar" class="navbar__link navbar__link--highlight">Cotizar precio</a></li>
           <li><a href="/trabaja.html" class="navbar__link">Trabaja con nosotros</a></li>
         </ul>
       </nav>
@@ -58,6 +59,7 @@
         <li><a href="#beneficios" class="navbar__mobile-link">Servicios</a></li>
         <li><a href="#testimonios" class="navbar__mobile-link">Testimonios</a></li>
         <li><a href="#faq" class="navbar__mobile-link">FAQ</a></li>
+        <li><a href="#cotizar" class="navbar__mobile-link">Cotizar precio</a></li>
         <li><a href="/trabaja.html" class="navbar__mobile-link">Trabaja con nosotros</a></li>
         <li><a href="#reserva" class="btn btn--primary navbar__mobile-cta">Reservar chofer</a></li>
       </ul>
@@ -166,6 +168,10 @@
         </p>
         <div class="hero__actions">
           <a href="#reserva" class="btn btn--primary btn--lg hero__cta">Reservar mi chofer</a>
+          <a href="#cotizar" class="btn btn--secondary btn--lg">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Cotizar precio
+          </a>
           <a
             href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20cotizar%20un%20chofer%20de%20reemplazo.%20%C2%BFPodr%C3%ADan%20ayudarme%3F"
             target="_blank"
@@ -504,6 +510,88 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ==========================================
+       COTIZADOR DE PRECIO
+    ========================================== -->
+    <section class="cotizador" id="cotizar" aria-labelledby="cotizador-title">
+      <div class="cotizador__container">
+        <header class="cotizador__header">
+          <p class="section-eyebrow">Cotización instantánea</p>
+          <h2 class="section-title" id="cotizador-title">¿Cuánto cuesta tu viaje?</h2>
+          <p class="section-subtitle">Ingresa origen y destino para calcular el precio al instante. Sin compromisos.</p>
+        </header>
+
+        <div class="cotizador__card">
+          <div class="cotizador__fields">
+
+            <div class="form-group">
+              <label class="form-group__label" for="cot-origen">
+                Dirección de inicio <span class="form-group__required" aria-hidden="true">*</span>
+              </label>
+              <input class="form-group__input" type="text" id="cot-origen"
+                placeholder="Ej: Av. Apoquindo 1234, Las Condes"
+                autocomplete="off">
+              <span class="form-group__hint">Lugar donde inicia el viaje (evento, salón, etc.)</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-group__label" for="cot-destino">
+                Dirección de destino <span class="form-group__required" aria-hidden="true">*</span>
+              </label>
+              <input class="form-group__input" type="text" id="cot-destino"
+                placeholder="Ej: Las Condes 4567, Santiago"
+                autocomplete="off">
+              <span class="form-group__hint">Tu hogar o destino final del viaje.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-group__label" for="cot-codigo">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Código de descuento <span class="form-group__optional">(opcional)</span>
+              </label>
+              <input class="form-group__input" type="text" id="cot-codigo"
+                placeholder="Ej: CASAPARQUELORETO"
+                autocomplete="off" spellcheck="false"
+                style="text-transform:uppercase">
+              <span class="form-group__hint">Si tienes un código especial, ingrésalo aquí.</span>
+              <span class="codigo-feedback" id="cot-codigo-feedback" aria-live="polite"></span>
+            </div>
+
+            <!-- Paradas — aparecen al calcular distancia -->
+            <div class="parada-section" id="cot-parada-section" hidden>
+              <div class="form-group">
+                <label class="parada-toggle" for="cot-parada-check">
+                  <input type="checkbox" id="cot-parada-check" class="parada-toggle__check">
+                  <span class="parada-toggle__box" aria-hidden="true"></span>
+                  <span class="parada-toggle__text">
+                    ¿Necesitas paradas en el camino?
+                    <span class="parada-toggle__hint" id="cot-parada-hint">1ª parada gratis · $5.000 por cada parada adicional</span>
+                  </span>
+                </label>
+              </div>
+              <div id="cot-paradas-container" hidden>
+                <div id="cot-paradas-list"></div>
+                <button type="button" class="btn btn--secondary btn--sm paradas-add-btn" id="cot-add-parada-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Añadir otra parada <span class="paradas-add-btn__cost">(+$5.000)</span>
+                </button>
+              </div>
+              <input type="hidden" id="cot-paradas" value="0">
+            </div>
+
+            <button type="button" class="btn btn--secondary btn--lg cotizador__calc-btn" id="cot-calc-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Calcular precio
+            </button>
+
+          </div>
+
+          <!-- Resultado de cotización (poblado por JS) -->
+          <div class="cotizador__result" id="cotizador-result" hidden aria-live="polite"></div>
+        </div>
       </div>
     </section>
 

@@ -699,24 +699,27 @@ const DISCOUNT_CODES = {
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
+// ─── PRECIOS (compartidos entre cotizador widget y formulario) ────────────────
+const PRICE_TABLE = [
+  { max: 19, price: 35000 },
+  { max: 34, price: 40000 },
+  { max: 44, price: 50000 },
+  { max: 54, price: 55000 },
+  { max: 64, price: 62000 },
+  { max: 70, price: 68000 },
+  { max: 75, price: 73000 },
+  { max: 80, price: 77000 },
+  { max: 85, price: 80000 },
+];
+const STOP_COST    = 5000;
+const getBasePrice = (km) => { for (const r of PRICE_TABLE) if (km <= r.max) return r.price; return null; };
+const getFreeStops = (km) => (km < 35 ? 1 : 2);
+
 // ─── COTIZADOR CON GOOGLE MAPS ────────────────────────────────────────────────
 const initCotizador = () => {
   const originInput = document.getElementById('centroEvento');
   const destInput   = document.getElementById('destino');
   if (!originInput || !destInput || typeof google === 'undefined') return;
-
-  const PRICE_TABLE = [
-    { max: 19, price: 35000 },
-    { max: 34, price: 40000 },
-    { max: 44, price: 50000 },
-    { max: 54, price: 55000 },
-    { max: 64, price: 62000 },
-    { max: 70, price: 68000 },
-    { max: 75, price: 73000 },
-    { max: 80, price: 77000 },
-    { max: 85, price: 80000 },
-  ];
-  const STOP_COST = 5000;
 
   const placesOpts = {
     componentRestrictions: { country: 'cl' },
@@ -731,13 +734,6 @@ const initCotizador = () => {
   let distanceKm  = null;
 
   const fmt = (n) => '$' + n.toLocaleString('es-CL');
-
-  const getBasePrice = (km) => {
-    for (const r of PRICE_TABLE) if (km <= r.max) return r.price;
-    return null;
-  };
-
-  const getFreeStops = (km) => (km < 35 ? 1 : 2);
 
   const updateQuote = () => {
     if (distanceKm === null) return;
@@ -854,8 +850,310 @@ const initCotizador = () => {
   });
 };
 
+// ─── COTIZADOR WIDGET (sección independiente al formulario) ──────────────────
+let cotParadaCount = 0;
+let cotParadaSeq   = 0;
+
+const initCotizadorWidget = () => {
+  const originInput = document.getElementById('cot-origen');
+  const destInput   = document.getElementById('cot-destino');
+  const calcBtn     = document.getElementById('cot-calc-btn');
+  const resultEl    = document.getElementById('cotizador-result');
+  if (!originInput || !destInput || !resultEl || typeof google === 'undefined') return;
+
+  const placesOpts = {
+    componentRestrictions: { country: 'cl' },
+    fields: ['formatted_address', 'geometry', 'place_id'],
+  };
+
+  const originAC = new google.maps.places.Autocomplete(originInput, placesOpts);
+  const destAC   = new google.maps.places.Autocomplete(destInput,   placesOpts);
+
+  let originPlace  = null;
+  let destPlace    = null;
+  let cotDistKm    = null;
+  let cotQuoteData = null;
+
+  const fmt = (n) => '$' + n.toLocaleString('es-CL');
+
+  // ── Paradas en el widget ──────────────────────────────────────────────────
+  const cotUpdateParadas = () => {
+    const el = document.getElementById('cot-paradas');
+    if (el) { el.value = cotParadaCount; el.dispatchEvent(new Event('change')); }
+  };
+
+  const cotRemoveParada = (id) => {
+    document.getElementById(`cot-parada-item-${id}`)?.remove();
+    cotParadaCount--;
+    cotUpdateParadas();
+    document.querySelectorAll('#cot-paradas-list .parada-item').forEach((el, i) => {
+      const lbl  = el.querySelector('.parada-item__label');
+      const free = cotDistKm !== null ? getFreeStops(cotDistKm) : 1;
+      if (lbl) lbl.textContent = i < free ? `Parada ${i + 1} (gratis)` : `Parada ${i + 1} (+$5.000)`;
+    });
+    if (cotParadaCount === 0) {
+      document.getElementById('cot-parada-check').checked = false;
+      document.getElementById('cot-paradas-container').hidden = true;
+    }
+  };
+
+  const cotAddParada = () => {
+    cotParadaCount++;
+    cotParadaSeq++;
+    cotUpdateParadas();
+    const seq  = cotParadaSeq;
+    const pos  = cotParadaCount;
+    const free = cotDistKm !== null ? getFreeStops(cotDistKm) : 1;
+    const lbl  = pos <= free ? `Parada ${pos} (gratis)` : `Parada ${pos} (+$5.000)`;
+    const id   = `cot-parada-${seq}`;
+
+    const item = document.createElement('div');
+    item.className = 'parada-item';
+    item.id = `cot-parada-item-${seq}`;
+    item.innerHTML = `
+      <div class="parada-item__header">
+        <span class="parada-item__label">${lbl}</span>
+        <button type="button" class="parada-item__remove" aria-label="Eliminar parada ${pos}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <input class="form-group__input" type="text" id="${id}"
+        placeholder="Ej: Av. Providencia 123, Providencia">`;
+
+    item.querySelector('.parada-item__remove').addEventListener('click', () => cotRemoveParada(seq));
+    document.getElementById('cot-paradas-list').appendChild(item);
+    setTimeout(() => document.getElementById(id)?.focus(), 50);
+  };
+
+  document.getElementById('cot-parada-check')?.addEventListener('change', function () {
+    const container = document.getElementById('cot-paradas-container');
+    if (this.checked) {
+      container.hidden = false;
+      if (cotParadaCount === 0) cotAddParada();
+    } else {
+      document.getElementById('cot-paradas-list').innerHTML = '';
+      cotParadaCount = 0;
+      cotParadaSeq   = 0;
+      cotUpdateParadas();
+      container.hidden = true;
+    }
+  });
+  document.getElementById('cot-add-parada-btn')?.addEventListener('click', cotAddParada);
+
+  // ── Cálculo de precio ─────────────────────────────────────────────────────
+  const renderCotResult = () => {
+    const q = cotQuoteData;
+    if (!q || q.sinCobertura) return;
+
+    const discRow = q.descuento > 0
+      ? `<div class="cotizador__result-row cotizador__result-row--discount">
+           <span>Descuento${q.descuentoPct ? ` (${q.descuentoPct}%)` : ''}</span>
+           <span>-${fmt(q.descuento)}</span>
+         </div>`
+      : '';
+    const stopsText = q.paradasPagas === 0
+      ? (q.paradasGratis === 1 ? 'Incluida (1 gratis)' : 'Incluidas (2 gratis)')
+      : `${fmt(q.costoParadas)} (${q.paradasPagas} extra${q.paradasPagas > 1 ? 's' : ''})`;
+
+    resultEl.hidden = false;
+    resultEl.innerHTML = `
+      <div class="cotizador__result-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Tu cotización estimada
+      </div>
+      <div class="cotizador__result-row"><span>Distancia</span><span>${q.distanciaKm} km</span></div>
+      <div class="cotizador__result-row"><span>Precio base</span><span>${fmt(q.precioBase)}</span></div>
+      ${discRow}
+      <div class="cotizador__result-row"><span>Paradas</span><span>${stopsText}</span></div>
+      <div class="cotizador__result-row cotizador__result-row--total"><span>Total estimado</span><span>${fmt(q.total)}</span></div>
+      <p class="cotizador__result-note">* Valor referencial, sujeto a confirmación por nuestro equipo.</p>
+      <button type="button" class="btn btn--primary btn--lg cotizador__continue" id="cot-continue">
+        Me interesa — continuar reserva
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>`;
+    document.getElementById('cot-continue')?.addEventListener('click', continueToReservation);
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  const calculateCotQuote = () => {
+    if (cotDistKm === null) return;
+    const basePrice = getBasePrice(cotDistKm);
+    if (!basePrice) return;
+
+    const freeStops  = getFreeStops(cotDistKm);
+    const totalStops = parseInt(document.getElementById('cot-paradas')?.value) || 0;
+    const paidStops  = Math.max(0, totalStops - freeStops);
+    const stopsCost  = paidStops * STOP_COST;
+    const subtotal   = basePrice + stopsCost;
+    const rawCode    = document.getElementById('cot-codigo')?.value || '';
+    const discPct    = DISCOUNT_CODES[normalizeCode(rawCode)] || 0;
+    const discAmt    = discPct > 0 ? Math.round(subtotal * discPct / 100) : 0;
+
+    cotQuoteData = {
+      origen:        originPlace?.formatted_address || originInput.value,
+      destino:       destPlace?.formatted_address   || destInput.value,
+      distanciaKm:   cotDistKm,
+      precioBase:    basePrice,
+      paradasGratis: freeStops,
+      paradasPagas:  paidStops,
+      costoParadas:  stopsCost,
+      codigoCupon:   rawCode.trim().toUpperCase(),
+      descuentoPct:  discPct,
+      descuento:     discAmt,
+      total:         subtotal - discAmt,
+    };
+    renderCotResult();
+  };
+
+  const runDistanceCalc = () => {
+    const originVal = originInput.value.trim();
+    const destVal   = destInput.value.trim();
+    if (!originVal || !destVal) return;
+
+    const origin = originPlace?.place_id       ? { placeId: originPlace.place_id }
+      : originPlace?.geometry?.location        ? originPlace.geometry.location
+      : originVal;
+    const dest = destPlace?.place_id           ? { placeId: destPlace.place_id }
+      : destPlace?.geometry?.location          ? destPlace.geometry.location
+      : destVal;
+
+    const svc = new google.maps.DirectionsService();
+    svc.route({ origin, destination: dest, travelMode: google.maps.TravelMode.DRIVING },
+      (response, status) => {
+        if (status !== 'OK') {
+          resultEl.hidden = false;
+          resultEl.innerHTML = `<p class="cotizador__result-note cotizador__result-note--error">No pudimos calcular esa ruta. Intenta con otra dirección o <a href="https://wa.me/56954873548" target="_blank" rel="noopener" style="color:var(--color-gold)">escríbenos por WhatsApp</a>.</p>`;
+          return;
+        }
+        const leg = response.routes[0]?.legs[0];
+        if (!leg) return;
+        cotDistKm = Math.round(leg.distance.value / 1000);
+
+        const paradaSec = document.getElementById('cot-parada-section');
+        const hintEl    = document.getElementById('cot-parada-hint');
+        const free      = getFreeStops(cotDistKm);
+
+        if (cotDistKm > 85) {
+          if (hintEl) hintEl.textContent = '2 primeras paradas gratis · $5.000 por cada parada adicional';
+          if (paradaSec) paradaSec.hidden = false;
+          cotQuoteData = {
+            sinCobertura: true,
+            distanciaKm:  cotDistKm,
+            origen:  originPlace?.formatted_address || originVal,
+            destino: destPlace?.formatted_address   || destVal,
+          };
+          resultEl.hidden = false;
+          resultEl.innerHTML = `
+            <div class="cotizador__result-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Viaje de larga distancia
+            </div>
+            <p class="cotizador__result-note">Tu viaje es de <strong>${cotDistKm} km</strong>. Nuestro equipo te contactará con una cotización personalizada.</p>
+            <button type="button" class="btn btn--primary btn--lg cotizador__continue" id="cot-continue">
+              Continuar a la reserva
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>`;
+          document.getElementById('cot-continue')?.addEventListener('click', continueToReservation);
+          resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return;
+        }
+
+        if (hintEl) hintEl.textContent = free === 1
+          ? '1ª parada gratis · $5.000 por cada parada adicional'
+          : '2 primeras paradas gratis · $5.000 por cada parada adicional';
+        if (paradaSec) paradaSec.hidden = false;
+        calculateCotQuote();
+      });
+  };
+
+  originAC.addListener('place_changed', () => {
+    originPlace = originAC.getPlace();
+    if (destInput.value.trim()) runDistanceCalc();
+  });
+  destAC.addListener('place_changed', () => {
+    destPlace = destAC.getPlace();
+    if (originInput.value.trim()) runDistanceCalc();
+  });
+
+  calcBtn?.addEventListener('click', runDistanceCalc);
+
+  document.getElementById('cot-paradas')?.addEventListener('change', () => {
+    if (cotDistKm !== null && cotQuoteData && !cotQuoteData.sinCobertura) calculateCotQuote();
+  });
+  document.getElementById('cot-codigo')?.addEventListener('input', () => {
+    const raw = document.getElementById('cot-codigo')?.value || '';
+    const pct = DISCOUNT_CODES[normalizeCode(raw)] || 0;
+    const fb  = document.getElementById('cot-codigo-feedback');
+    if (fb) {
+      if (raw.trim() && pct > 0)  { fb.textContent = `✓ Código válido — ${pct}% de descuento`; fb.className = 'codigo-feedback codigo-feedback--valid'; }
+      else if (raw.trim())         { fb.textContent = 'Código no reconocido'; fb.className = 'codigo-feedback codigo-feedback--invalid'; }
+      else                         { fb.textContent = ''; fb.className = 'codigo-feedback'; }
+    }
+    if (cotDistKm !== null && cotQuoteData && !cotQuoteData.sinCobertura) calculateCotQuote();
+  });
+
+  // ── Continuar a la reserva ────────────────────────────────────────────────
+  const continueToReservation = () => {
+    if (!cotQuoteData) return;
+
+    const origenEl  = document.getElementById('centroEvento');
+    const destinoEl = document.getElementById('destino');
+    const codigoEl  = document.getElementById('codigoDescuento');
+    const cotDataEl = document.getElementById('cotizacion-data');
+    const paradasEl = document.getElementById('paradas');
+
+    if (origenEl)  origenEl.value  = cotQuoteData.origen  || '';
+    if (destinoEl) destinoEl.value = cotQuoteData.destino || '';
+    if (codigoEl)  codigoEl.value  = cotQuoteData.codigoCupon || '';
+    if (cotDataEl) cotDataEl.value = JSON.stringify(cotQuoteData);
+
+    // Mostrar sección de paradas en el formulario con el hint correcto
+    const paradaSectionForm = document.getElementById('parada-section');
+    if (paradaSectionForm && cotQuoteData.distanciaKm) {
+      paradaSectionForm.hidden = false;
+      const hintEl = document.getElementById('parada-hint');
+      if (hintEl) {
+        const free = getFreeStops(cotQuoteData.distanciaKm);
+        hintEl.textContent = free === 1
+          ? '1ª parada gratis · $5.000 por cada parada adicional'
+          : '2 primeras paradas gratis · $5.000 por cada parada adicional';
+      }
+    }
+
+    // Prefill paradas del formulario desde el widget
+    if (cotParadaCount > 0) {
+      const paradaCheck     = document.getElementById('parada-check');
+      const paradasContainer = document.getElementById('paradas-container');
+      const paradasList     = document.getElementById('paradas-list');
+      if (paradaCheck && paradasContainer && paradasList) {
+        paradasList.innerHTML = '';
+        paradaCount = 0;
+        paradaSeq   = 0;
+        const addresses = [...document.querySelectorAll('#cot-paradas-list .parada-item input[type="text"]')]
+          .map(inp => inp.value.trim());
+        paradaCheck.checked = true;
+        paradasContainer.hidden = false;
+        addresses.forEach(addr => {
+          addParada();
+          const lastInput = document.querySelector(`#parada-item-${paradaSeq} input[type="text"]`);
+          if (lastInput && addr) lastInput.value = addr;
+        });
+      }
+    }
+    if (paradasEl) { paradasEl.value = cotParadaCount; paradasEl.dispatchEvent(new Event('change')); }
+
+    codigoEl?.dispatchEvent(new Event('input'));
+
+    goToStep(1);
+    window.scrollTo({
+      top: document.getElementById('reserva').getBoundingClientRect().top + window.scrollY - 80,
+      behavior: 'smooth',
+    });
+  };
+};
+
 // Callback invocado por el script de Google Maps una vez cargado
-window.initGoogleMaps = () => { initCotizador(); };
+window.initGoogleMaps = () => { initCotizadorWidget(); initCotizador(); };
 
 // ─── HERO TEXT ROTATOR ────────────────────────────────────────────────────────
 const initHeroRotator = () => {
