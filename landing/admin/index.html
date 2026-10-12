@@ -348,14 +348,23 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 
 // ── Auth ───────────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    el('login-screen').hidden = true;
-    el('app').hidden = false;
-    startListeners();
-  } else {
-    el('login-screen').hidden = false;
-    el('app').hidden = true;
-    stopListeners();
+  try {
+    if (user) {
+      el('login-screen').hidden = true;
+      el('app').hidden = false;
+      startListeners();
+    } else {
+      const btn = el('login-btn');
+      if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
+      el('login-screen').hidden = false;
+      el('app').hidden = true;
+      stopListeners();
+    }
+  } catch (err) {
+    const errEl = el('login-error');
+    if (errEl) { errEl.textContent = 'Error interno: ' + (err.code || err.message); errEl.hidden = false; }
+    const btn = el('login-btn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
   }
 });
 
@@ -392,20 +401,29 @@ document.querySelectorAll('.header__nav-btn').forEach(btn => {
 // ── Firestore listeners ────────────────────────────────────────────────────
 function startListeners() {
   const q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
-  unsubReservations = onSnapshot(q, (snap) => {
-    reservations = {};
-    snap.forEach(d => { reservations[d.id] = { id: d.id, ...d.data() }; });
-    renderReservations();
-    updateBadges();
-    if (selectedId && reservations[selectedId]) renderDetail(reservations[selectedId]);
-  });
+  unsubReservations = onSnapshot(q,
+    (snap) => {
+      reservations = {};
+      snap.forEach(d => { reservations[d.id] = { id: d.id, ...d.data() }; });
+      renderReservations();
+      updateBadges();
+      if (selectedId && reservations[selectedId]) renderDetail(reservations[selectedId]);
+    },
+    (err) => {
+      console.error('Firestore reservations error:', err.code, err.message);
+      el('reservations-list').innerHTML = `<div class="empty-state"><p>Error Firestore: ${err.code || err.message}</p></div>`;
+    }
+  );
 
-  unsubDrivers = onSnapshot(collection(db, 'drivers'), (snap) => {
-    drivers = {};
-    snap.forEach(d => { drivers[d.id] = { id: d.id, ...d.data() }; });
-    renderDrivers();
-    if (selectedId) renderDetail(reservations[selectedId]); // refresh driver select
-  });
+  unsubDrivers = onSnapshot(collection(db, 'drivers'),
+    (snap) => {
+      drivers = {};
+      snap.forEach(d => { drivers[d.id] = { id: d.id, ...d.data() }; });
+      renderDrivers();
+      if (selectedId) renderDetail(reservations[selectedId]);
+    },
+    (err) => console.error('Firestore drivers error:', err.code, err.message)
+  );
 }
 
 function stopListeners() {
