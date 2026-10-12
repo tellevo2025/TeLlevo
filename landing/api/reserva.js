@@ -94,12 +94,15 @@ module.exports = async function handler(req, res) {
   }
 
   // ── 2. Reenviar al GAS (emails + calendario) ────────────────────────────
+  // Debe ser await — en serverless, el proceso muere al enviar la respuesta
   if (GAS_URL) {
-    fetch(GAS_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    params.toString(),
-    }).catch(e => console.error('GAS forward error:', e.message));
+    try {
+      await fetch(GAS_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params.toString(),
+      });
+    } catch (e) { console.error('GAS forward error:', e.message); }
   }
 
   return res.status(200).setHeader('Content-Type', 'text/plain').send('✅');
