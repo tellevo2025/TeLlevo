@@ -348,6 +348,8 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 
 // ── Auth ───────────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, (user) => {
+  // Si ya estamos en modo REST, ignorar — el estado lo maneja el fallback
+  if (window._restMode) return;
   try {
     if (user) {
       el('login-screen').hidden = true;
@@ -413,7 +415,19 @@ el('login-form').addEventListener('submit', async (e) => {
   }
 });
 
-el('logout-btn').addEventListener('click', () => signOut(auth));
+el('logout-btn').addEventListener('click', async () => {
+  if (window._restMode) {
+    // Modo REST: limpiar estado y volver a login
+    window._restMode = false;
+    window._fbToken  = null;
+    if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
+    stopListeners();
+    el('login-screen').hidden = false;
+    el('app').hidden = true;
+  } else {
+    await signOut(auth);
+  }
+});
 
 // ── Nav ────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.header__nav-btn').forEach(btn => {
