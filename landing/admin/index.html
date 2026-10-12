@@ -346,87 +346,55 @@ const statusLabel = { pending: 'Pendiente', confirmed: 'Confirmada', completed: 
 const el  = (id) => document.getElementById(id);
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 
-// ── Auth ───────────────────────────────────────────────────────────────────
+// ── Auth — solo REST API, sin depender del SDK de Firebase Auth ────────────
+// El SDK de Firebase Auth se cuelga en este entorno; usamos la REST API directamente.
+// onAuthStateChanged se registra solo para limpiar sesiones cacheadas antiguas.
 onAuthStateChanged(auth, (user) => {
-  // Si ya estamos en modo REST, ignorar — el estado lo maneja el fallback
-  if (window._restMode) return;
-  try {
-    if (user) {
-      el('login-screen').hidden = true;
-      el('app').hidden = false;
-      startListeners();
-    } else {
-      const btn = el('login-btn');
-      if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
-      el('login-screen').hidden = false;
-      el('app').hidden = true;
-      stopListeners();
-    }
-  } catch (err) {
-    const errEl = el('login-error');
-    if (errEl) { errEl.textContent = 'Error interno: ' + (err.code || err.message); errEl.hidden = false; }
-    const btn = el('login-btn');
-    if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
+  if (window._restMode) return; // REST mode activo — ignorar SDK
+  if (user) {
+    // Hay sesión cacheada del SDK — cerrarla para forzar login limpio vía REST
+    signOut(auth).catch(() => {});
   }
+  // Siempre mostrar login screen al cargar (no auto-login via SDK)
+  el('login-screen').hidden = false;
+  el('app').hidden = true;
 });
 
 el('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const btn = el('login-btn');
-  const errEl = el('login-error');
+  const btn    = el('login-btn');
+  const errEl  = el('login-error');
   btn.disabled = true;
   btn.textContent = 'Ingresando…';
   errEl.hidden = true;
   try {
-    const timeout = new Promise((_, rej) =>
-      setTimeout(() => rej(new Error('timeout: Firebase SDK no responde — usando REST')), 8000)
+    const r = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseConfig.apiKey}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: el('login-email').value.trim(), password: el('login-pwd').value, returnSecureToken: true }) }
     );
-    await Promise.race([
-      signInWithEmailAndPassword(auth, el('login-email').value.trim(), el('login-pwd').value),
-      timeout,
-    ]);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error?.message || 'Credenciales inválidas');
+    window._fbToken = data.idToken;
+    el('login-screen').hidden = true;
+    el('app').hidden = false;
+    startListenersREST(data.idToken);
   } catch (err) {
-    // Si es timeout, intentar login directo vía REST API
-    if (err.message?.startsWith('timeout')) {
-      try {
-        const r = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseConfig.apiKey}`,
-          { method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ email: el('login-email').value.trim(), password: el('login-pwd').value, returnSecureToken: true }) }
-        );
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error?.message || 'Credenciales inválidas');
-        // Login exitoso vía REST: guardar token y mostrar app
-        window._fbToken = data.idToken;
-        window._fbUserId = data.localId;
-        el('login-screen').hidden = true;
-        el('app').hidden = false;
-        startListenersREST(data.idToken);
-        return;
-      } catch (restErr) {
-        errEl.textContent = 'Error: ' + (restErr.message || 'Credenciales inválidas');
-      }
-    } else {
-      errEl.textContent = err.code ? `Error: ${err.code}` : (err.message || 'Error al iniciar sesión');
-    }
+    errEl.textContent = err.message === 'INVALID_LOGIN_CREDENTIALS' ? 'Email o contraseña incorrectos' : (err.message || 'Error al iniciar sesión');
     errEl.hidden = false;
     btn.disabled = false;
     btn.textContent = 'Ingresar';
   }
 });
 
-el('logout-btn').addEventListener('click', async () => {
-  if (window._restMode) {
-    // Modo REST: limpiar estado y volver a login
-    window._restMode = false;
-    window._fbToken  = null;
-    if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
-    stopListeners();
-    el('login-screen').hidden = false;
-    el('app').hidden = true;
-  } else {
-    await signOut(auth);
-  }
+el('logout-btn').addEventListener('click', () => {
+  window._restMode = false;
+  window._fbToken  = null;
+  if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
+  stopListeners();
+  el('login-screen').hidden = false;
+  el('app').hidden = true;
+  signOut(auth).catch(() => {}); // intentar limpiar sesión SDK en segundo plano
 });
 
 // ── Nav ────────────────────────────────────────────────────────────────────
