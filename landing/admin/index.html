@@ -305,23 +305,13 @@
 </aside>
 
 <script type="module">
-import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
-import { getFirestore, collection, query, orderBy, onSnapshot,
-         doc, updateDoc, addDoc, deleteDoc, serverTimestamp }
-  from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
+// Toda la autenticación y Firestore se hace vía REST API directa.
+// El SDK de Firebase se omite completamente para evitar cuelgues de red.
 
-// ── Firebase init ──────────────────────────────────────────────────────────
-const app  = initializeApp({
-  apiKey:            '%%FIREBASE_API_KEY%%',
-  authDomain:        '%%FIREBASE_AUTH_DOMAIN%%',
-  projectId:         '%%FIREBASE_PROJECT_ID%%',
-  appId:             '%%FIREBASE_APP_ID%%',
-  messagingSenderId: '%%FIREBASE_MESSAGING_SENDER_ID%%',
-});
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const firebaseConfig = {
+  apiKey:    '%%FIREBASE_API_KEY%%',
+  projectId: '%%FIREBASE_PROJECT_ID%%',
+};
 
 // ── State ──────────────────────────────────────────────────────────────────
 let currentStatus    = 'pending';
@@ -346,19 +336,8 @@ const statusLabel = { pending: 'Pendiente', confirmed: 'Confirmada', completed: 
 const el  = (id) => document.getElementById(id);
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 
-// ── Auth — solo REST API, sin depender del SDK de Firebase Auth ────────────
-// El SDK de Firebase Auth se cuelga en este entorno; usamos la REST API directamente.
-// onAuthStateChanged se registra solo para limpiar sesiones cacheadas antiguas.
-onAuthStateChanged(auth, (user) => {
-  if (window._restMode) return; // REST mode activo — ignorar SDK
-  if (user) {
-    // Hay sesión cacheada del SDK — cerrarla para forzar login limpio vía REST
-    signOut(auth).catch(() => {});
-  }
-  // Siempre mostrar login screen al cargar (no auto-login via SDK)
-  el('login-screen').hidden = false;
-  el('app').hidden = true;
-});
+// La página empieza siempre con login screen visible (ver HTML: app tiene hidden)
+// No hay SDK de Firebase — todo es REST puro.
 
 el('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -378,7 +357,7 @@ el('login-form').addEventListener('submit', async (e) => {
     window._fbToken = data.idToken;
     el('login-screen').hidden = true;
     el('app').hidden = false;
-    startListenersREST(data.idToken);
+    startListeners(data.idToken);
   } catch (err) {
     errEl.textContent = err.message === 'INVALID_LOGIN_CREDENTIALS' ? 'Email o contraseña incorrectos' : (err.message || 'Error al iniciar sesión');
     errEl.hidden = false;
@@ -388,13 +367,10 @@ el('login-form').addEventListener('submit', async (e) => {
 });
 
 el('logout-btn').addEventListener('click', () => {
-  window._restMode = false;
-  window._fbToken  = null;
-  if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
+  window._fbToken = null;
   stopListeners();
   el('login-screen').hidden = false;
   el('app').hidden = true;
-  signOut(auth).catch(() => {}); // intentar limpiar sesión SDK en segundo plano
 });
 
 // ── Nav ────────────────────────────────────────────────────────────────────
@@ -408,7 +384,7 @@ document.querySelectorAll('.header__nav-btn').forEach(btn => {
   });
 });
 
-// ── Firestore REST helpers (fallback when SDK auth hangs) ─────────────────
+// ── Firestore REST API ─────────────────────────────────────────────────────
 function _fsDocToObj(doc) {
   const id = (doc.name || '').split('/').pop();
   const obj = { id };
@@ -439,16 +415,6 @@ function _fsToVal(val) {
   return { stringValue: String(val) };
 }
 const _fsBase = () => `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-async function _fsQuery(coll, token) {
-  const r = await fetch(`${_fsBase()}:runQuery`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: coll }],
-      orderBy: [{ field: { fieldPath: coll === 'reservations' ? 'createdAt' : 'nombre' }, direction: coll === 'reservations' ? 'DESCENDING' : 'ASCENDING' }], limit: 500 } })
-  });
-  const data = await r.json();
-  return Array.isArray(data) ? data.filter(d => d.document).map(d => _fsDocToObj(d.document)) : [];
-}
 async function _fsUpdate(coll, docId, fields, token) {
   const mask = Object.keys(fields).map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
   await fetch(`${_fsBase()}/${coll}/${docId}?${mask}`, {
@@ -469,18 +435,16 @@ async function _fsDel(coll, docId, token) {
   await fetch(`${_fsBase()}/${coll}/${docId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
 }
 
-// Unified wrappers — dispatch to SDK or REST depending on auth mode
 async function dbUpdate(coll, docId, fields) {
-  if (window._restMode) { await _fsUpdate(coll, docId, fields, window._fbToken); await _restRefresh(); }
-  else await updateDoc(doc(db, coll, docId), fields);
+  await _fsUpdate(coll, docId, fields, window._fbToken);
+  await _restRefresh();
 }
 async function dbAdd(coll, data) {
-  if (window._restMode) { return await _fsAdd(coll, data, window._fbToken); }
-  else { const ref = await addDoc(collection(db, coll), data); return ref.id; }
+  return await _fsAdd(coll, data, window._fbToken);
 }
 async function dbDel(coll, docId) {
-  if (window._restMode) { await _fsDel(coll, docId, window._fbToken); await _restRefresh(); }
-  else await deleteDoc(doc(db, coll, docId));
+  await _fsDel(coll, docId, window._fbToken);
+  await _restRefresh();
 }
 
 let _restPoll = null;
@@ -488,56 +452,34 @@ async function _restRefresh() {
   const token = window._fbToken;
   if (!token) return;
   try {
-    const [resArr, drvArr] = await Promise.all([
-      fetch(`${_fsBase()}:runQuery`, { method:'POST', headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-        body: JSON.stringify({ structuredQuery:{ from:[{collectionId:'reservations'}], orderBy:[{field:{fieldPath:'createdAt'},direction:'DESCENDING'}], limit:500 }}) })
-        .then(r => r.json()).then(d => Array.isArray(d) ? d.filter(x => x.document).map(x => _fsDocToObj(x.document)) : []),
-      fetch(`${_fsBase()}/drivers`, { headers:{'Authorization':`Bearer ${token}`} })
-        .then(r => r.json()).then(d => (d.documents || []).map(_fsDocToObj)),
+    const fsBase = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+    const [resData, drvData] = await Promise.all([
+      fetch(`${fsBase}:runQuery`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'reservations' }], orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }], limit: 500 } }),
+      }).then(r => r.json()),
+      fetch(`${fsBase}/drivers`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
     ]);
-    reservations = {};  resArr.forEach(r => { reservations[r.id] = r; });
-    drivers = {};       drvArr.forEach(d => { drivers[d.id] = d; });
+    reservations = {};
+    (Array.isArray(resData) ? resData : []).filter(x => x.document).forEach(x => {
+      const obj = _fsDocToObj(x.document); reservations[obj.id] = obj;
+    });
+    drivers = {};
+    (drvData.documents || []).forEach(d => { const obj = _fsDocToObj(d); drivers[obj.id] = obj; });
     renderReservations(); updateBadges(); renderDrivers();
     if (selectedId && reservations[selectedId]) renderDetail(reservations[selectedId]);
   } catch (e) { console.error('REST refresh error:', e); }
 }
-function startListenersREST(idToken) {
-  window._fbToken  = idToken;
-  window._restMode = true;
+
+function startListeners(idToken) {
+  window._fbToken = idToken;
   _restRefresh();
   _restPoll = setInterval(_restRefresh, 30000);
 }
 
-// ── Firestore listeners ────────────────────────────────────────────────────
-function startListeners() {
-  const q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
-  unsubReservations = onSnapshot(q,
-    (snap) => {
-      reservations = {};
-      snap.forEach(d => { reservations[d.id] = { id: d.id, ...d.data() }; });
-      renderReservations();
-      updateBadges();
-      if (selectedId && reservations[selectedId]) renderDetail(reservations[selectedId]);
-    },
-    (err) => {
-      console.error('Firestore reservations error:', err.code, err.message);
-      el('reservations-list').innerHTML = `<div class="empty-state"><p>Error Firestore: ${err.code || err.message}</p></div>`;
-    }
-  );
-
-  unsubDrivers = onSnapshot(collection(db, 'drivers'),
-    (snap) => {
-      drivers = {};
-      snap.forEach(d => { drivers[d.id] = { id: d.id, ...d.data() }; });
-      renderDrivers();
-      if (selectedId) renderDetail(reservations[selectedId]);
-    },
-    (err) => console.error('Firestore drivers error:', err.code, err.message)
-  );
-}
-
 function stopListeners() {
-  unsubReservations?.(); unsubDrivers?.();
+  if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
   reservations = {}; drivers = {};
 }
 
