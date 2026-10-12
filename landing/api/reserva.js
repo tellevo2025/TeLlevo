@@ -5,7 +5,7 @@
 */
 const admin = require('firebase-admin');
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwF2yM80mDIwnEv_fLiz35fvKSl4KgF2og5QU4zRA11kN7Ou0Mu7BeYCL__6FpUYqzG/exec';
+const GAS_URL = process.env.APPSCRIPT_URL || process.env.appscritp || '';
 
 // ── Firebase Admin ─────────────────────────────────────────────────────────
 if (!admin.apps.length) {
@@ -94,12 +94,13 @@ module.exports = async function handler(req, res) {
   }
 
   // ── 2. Reenviar al GAS (emails + calendario) ────────────────────────────
-  // Fire-and-forget: no bloqueamos la respuesta al usuario
-  fetch(GAS_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:    params.toString(),
-  }).catch(e => console.error('GAS forward error:', e.message));
+  if (GAS_URL) {
+    fetch(GAS_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    params.toString(),
+    }).catch(e => console.error('GAS forward error:', e.message));
+  }
 
   return res.status(200).setHeader('Content-Type', 'text/plain').send('✅');
 };
