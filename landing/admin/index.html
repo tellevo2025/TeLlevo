@@ -369,7 +369,7 @@ el('login-form').addEventListener('submit', async (e) => {
   try {
     await signInWithEmailAndPassword(auth, el('login-email').value.trim(), el('login-pwd').value);
   } catch (err) {
-    errEl.textContent = 'Correo o contraseña incorrectos.';
+    errEl.textContent = err.code ? `Error: ${err.code}` : (err.message || 'Error al iniciar sesión');
     errEl.hidden = false;
     btn.disabled = false;
     btn.textContent = 'Ingresar';
