@@ -1211,29 +1211,6 @@ const initHeroRotator = () => {
   setInterval(rotate, 3500);
 };
 
-// ─── THEME TOGGLE ─────────────────────────────────────────────────────────────
-const initThemeToggle = () => {
-  const btn  = document.getElementById('theme-toggle');
-  if (!btn) return;
-
-  const moonIcon = btn.querySelector('.theme-toggle__icon--moon');
-  const sunIcon  = btn.querySelector('.theme-toggle__icon--sun');
-
-  const applyTheme = (isLight) => {
-    document.body.classList.toggle('light-mode', isLight);
-    sunIcon.style.display  = isLight ? 'none' : '';
-    moonIcon.style.display = isLight ? '' : 'none';
-    btn.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
-    localStorage.setItem('tellevo-theme', isLight ? 'light' : 'dark');
-  };
-
-  const saved = localStorage.getItem('tellevo-theme');
-  if (saved === 'light') applyTheme(true);
-
-  btn.addEventListener('click', () => {
-    applyTheme(!document.body.classList.contains('light-mode'));
-  });
-};
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -1248,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCarousel();
   initReveal();
   initHeroRotator();
-  initThemeToggle();
+
   initFAQ();
 
   // Retira el globo del hero del layout al terminar su animación
