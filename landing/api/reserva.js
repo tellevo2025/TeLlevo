@@ -31,6 +31,7 @@ const DISCOUNT_CODES = {
   'MATRIFRAN&FABRI':         10,
   'MATRIMACA&JOACO':         15,
   'MATRIV&V':                10,
+  'SLIER':                   10,
 };
 
 const ipCounts       = new Map();
