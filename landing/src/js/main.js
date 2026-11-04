@@ -430,6 +430,61 @@ const showResult = (type) => {
         quoteEl.hidden = false;
       }
     } catch {}
+
+    // ── WhatsApp resumen para el admin ──────────────────────────────────────
+    try {
+      const q2   = JSON.parse(document.getElementById('cotizacion-data').value || '{}');
+      const get  = id => (document.getElementById(id)?.value || '').trim();
+      const fmt2 = n  => '$' + Number(n).toLocaleString('es-CL');
+
+      const nombre      = get('nombre');
+      const telefono    = get('telefono');
+      const telefono2   = get('telefono2');
+      const correo      = get('correo');
+      const codigo      = get('codigoDescuento');
+      const fecha       = get('fechaViaje');
+      const hora        = get('horaViaje');
+      const origen      = get('centroEvento');
+      const destino     = get('destino');
+      const personas    = get('personas');
+      const paradas     = get('paradas');
+      const marcaModelo = get('marcaModelo');
+      const patente     = get('patente');
+      const transmision = get('transmision');
+      const seguro      = get('seguro');
+
+      const stops = [];
+      document.querySelectorAll('#paradas-list .parada-item input[type="text"]').forEach(inp => {
+        if (inp.value.trim()) stops.push(inp.value.trim());
+      });
+
+      const totalStr = q2.total ? fmt2(q2.total) : 'A confirmar';
+
+      const lines = [
+        `Hola! Soy ${nombre || 'un cliente'}, acabo de hacer una reserva en TeLlevo y quisiera pagar el abono. Te comparto los detalles:`,
+        '',
+        `👤 Nombre: ${nombre || '—'}`,
+        `📞 Teléfono: ${telefono || '—'}`,
+      ];
+      if (telefono2) lines.push(`📞 Segundo Tel: ${telefono2}`);
+      lines.push(`📧 Correo: ${correo || '—'}`);
+      lines.push(`🤝 Alianza: ${codigo || 'Sin alianza'}`);
+      lines.push(`📅 Fecha: ${fecha || '—'} a las ${hora || '—'}`);
+      lines.push(`🏛 Centro de eventos: ${origen || '—'}`);
+      lines.push(`🏠 Destino final: ${destino || '—'}`);
+      lines.push(`👥 Nº personas: ${personas || '—'}`);
+      lines.push(`🛑 Nº paradas: ${paradas || '0'}`);
+      stops.forEach((s, i) => lines.push(`   📍 Parada ${i + 1}: ${s}`));
+      if (marcaModelo) lines.push(`🚘 Auto: ${marcaModelo}`);
+      if (patente)     lines.push(`🔖 Patente: ${patente}`);
+      if (transmision) lines.push(`⚙️ Transmisión: ${transmision}`);
+      if (seguro)      lines.push(`🛡 Seguro: ${seguro}`);
+      lines.push(`💰 Valor del servicio: ${totalStr}`);
+
+      const wspUrl = `https://api.whatsapp.com/send/?phone=56954873548&text=${encodeURIComponent(lines.join('\n'))}&type=phone_number&app_absent=0`;
+      const wspBtn = document.getElementById('wsp-summary-btn');
+      if (wspBtn) wspBtn.href = wspUrl;
+    } catch {}
   }
 
   const resultEl = document.getElementById(`result-${type}`);
@@ -1035,6 +1090,14 @@ const initCotizadorWidget = () => {
         const hintEl    = document.getElementById('cot-parada-hint');
         const free      = getFreeStops(cotDistKm);
 
+        // Actualizar labels de paradas ya existentes según la distancia real
+        document.querySelectorAll('#cot-paradas-list .parada-item').forEach((item, i) => {
+          const lbl = item.querySelector('.parada-item__label');
+          if (lbl) lbl.textContent = i < free
+            ? `Parada ${i + 1} (gratis)`
+            : `Parada ${i + 1} (+$5.000)`;
+        });
+
         if (cotDistKm > 85) {
           if (hintEl) hintEl.textContent = '2 primeras paradas gratis · $5.000 por cada parada adicional';
           if (paradaSec) paradaSec.hidden = false;
@@ -1128,6 +1191,28 @@ const initCotizadorWidget = () => {
       if (hint) hint.innerHTML =
         '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Precargado desde tu cotización';
     });
+    // Generar quoteId y guardar cotización para analytics
+    const quoteId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `q_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    cotQuoteData.quoteId = quoteId;
+    fetch('/api/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quoteId,
+        distanciaKm:  cotQuoteData.distanciaKm,
+        precioTotal:  cotQuoteData.total,
+        precioBase:   cotQuoteData.precioBase,
+        descuento:    cotQuoteData.descuento,
+        descuentoPct: cotQuoteData.descuentoPct,
+        paradasPagas: cotQuoteData.paradasPagas,
+        origen:       cotQuoteData.origen,
+        destino:      cotQuoteData.destino,
+        sinCobertura: !!cotQuoteData.sinCobertura,
+      }),
+    }).catch(() => {});
+
     if (cotDataEl) cotDataEl.value = JSON.stringify(cotQuoteData);
 
     const paradaSectionForm = document.getElementById('parada-section');

@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeLlevo — Finanzas</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0A1628;
+      --surface:   #0D1F3C;
+      --surface-2: #112240;
+      --border:    #1B3A6B;
+      --gold:      #C9A84C;
+      --gold-b:    #F0C040;
+      --text:      #E8EAF0;
+      --muted:     #8892A4;
+      --pending:   #F5A623;
+      --confirmed: #4A9EFF;
+      --saldado:   #A78BFA;
+      --completed: #48BB78;
+      --cancelled: #FC8181;
+      --radius:    10px;
+      --radius-lg: 14px;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; -webkit-font-smoothing: antialiased; }
+    button { font-family: inherit; cursor: pointer; }
+    [hidden] { display: none !important; }
+
+    /* ═══ LOGIN ═══ */
+    .login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+      background: radial-gradient(ellipse at 50% -10%, rgba(27,58,107,.4) 0%, transparent 65%), var(--bg);
+    }
+    .login-card {
+      width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px 28px; position: relative; overflow: hidden;
+    }
+    .login-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #C9A84C, #F0C040, #C9A84C, transparent);
+    }
+    .login-logo { font-size: 1.5rem; font-weight: 700; color: var(--gold); margin-bottom: 4px; letter-spacing: -.02em; }
+    .login-sub  { font-size: .8rem; color: var(--muted); margin-bottom: 26px; }
+    .login-form { display: flex; flex-direction: column; gap: 14px; }
+    .field label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; }
+    .field input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 13px; color: var(--text); font-size: 16px; outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .field input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
+    .login-error { color: var(--cancelled); font-size: .82rem; padding: 9px 13px; background: rgba(252,129,129,.08); border-radius: 8px; border: 1px solid rgba(252,129,129,.25); }
+
+    /* ═══ BOTONES ═══ */
+    .btn-primary {
+      background: linear-gradient(135deg, #C9A84C, #F0C040 50%, #C9A84C); color: #0A1628;
+      font-weight: 700; font-size: .9rem; border: none; border-radius: 8px; padding: 11px 18px;
+      transition: opacity .2s, transform .15s;
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 14px; font-size: .875rem; font-weight: 500; transition: border-color .2s, color .2s;
+    }
+    .btn-secondary:hover { border-color: rgba(201,168,76,.5); color: var(--text); }
+    .btn-ghost {
+      background: transparent; border: none; color: var(--muted); font-size: .875rem;
+      padding: 6px 10px; border-radius: 6px; transition: color .2s;
+    }
+    .btn-ghost:hover { color: var(--text); }
+    .btn-danger {
+      background: transparent; color: var(--cancelled); border: 1px solid rgba(252,129,129,.3);
+      border-radius: 8px; padding: 8px 14px; font-size: .875rem; font-weight: 500; transition: background .2s;
+    }
+    .btn-danger:hover { background: rgba(252,129,129,.08); }
+
+    /* ═══ APP SHELL ═══ */
+    #app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .header {
+      display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 50px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header__logo { font-size: .95rem; font-weight: 700; color: var(--gold); letter-spacing: -.01em; white-space: nowrap; }
+    .header__badge { font-size: .65rem; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; }
+    .header__actions { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
+    .header__back { color: var(--muted); font-size: .8rem; text-decoration: none; padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; transition: color .2s, border-color .2s; white-space: nowrap; }
+    .header__back:hover { color: var(--text); border-color: rgba(201,168,76,.4); }
+
+    /* ═══ TAB BAR ═══ */
+    .tab-bar {
+      display: flex; background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 50px; z-index: 99; overflow-x: auto; scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1; min-width: 72px; display: flex; flex-direction: column; align-items: center;
+      gap: 3px; padding: 9px 6px 8px; border: none; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted); font-family: inherit; font-size: .72rem;
+      font-weight: 500; cursor: pointer; transition: color .15s, border-color .15s; white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface-2); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 700; }
+    .tab-icon { font-size: 1.15rem; line-height: 1; }
+
+    /* ═══ VIEWS ═══ */
+    .view { flex: 1; padding: 20px 16px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+    /* ═══ CONTROLES PERÍODO ═══ */
+    .period-bar {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+    }
+    .period-bar h2 { font-size: .95rem; font-weight: 700; flex: 1; margin: 0; line-height: 1.2; }
+    .month-picker, .week-picker {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: .875rem; padding: 8px 11px; outline: none;
+      transition: border-color .2s; flex-shrink: 0; box-sizing: border-box; min-width: 160px;
+    }
+    .month-picker:focus, .week-picker:focus { border-color: var(--gold); }
+    .period-mode-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      color: var(--muted); font-family: inherit; font-size: .73rem; font-weight: 500;
+      padding: 5px 10px; cursor: pointer; transition: all .15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .period-mode-btn.active { background: rgba(201,168,76,.15); border-color: var(--gold); color: var(--gold); font-weight: 600; }
+
+    /* ═══ SUMMARY CARDS ═══ */
+    .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 22px; }
+    @media (min-width: 560px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px 16px; position: relative; overflow: hidden;
+    }
+    .summary-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, transparent);
+    }
+    .summary-card--gold  { --card-accent: linear-gradient(90deg, var(--gold), var(--gold-b)); }
+    .summary-card--green { --card-accent: var(--completed); }
+    .summary-card--blue  { --card-accent: var(--confirmed); }
+    .summary-card__label { font-size: .7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+    .summary-card__value { font-size: 1.45rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+    .summary-card__value--gold  { color: var(--gold); }
+    .summary-card__value--green { color: var(--completed); }
+    .summary-card__value--blue  { color: var(--confirmed); }
+    .summary-card__sub { font-size: .75rem; color: var(--muted); margin-top: 5px; }
+
+    /* ═══ TABLA DE VIAJES ═══ */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: .855rem; }
+    thead th {
+      background: var(--surface-2); padding: 10px 13px; text-align: left;
+      font-size: .7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    tbody tr { border-top: 1px solid var(--border); transition: background .15s; border-left: 3px solid transparent; }
+    tbody tr:hover { background: var(--surface-2); }
+    tbody tr[data-status="pending"]   { border-left-color: var(--pending); }
+    tbody tr[data-status="confirmed"] { border-left-color: var(--confirmed); background: rgba(74,158,255,.04); }
+    tbody tr[data-status="saldado"]   { border-left-color: var(--saldado); }
+    tbody tr[data-status="completed"] { border-left-color: var(--completed); }
+    tbody tr[data-status="cancelled"] { border-left-color: var(--cancelled); opacity: .55; }
+    tbody td { padding: 10px 13px; vertical-align: middle; }
+    td.td-mono { font-variant-numeric: tabular-nums; }
+    td.td-price { font-weight: 600; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    td.td-muted { color: var(--muted); font-size: .82rem; }
+
+    .status-chip {
+      display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .72rem; font-weight: 600;
+      white-space: nowrap;
+    }
+    .chip-pending   { background: rgba(245,166,35,.12);  color: var(--pending);   }
+    .chip-confirmed { background: rgba(74,158,255,.12);  color: var(--confirmed); }
+    .chip-saldado   { background: rgba(167,139,250,.12); color: var(--saldado);   }
+    .chip-completed { background: rgba(72,187,120,.12);  color: var(--completed); }
+    .chip-cancelled { background: rgba(252,129,129,.1);  color: var(--cancelled); }
+
+    .route-cell { max-width: 180px; }
+    .route-cell span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
+    .route-arrow { color: var(--muted); font-size: .7rem; }
+
+    .empty-state {
+      text-align: center; padding: 48px 20px; color: var(--muted); display: flex;
+      flex-direction: column; align-items: center; gap: 12px;
+    }
+    .empty-state p { font-size: .9rem; }
+
+    /* ═══ GASTO FORM ═══ */
+    .card-section {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 18px; margin-bottom: 14px;
+    }
+    .card-section h3 { font-size: .9rem; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid .span-2 { grid-column: 1 / -1; }
+    .form-field label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 12px; color: var(--text); font-family: inherit; font-size: 16px; outline: none;
+      transition: border-color .2s;
+    }
+    #g-fecha { width: 140px !important; padding: 6px 8px !important; font-size: .82rem !important; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--gold); }
+    .form-field select option { background: var(--bg); }
+    .form-field textarea { resize: vertical; min-height: 70px; }
+    .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+    /* ═══ LISTA GASTOS ═══ */
+    .expense-item {
+      display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start;
+      padding: 12px 14px; border-top: 1px solid var(--border); transition: background .15s;
+    }
+    .expense-item:hover { background: var(--surface-2); }
+    .expense-item:first-child { border-top: none; }
+    .expense-name { font-size: .9rem; font-weight: 500; }
+    .expense-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .expense-amount { font-weight: 700; color: var(--cancelled); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+    .expense-reembolso { font-size: .72rem; color: var(--completed); text-align: right; }
+    .expense-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 6px; }
+
+    /* ═══ PAGOS A CHOFERES ═══ */
+    .socio-badge { font-size: .7rem; font-weight: 600; background: rgba(201,168,76,.12); color: var(--gold); padding: 2px 7px; border-radius: 20px; }
+    .driver-debt-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 12px; overflow: hidden;
+    }
+    .driver-debt-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; gap: 10px; flex-wrap: wrap;
+    }
+    .driver-debt-name { font-weight: 700; font-size: 1rem; }
+    .driver-debt-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .driver-debt-total { font-size: 1.15rem; font-weight: 700; color: var(--cancelled); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .driver-debt-total--paid { color: var(--completed); }
+    .driver-trip-row {
+      display: grid; grid-template-columns: auto 1fr auto auto;
+      gap: 6px 12px; align-items: center; padding: 10px 16px;
+      border-top: 1px solid var(--border); font-size: .855rem;
+    }
+    .driver-trip-date { color: var(--muted); font-size: .78rem; white-space: nowrap; }
+    .driver-trip-route { overflow: hidden; }
+    .driver-trip-route span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
+    .driver-trip-amount { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .driver-trip-amount--paid { color: var(--muted); text-decoration: line-through; }
+    .pay-btn {
+      border: none; border-radius: 7px; padding: 6px 12px; font-size: .78rem; font-weight: 600;
+      cursor: pointer; transition: opacity .2s; white-space: nowrap;
+    }
+    .pay-btn--pending { background: rgba(72,187,120,.12); color: var(--completed); }
+    .pay-btn--paid    { background: var(--surface-2); color: var(--muted); }
+    .pay-btn:hover { opacity: .75; }
+    .driver-debt-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface-2);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .driver-debt-footer-info { font-size: .78rem; color: var(--muted); }
+    /* ═══ TARIFA CONFIG ═══ */
+    .driver-config-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      border-top: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .driver-config-item:first-child { border-top: none; }
+    .driver-config-name { font-weight: 600; flex: 1; min-width: 100px; }
+    .driver-config-tarifa { display: flex; align-items: center; gap: 6px; }
+    .driver-config-tarifa input {
+      width: 110px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+      padding: 7px 10px; color: var(--text); font-family: inherit; font-size: 16px; outline: none;
+      transition: border-color .2s; text-align: right;
+    }
+    .driver-config-tarifa input:focus { border-color: var(--gold); }
+
+    /* ═══ REPARTO ═══ */
+    .partner-row {
+      display: grid; grid-template-columns: 1fr auto auto; gap: 8px 14px; align-items: center;
+      padding: 14px; border-top: 1px solid var(--border);
+    }
+    .partner-row:first-child { border-top: none; }
+    .partner-name { font-weight: 600; }
+    .partner-pct { font-size: .82rem; color: var(--muted); }
+    .partner-total { font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+    .locked-badge { font-size: .7rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; }
+    .pct-input {
+      width: 70px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+      padding: 6px 9px; color: var(--text); font-family: inherit; font-size: 16px; outline: none;
+      text-align: right; transition: border-color .2s;
+    }
+    .pct-input:focus { border-color: var(--gold); }
+
+    .utilidad-box {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px; margin-bottom: 16px;
+    }
+    .utilidad-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: .875rem; }
+    .utilidad-row + .utilidad-row { border-top: 1px solid rgba(27,58,107,.5); }
+    .utilidad-row__label { color: var(--muted); }
+    .utilidad-row__value { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .utilidad-row--total .utilidad-row__label { color: var(--text); font-weight: 700; font-size: .95rem; }
+    .utilidad-row--total .utilidad-row__value { color: var(--gold); font-weight: 700; font-size: 1.1rem; }
+
+    /* ═══ CUADRE ═══ */
+    .cuadre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 480px) { .cuadre-grid { grid-template-columns: 1fr; } }
+    .cuadre-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .cuadre-card__label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: 8px; }
+    .cuadre-card__value { font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em; }
+    .cuadre-card__value--pos { color: var(--completed); }
+    .cuadre-card__value--neg { color: var(--cancelled); }
+    .cuadre-card__sub { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+    .cuadre-nota { font-size: .82rem; color: var(--muted); margin-top: 8px; }
+
+    /* ═══ LOADING ═══ */
+    .spinner { width: 22px; height: 22px; border: 2.5px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-row { display: flex; justify-content: center; padding: 40px; }
+
+    /* ═══ SECTION DIVIDER ═══ */
+    .section-title { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; margin-top: 22px; }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ═══ TOAST ═══ */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px;
+      padding: 10px 18px; font-size: .875rem; font-weight: 500; color: var(--text);
+      box-shadow: 0 8px 24px rgba(0,0,0,.4); transition: transform .25s ease, opacity .25s ease;
+      opacity: 0; pointer-events: none; z-index: 999; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 480px) {
+      .header__back span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">TeLlevo</div>
+    <div class="login-sub">Panel de Finanzas</div>
+    <form id="login-form" class="login-form" novalidate>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" autocomplete="email" placeholder="socio@tellevo.cl">
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="login-pwd" autocomplete="current-password">
+      </div>
+      <p id="login-error" class="login-error" hidden></p>
+      <button type="submit" id="login-btn" class="btn-primary">Ingresar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app" hidden>
+  <header class="header">
+    <div class="header__logo">TeLlevo</div>
+    <div class="header__badge">Finanzas</div>
+    <div class="header__actions">
+      <a href="/admin/" class="header__back">← <span>Admin</span></a>
+      <button id="logout-btn" class="btn-ghost">Salir</button>
+    </div>
+  </header>
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-view="viajes"><span class="tab-icon">✈️</span>Viajes</button>
+    <button class="tab-btn" data-view="gastos"><span class="tab-icon">💸</span>Gastos</button>
+    <button class="tab-btn" data-view="choferes"><span class="tab-icon">🚗</span>Choferes</button>
+    <button class="tab-btn" data-view="reparto"><span class="tab-icon">📊</span>Reparto</button>
+    <button class="tab-btn" data-view="cuadre"><span class="tab-icon">🏦</span>Cuadre</button>
+  </nav>
+
+  <!-- VIAJES -->
+  <main id="view-viajes" class="view">
+    <div class="period-bar">
+      <h2>Viajes</h2>
+      <button class="period-mode-btn active" id="viajes-mode-month">Mensual</button>
+      <button class="period-mode-btn" id="viajes-mode-week">Semanal</button>
+      <input type="month" id="month-picker" class="month-picker">
+      <input type="week" id="week-picker-viajes" class="week-picker" hidden>
+    </div>
+
+    <div class="summary-grid" id="summary-grid">
+      <div class="summary-card summary-card--gold" style="grid-column: 1 / -1">
+        <div class="summary-card__label" id="sum-ingresos-label">Facturado este mes</div>
+        <div class="summary-card__value summary-card__value--gold" id="sum-ingresos">—</div>
+        <div class="summary-card__sub" id="sum-viajes">— viajes</div>
+      </div>
+      <div class="summary-card summary-card--green">
+        <div class="summary-card__label">Cobrado</div>
+        <div class="summary-card__value summary-card__value--green" id="sum-completados">—</div>
+        <div class="summary-card__sub">Completados</div>
+      </div>
+      <div class="summary-card summary-card--blue">
+        <div class="summary-card__label">Por cobrar</div>
+        <div class="summary-card__value summary-card__value--blue" id="sum-por-cobrar">—</div>
+        <div class="summary-card__sub">Viajes confirmados</div>
+      </div>
+    </div>
+
+    <div class="table-wrap" id="trips-table-wrap">
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+  </main>
+
+  <!-- GASTOS -->
+  <main id="view-gastos" class="view" hidden>
+    <div class="period-bar">
+      <h2>Gastos</h2>
+      <input type="week" id="week-picker-gastos" class="week-picker">
+    </div>
+
+    <div class="card-section">
+      <h3>Registrar gasto</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Fecha</label>
+          <input type="date" id="g-fecha">
+        </div>
+        <div class="form-field">
+          <label>Categoría</label>
+          <select id="g-categoria">
+            <option value="bencina">⛽ Bencina</option>
+            <option value="tag">🏷 TAG / Pase diario</option>
+            <option value="publicidad">📣 Publicidad</option>
+            <option value="dominio">🌐 Dominio / hosting</option>
+            <option value="herramientas">🔧 Herramientas</option>
+            <option value="otro">📦 Otro</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Monto ($)</label>
+          <input type="number" id="g-monto" placeholder="Ej: 15000" min="0" step="100">
+        </div>
+        <div class="form-field">
+          <label>Quién pagó</label>
+          <select id="g-quien-pago">
+            <option value="joaco">Joaco</option>
+            <option value="gabriel">Gabriel</option>
+            <option value="vicente">Vicente</option>
+            <option value="empresa">Empresa</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Reembolsar a</label>
+          <select id="g-reembolso">
+            <option value="">Sin reembolso</option>
+            <option value="joaco">Joaco</option>
+            <option value="gabriel">Gabriel</option>
+            <option value="vicente">Vicente</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Nota (opcional)</label>
+          <input type="text" id="g-nota" placeholder="Descripción breve">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="btn-add-gasto">+ Agregar gasto</button>
+      </div>
+    </div>
+
+    <div class="section-title">Gastos del mes</div>
+    <div class="card-section" style="padding:0">
+      <div id="gastos-list">
+        <div class="loading-row"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <div class="summary-grid" style="margin-top:14px">
+      <div class="summary-card">
+        <div class="summary-card__label">Total gastos</div>
+        <div class="summary-card__value summary-card__value--orange" id="g-sum-total">—</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card__label">Reembolsos</div>
+        <div class="summary-card__value summary-card__value--green" id="g-sum-reembolsos">—</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CHOFERES -->
+  <main id="view-choferes" class="view" hidden>
+    <div class="period-bar">
+      <h2>Choferes</h2>
+      <input type="week" id="week-picker-choferes" class="week-picker">
+    </div>
+
+    <div id="driver-debts-list">
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
+    <details style="margin-top:20px">
+      <summary style="cursor:pointer;font-size:.82rem;color:var(--muted);font-weight:600;padding:8px 0;user-select:none">
+        ⚙ Configurar tarifas por chofer
+      </summary>
+      <div style="margin-top:10px">
+        <div class="card-section" style="padding:0">
+          <div id="driver-config-list"></div>
+        </div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:8px">Tarifa default: $20.000 por servicio.</p>
+      </div>
+    </details>
+  </main>
+
+  <!-- REPARTO -->
+  <main id="view-reparto" class="view" hidden>
+    <div class="period-bar">
+      <h2>Reparto</h2>
+      <input type="week" id="week-picker-reparto" class="week-picker">
+    </div>
+
+    <div class="utilidad-box" id="utilidad-box">
+      <div class="utilidad-row">
+        <span class="utilidad-row__label" id="rep-ingresos-label">Ingresos de la semana</span>
+        <span class="utilidad-row__value" id="rep-ingresos">—</span>
+      </div>
+      <div class="utilidad-row">
+        <span class="utilidad-row__label">− Pago a choferes</span>
+        <span class="utilidad-row__value" id="rep-choferes">—</span>
+      </div>
+      <div class="utilidad-row">
+        <span class="utilidad-row__label">− Gastos de la semana</span>
+        <span class="utilidad-row__value" id="rep-gastos">—</span>
+      </div>
+      <div class="utilidad-row utilidad-row--total" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--border)">
+        <span class="utilidad-row__label">Utilidad neta</span>
+        <span class="utilidad-row__value" id="rep-utilidad">—</span>
+      </div>
+    </div>
+
+    <div class="section-title">Porcentajes de reparto</div>
+    <div class="card-section" style="padding:0;margin-bottom:14px">
+      <div id="partner-rows"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" id="btn-save-pct">Guardar porcentajes</button>
+      <button class="btn-secondary" id="btn-export-excel" style="color:var(--completed)">📥 Exportar Excel</button>
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:8px">
+      El 50% de Joaco es fijo. Gabriel + Vicente deben sumar exactamente 50%.
+    </p>
+
+    <div class="section-title" style="margin-top:24px">Resumen por socio</div>
+    <div class="card-section" style="padding:0">
+      <div id="resumen-socios"></div>
+    </div>
+  </main>
+
+  <!-- CUADRE -->
+  <main id="view-cuadre" class="view" hidden>
+    <div class="period-bar">
+      <h2>Cuadre bancario</h2>
+      <input type="week" id="week-picker-cuadre" class="week-picker">
+    </div>
+
+    <div class="cuadre-grid" id="cuadre-cards">
+      <div class="cuadre-card">
+        <div class="cuadre-card__label">Saldo calculado</div>
+        <div class="cuadre-card__value" id="cuadre-calculado">—</div>
+        <div class="cuadre-card__sub">Cobrado − pagos realizados</div>
+      </div>
+      <div class="cuadre-card">
+        <div class="cuadre-card__label">Saldo real en banco</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <input type="number" id="cuadre-saldo-real" placeholder="Ingresa el saldo" step="1000"
+            style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:inherit;font-size:16px;outline:none">
+          <button class="btn-secondary" id="btn-save-cuadre">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cuadre-grid">
+      <div class="cuadre-card">
+        <div class="cuadre-card__label">Diferencia</div>
+        <div class="cuadre-card__value" id="cuadre-diferencia">—</div>
+        <div class="cuadre-card__sub">Real − Calculado</div>
+      </div>
+      <div class="cuadre-card">
+        <div class="cuadre-card__label">Por cobrar (viajes)</div>
+        <div class="cuadre-card__value cuadre-card__value--neg" id="cuadre-por-cobrar">—</div>
+        <div class="cuadre-card__sub">Pending + confirmed + saldado</div>
+      </div>
+    </div>
+
+    <div class="card-section" style="margin-top:4px">
+      <div class="cuadre-card__label" style="margin-bottom:8px">Nota del mes</div>
+      <textarea id="cuadre-nota" class="form-field" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:15px;outline:none;resize:vertical;min-height:80px" placeholder="Ej: $5.000 en efectivo sin depositar…"></textarea>
+      <div class="form-actions" style="margin-top:10px">
+        <button class="btn-secondary" id="btn-save-nota">Guardar nota</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey:    '%%FIREBASE_API_KEY%%',
+  projectId: '%%FIREBASE_PROJECT_ID%%',
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const el  = id => document.getElementById(id);
+const fmt = n => n != null
+  ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+  : '—';
+const toISODate = f => {
+  if (!f) return '';
+  const d = new Date(f + 'T12:00:00');
+  return isNaN(d) ? f : d.toISOString().slice(0, 10);
+};
+const fmtDate = f => {
+  if (!f) return '—';
+  const d = new Date(f + 'T12:00:00');
+  return d.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
+};
+const currentMonth = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
+
+let _toastTimer;
+function toast(msg, ms = 2500) {
+  const t = el('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// ── Firestore REST ───────────────────────────────────────────────────────────
+const fsBase = () => `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+
+function _docToObj(doc) {
+  const id = (doc.name || '').split('/').pop();
+  const obj = { id };
+  function pv(v) {
+    if ('stringValue'    in v) return v.stringValue;
+    if ('integerValue'   in v) return parseInt(v.integerValue);
+    if ('doubleValue'    in v) return v.doubleValue;
+    if ('booleanValue'   in v) return v.booleanValue;
+    if ('nullValue'      in v) return null;
+    if ('timestampValue' in v) return new Date(v.timestampValue);
+    if ('mapValue'       in v) {
+      const m = {};
+      for (const [k, v2] of Object.entries(v.mapValue.fields || {})) m[k] = pv(v2);
+      return m;
+    }
+    return null;
+  }
+  for (const [k, v] of Object.entries(doc.fields || {})) obj[k] = pv(v);
+  return obj;
+}
+function _toVal(val) {
+  if (val === null || val === undefined) return { nullValue: null };
+  if (typeof val === 'boolean') return { booleanValue: val };
+  if (typeof val === 'number') return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
+  if (typeof val === 'string') return { stringValue: val };
+  if (val instanceof Date) return { timestampValue: val.toISOString() };
+  if (typeof val === 'object') return { mapValue: { fields: Object.fromEntries(Object.entries(val).map(([k, v]) => [k, _toVal(v)])) } };
+  return { stringValue: String(val) };
+}
+function _fields(data) {
+  return Object.fromEntries(Object.entries(data).map(([k, v]) => [k, _toVal(v)]));
+}
+
+async function fsGet(coll, docId) {
+  const r = await fetch(`${fsBase()}/${coll}/${docId}`, { headers: { Authorization: `Bearer ${window._fbToken}` } });
+  if (r.status === 404) return null;
+  return _docToObj(await r.json());
+}
+async function fsSet(coll, docId, data) {
+  await fetch(`${fsBase()}/${coll}/${docId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: _fields(data) }),
+  });
+}
+async function fsPatch(coll, docId, data) {
+  const mask = Object.keys(data).map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
+  await fetch(`${fsBase()}/${coll}/${docId}?${mask}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: _fields(data) }),
+  });
+}
+async function fsAdd(coll, data) {
+  const r = await fetch(`${fsBase()}/${coll}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: _fields(data) }),
+  });
+  return ((await r.json()).name || '').split('/').pop();
+}
+async function fsDel(coll, docId) {
+  await fetch(`${fsBase()}/${coll}/${docId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${window._fbToken}` } });
+}
+async function fsList(coll) {
+  const r = await fetch(`${fsBase()}/${coll}`, { headers: { Authorization: `Bearer ${window._fbToken}` } });
+  const data = await r.json();
+  return (data.documents || []).map(_docToObj);
+}
+async function fsQuery(coll, orderField = 'createdAt', dir = 'DESCENDING', limit = 500) {
+  const r = await fetch(`${fsBase()}:runQuery`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: coll }], orderBy: [{ field: { fieldPath: orderField }, direction: dir }], limit } }),
+  });
+  const data = await r.json();
+  return (Array.isArray(data) ? data : []).filter(x => x.document).map(x => _docToObj(x.document));
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let reservations = [];
+let drivers      = {};
+let expenses     = [];
+let partnerCfg   = { joaco_pct: 50, gabriel_pct: 30, vicente_pct: 20, tarifaDefault: 20000 };
+let bankData     = {};
+let currentView  = 'viajes';
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+el('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = el('login-btn');
+  btn.disabled = true; btn.textContent = 'Ingresando…';
+  el('login-error').hidden = true;
+  try {
+    const r = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseConfig.apiKey}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: el('login-email').value.trim(), password: el('login-pwd').value, returnSecureToken: true }) }
+    );
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error?.message || 'Credenciales inválidas');
+    window._fbToken = data.idToken;
+    el('login-screen').hidden = true;
+    el('app').hidden = false;
+    await init();
+  } catch (err) {
+    const msg = err.message === 'INVALID_LOGIN_CREDENTIALS' ? 'Email o contraseña incorrectos' : (err.message || 'Error al iniciar sesión');
+    el('login-error').textContent = msg;
+    el('login-error').hidden = false;
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  }
+});
+
+el('logout-btn').addEventListener('click', () => {
+  window._fbToken = null;
+  el('login-screen').hidden = false;
+  el('app').hidden = true;
+});
+
+// ── Nav ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    document.querySelectorAll('[id^="view-"]').forEach(v => { v.hidden = true; });
+    el(`view-${currentView}`).hidden = false;
+    renderCurrentView();
+  });
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  // set default months
+  const m = currentMonth();
+  const w = currentWeek();
+  el('month-picker').value        = m;
+  el('week-picker-viajes').value  = w;
+  el('week-picker-gastos').value  = w;
+  el('week-picker-choferes').value = w;
+  el('week-picker-reparto').value = w;
+  el('week-picker-cuadre').value  = w;
+  el('g-fecha').value = new Date().toISOString().slice(0, 10);
+
+  await loadAll();
+}
+
+async function loadAll() {
+  const [res, drv, exp, cfg] = await Promise.all([
+    fsQuery('reservations', 'createdAt', 'DESCENDING', 500),
+    fsList('drivers'),
+    fsQuery('expenses', 'fecha', 'DESCENDING', 500).catch(() => []),
+    fsGet('partnerConfig', 'current').catch(() => null),
+  ]);
+  reservations = res;
+  drivers = {};
+  drv.forEach(d => { drivers[d.id] = d; });
+  expenses = exp;
+  if (cfg) partnerCfg = { ...partnerCfg, ...cfg };
+
+  await autoCancelOldPending();
+  renderCurrentView();
+}
+
+async function autoCancelOldPending() {
+  const today = new Date().toISOString().slice(0, 10);
+  const toCancel = reservations.filter(r =>
+    r.status === 'pending' && toISODate(r.fecha) && toISODate(r.fecha) < today
+  );
+  if (!toCancel.length) return;
+  await Promise.all(toCancel.map(r => fsPatch('reservations', r.id, { status: 'cancelled' })));
+  toCancel.forEach(r => { r.status = 'cancelled'; });
+}
+
+function renderCurrentView() {
+  switch (currentView) {
+    case 'viajes':   renderViajes(); break;
+    case 'gastos':   renderGastos(); break;
+    case 'choferes': renderChoferes(); break;
+    case 'reparto':  renderReparto(); break;
+    case 'cuadre':   renderCuadre(); break;
+  }
+}
+
+// ── Helpers de precio ────────────────────────────────────────────────────────
+function getPrecio(r) {
+  const v = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
+  return v != null ? Number(v) : null;
+}
+
+// ── VIAJES ───────────────────────────────────────────────────────────────────
+const statusLabel = { pending: 'Pendiente', confirmed: 'Confirmada', saldado: 'Saldada', completed: 'Completada', cancelled: 'Cancelada' };
+
+function getMonthItems(month, allRes) {
+  return allRes.filter(r => {
+    const d = toISODate(r.fecha);
+    return d && d.slice(0, 7) === month;
+  });
+}
+
+function currentWeek() {
+  const d = new Date();
+  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = tmp.getUTCDay() || 7;
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - day);
+  const y = tmp.getUTCFullYear();
+  const jan4 = new Date(Date.UTC(y, 0, 4));
+  const w = Math.ceil((((tmp - jan4) / 86400000) + (jan4.getUTCDay() || 7) - 3) / 7);
+  return `${y}-W${String(w).padStart(2, '0')}`;
+}
+function weekToRange(weekStr) {
+  if (!weekStr) return null;
+  const m = weekStr.match(/^(\d{4})-W(\d{1,2})$/);
+  if (!m) return null;
+  const year = parseInt(m[1]), week = parseInt(m[2]);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const day  = jan4.getUTCDay() || 7;
+  const start = new Date(jan4);
+  start.setUTCDate(jan4.getUTCDate() + (week - 1) * 7 - day + 1);
+  const end = new Date(start);
+  end.setUTCDate(start.getUTCDate() + 6);
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+}
+function getWeekItems(weekStr, allRes) {
+  const range = weekToRange(weekStr);
+  if (!range) return [];
+  return allRes.filter(r => { const d = toISODate(r.fecha); return d && d >= range.start && d <= range.end; });
+}
+
+let viajesMode = 'month';
+el('month-picker').addEventListener('change', renderViajes);
+el('week-picker-viajes').addEventListener('change', renderViajes);
+el('viajes-mode-month').addEventListener('click', () => {
+  viajesMode = 'month';
+  el('viajes-mode-month').classList.add('active');
+  el('viajes-mode-week').classList.remove('active');
+  el('month-picker').hidden = false;
+  el('week-picker-viajes').hidden = true;
+  renderViajes();
+});
+el('viajes-mode-week').addEventListener('click', () => {
+  viajesMode = 'week';
+  el('viajes-mode-week').classList.add('active');
+  el('viajes-mode-month').classList.remove('active');
+  el('month-picker').hidden = true;
+  el('week-picker-viajes').hidden = false;
+  renderViajes();
+});
+
+function renderViajes() {
+  let allPeriod;
+  if (viajesMode === 'week') {
+    const week = el('week-picker-viajes').value || currentWeek();
+    allPeriod = getWeekItems(week, reservations);
+    el('sum-ingresos-label').textContent = 'Facturado esta semana';
+  } else {
+    const month = el('month-picker').value || currentMonth();
+    allPeriod = getMonthItems(month, reservations);
+    el('sum-ingresos-label').textContent = 'Facturado este mes';
+  }
+  const items    = allPeriod.filter(r => r.status !== 'cancelled');
+  const cancelled = allPeriod.filter(r => r.status === 'cancelled');
+  const allMonth  = allPeriod;
+
+  const facturados    = items.filter(r => r.status !== 'pending');
+  const totalIngresos = facturados.reduce((s, r) => s + (getPrecio(r) || 0), 0);
+  const totalComp     = items.filter(r => r.status === 'completed' || r.status === 'saldado').reduce((s, r) => s + (getPrecio(r) || 0), 0);
+  // confirmed = 50% abono ya pagado → falta cobrar el 50% restante
+  const confirmedItems = items.filter(r => r.status === 'confirmed');
+  const porCobrar      = confirmedItems.reduce((s, r) => s + Math.round((getPrecio(r) || 0) * 0.5), 0);
+  const confirmedCnt   = confirmedItems.length;
+
+  el('sum-ingresos').textContent    = fmt(totalIngresos);
+  el('sum-viajes').textContent      = `${facturados.length} viaje${facturados.length !== 1 ? 's' : ''} · promedio ${facturados.length ? fmt(Math.round(totalIngresos / facturados.length)) : '—'}`;
+  el('sum-completados').textContent = fmt(totalComp);
+  el('sum-por-cobrar').textContent  = confirmedCnt ? fmt(porCobrar) : '$0';
+  el('sum-por-cobrar').closest('.summary-card').querySelector('.summary-card__sub').textContent =
+    confirmedCnt ? `50% restante · ${confirmedCnt} viaje${confirmedCnt !== 1 ? 's' : ''} confirmado${confirmedCnt !== 1 ? 's' : ''}` : 'Sin viajes confirmados';
+
+  if (!allMonth.length) {
+    el('trips-table-wrap').innerHTML = `<div class="empty-state"><p>Sin viajes en este período</p></div>`;
+    return;
+  }
+
+  const sorted = [...allMonth].sort((a, b) => (toISODate(a.fecha) || '').localeCompare(toISODate(b.fecha) || '') || (a.hora || '').localeCompare(b.hora || ''));
+
+  const chipClass = { pending: 'chip-pending', confirmed: 'chip-confirmed', saldado: 'chip-saldado', completed: 'chip-completed', cancelled: 'chip-cancelled' };
+  const rows = sorted.map(r => {
+    const precio = getPrecio(r);
+    const orig = (r.origen || '').split(',')[0];
+    const dest = (r.destino || '').split(',')[0];
+    const km   = r.cotizacion?.distanciaKm ? `${r.cotizacion.distanciaKm} km` : '—';
+    return `<tr data-status="${r.status}">
+      <td class="td-mono">${fmtDate(r.fecha)}${r.hora ? `<br><span style="color:var(--muted);font-size:.75rem">${r.hora}</span>` : ''}</td>
+      <td><div style="font-weight:500">${r.nombre || '—'}</div><div style="font-size:.75rem;color:var(--muted)">${r.telefono || ''}</div></td>
+      <td class="route-cell"><span>${orig}</span><span class="route-arrow">↓</span><span>${dest}</span></td>
+      <td class="td-muted">${km}</td>
+      <td class="td-muted">${r.driverName || '—'}</td>
+      <td><span class="status-chip ${chipClass[r.status] || ''}">${statusLabel[r.status] || r.status}</span></td>
+      <td class="td-price">${precio != null ? fmt(precio) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  el('trips-table-wrap').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Cliente</th><th>Ruta</th><th>Km</th><th>Chofer</th><th>Estado</th><th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── GASTOS ───────────────────────────────────────────────────────────────────
+const catLabel = { bencina: '⛽ Bencina', tag: '🏷 TAG / Pase', publicidad: '📣 Publicidad', dominio: '🌐 Dominio', herramientas: '🔧 Herramientas', otro: '📦 Otro' };
+
+el('week-picker-gastos').addEventListener('change', renderGastos);
+
+el('btn-add-gasto').addEventListener('click', async () => {
+  const monto = Number(el('g-monto').value);
+  if (!monto || monto <= 0) { toast('Ingresa un monto válido'); return; }
+  const fecha = el('g-fecha').value;
+  if (!fecha) { toast('Selecciona una fecha'); return; }
+  el('btn-add-gasto').disabled = true;
+  try {
+    await fsAdd('expenses', {
+      fecha,
+      categoria:   el('g-categoria').value,
+      monto,
+      quienPago:   el('g-quien-pago').value,
+      reembolsoA:  el('g-reembolso').value || null,
+      nota:        el('g-nota').value.trim() || null,
+      createdAt:   new Date().toISOString(),
+    });
+    el('g-monto').value = '';
+    el('g-nota').value  = '';
+    await loadAll();
+    toast('✓ Gasto guardado');
+  } finally {
+    el('btn-add-gasto').disabled = false;
+  }
+});
+
+function renderGastos() {
+  const week  = el('week-picker-gastos').value || currentWeek();
+  const range = weekToRange(week);
+  const items = (range
+    ? expenses.filter(g => (g.fecha || '') >= range.start && (g.fecha || '') <= range.end)
+    : []
+  ).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+  const totalGastos    = items.reduce((s, g) => s + (Number(g.monto) || 0), 0);
+  const totalReembolso = items.filter(g => g.reembolsoA).reduce((s, g) => s + (Number(g.monto) || 0), 0);
+  el('g-sum-total').textContent      = fmt(totalGastos);
+  el('g-sum-reembolsos').textContent = fmt(totalReembolso);
+
+  if (!items.length) {
+    el('gastos-list').innerHTML = `<div class="empty-state"><p>Sin gastos esta semana</p></div>`;
+    return;
+  }
+
+  el('gastos-list').innerHTML = items.map(g => `
+    <div class="expense-item">
+      <div>
+        <div class="expense-name">${catLabel[g.categoria] || g.categoria}${g.nota ? ` — ${g.nota}` : ''}</div>
+        <div class="expense-meta">${fmtDate(g.fecha)} · Pagó: <strong>${g.quienPago}</strong>${g.reembolsoA ? ` · Reembolsar a: ${g.reembolsoA}` : ''}</div>
+      </div>
+      <div>
+        <div class="expense-amount">−${fmt(g.monto)}</div>
+        ${g.reembolsoA ? `<div class="expense-reembolso">↩ ${g.reembolsoA}</div>` : ''}
+      </div>
+      <div class="expense-actions">
+        <button class="btn-ghost" style="font-size:.75rem;color:var(--cancelled)" data-del-gasto="${g.id}">Eliminar</button>
+      </div>
+    </div>`).join('');
+
+  el('gastos-list').querySelectorAll('[data-del-gasto]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('¿Eliminar este gasto?')) return;
+      await fsDel('expenses', btn.dataset.delGasto);
+      await loadAll();
+      toast('Gasto eliminado');
+    });
+  });
+}
+
+// ── CHOFERES ─────────────────────────────────────────────────────────────────
+el('week-picker-choferes').addEventListener('change', renderChoferes);
+
+// Devuelve el lunes de la semana de una fecha ISO
+function getWeekMonday(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T12:00:00');
+  if (isNaN(d)) return null;
+  const day = d.getDay(); // 0=Dom, 1=Lun...
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+function fmtWeekRange(mondayStr) {
+  const mon = new Date(mondayStr + 'T12:00:00');
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const opts = { day: 'numeric', month: 'short' };
+  return `${mon.toLocaleDateString('es-CL', opts)} – ${sun.toLocaleDateString('es-CL', opts)}`;
+}
+
+function renderChoferes() {
+  const week = el('week-picker-choferes').value || currentWeek();
+
+  const trips = getWeekItems(week, reservations).filter(r =>
+    r.status === 'completed' && r.driverId
+  ).sort((a, b) => (toISODate(a.fecha) || '').localeCompare(toISODate(b.fecha) || ''));
+
+  const debtsEl = el('driver-debts-list');
+
+  if (!trips.length) {
+    debtsEl.innerHTML = `<div class="empty-state"><p>Sin viajes completados esta semana</p></div>`;
+  } else {
+    // Agrupar: primero por chofer, luego por semana (lunes)
+    const byDriver = {};
+    trips.forEach(r => {
+      if (!byDriver[r.driverId]) byDriver[r.driverId] = {};
+      const wk = getWeekMonday(toISODate(r.fecha)) || toISODate(r.fecha) || 'sin-fecha';
+      if (!byDriver[r.driverId][wk]) byDriver[r.driverId][wk] = [];
+      byDriver[r.driverId][wk].push(r);
+    });
+
+    debtsEl.innerHTML = Object.entries(byDriver).map(([driverId, weeks]) => {
+      const driver = drivers[driverId];
+      const tarifa = driver?.tarifaPorServicio ?? 20000;
+      const driverName = driver?.nombre || trips.find(r => r.driverId === driverId)?.driverName || driverId;
+      const allTrips = Object.values(weeks).flat();
+      const totalPending = allTrips.filter(r => !r.pagadoChofer).reduce((s,r) => s + (r.montoChofer ?? tarifa), 0);
+      const allPaid = totalPending === 0;
+
+      const weekBlocks = Object.entries(weeks)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([monday, wtrips]) => {
+          const pending = wtrips.filter(r => !r.pagadoChofer);
+          const weekPendingAmt = pending.reduce((s,r) => s + (r.montoChofer ?? tarifa), 0);
+          const weekAllPaid = pending.length === 0;
+
+          const tripRows = wtrips.map(r => {
+            const orig = (r.origen  || '').split(',')[0];
+            const dest = (r.destino || '').split(',')[0];
+            const paid = !!r.pagadoChofer;
+            const monto = r.montoChofer ?? tarifa;
+            return `<div class="driver-trip-row">
+              <div class="driver-trip-date">${fmtDate(r.fecha)}</div>
+              <div class="driver-trip-route">
+                <span>${orig}</span>
+                <span style="color:var(--muted);font-size:.72rem">→ ${dest}</span>
+              </div>
+              ${paid
+                ? `<div class="driver-trip-amount driver-trip-amount--paid">${fmt(monto)}</div>`
+                : `<input type="number" class="trip-monto-input" data-trip-input="${r.id}"
+                    value="${monto}" min="0" step="1000"
+                    style="width:88px;background:var(--bg);border:1px solid var(--border);border-radius:6px;
+                           padding:5px 7px;color:var(--text);font-family:inherit;font-size:.82rem;text-align:right;outline:none">`
+              }
+              <button class="pay-btn ${paid ? 'pay-btn--paid' : 'pay-btn--pending'}"
+                data-pay-trip="${r.id}" data-paid="${paid}">
+                ${paid ? '✓' : 'Pagar'}
+              </button>
+            </div>`;
+          }).join('');
+
+          return `<div style="border-top:1px solid var(--border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--surface-2)">
+              <span style="font-size:.78rem;font-weight:600;color:var(--muted)">Fin de semana ${fmtWeekRange(monday)}</span>
+              ${weekAllPaid
+                ? `<span style="font-size:.78rem;color:var(--completed);font-weight:600">✓ Pagado</span>`
+                : `<button class="pay-btn pay-btn--pending" style="font-size:.75rem;padding:5px 10px"
+                    data-pay-all="${driverId}" data-ids="${pending.map(r=>r.id).join(',')}">
+                    Pagar semana ${fmt(weekPendingAmt)}
+                  </button>`
+              }
+            </div>
+            ${tripRows}
+          </div>`;
+        }).join('');
+
+      return `<div class="driver-debt-card">
+        <div class="driver-debt-header">
+          <div>
+            <div class="driver-debt-name">${driverName}</div>
+            <div class="driver-debt-meta">${allTrips.length} viaje${allTrips.length !== 1 ? 's' : ''} · ${fmt(tarifa)}/servicio</div>
+          </div>
+          <div class="driver-debt-total ${allPaid ? 'driver-debt-total--paid' : ''}">
+            ${allPaid ? '✓ Todo pagado' : `Debes ${fmt(totalPending)}`}
+          </div>
+        </div>
+        ${weekBlocks}
+      </div>`;
+    }).join('');
+
+    // Listeners pagar uno a uno
+    debtsEl.querySelectorAll('[data-pay-trip]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const tripId = btn.dataset.payTrip;
+        const isPaid = btn.dataset.paid === 'true';
+        const input  = debtsEl.querySelector(`[data-trip-input="${tripId}"]`);
+        const monto  = input ? Number(input.value) : null;
+        btn.disabled = true;
+        const patch = { pagadoChofer: !isPaid };
+        if (!isPaid && monto) patch.montoChofer = monto;
+        await fsPatch('reservations', tripId, patch);
+        const r = reservations.find(x => x.id === tripId);
+        if (r) { r.pagadoChofer = !isPaid; if (!isPaid && monto) r.montoChofer = monto; }
+        renderChoferes();
+        toast(isPaid ? 'Marcado como pendiente' : '✓ Marcado como pagado');
+      });
+    });
+
+    // Listener pagar semana completa
+    debtsEl.querySelectorAll('[data-pay-all]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const ids = btn.dataset.ids.split(',').filter(Boolean);
+        btn.disabled = true;
+        await Promise.all(ids.map(id => {
+          const input = debtsEl.querySelector(`[data-trip-input="${id}"]`);
+          const monto = input ? Number(input.value) : null;
+          const patch = { pagadoChofer: true };
+          if (monto) patch.montoChofer = monto;
+          return fsPatch('reservations', id, patch);
+        }));
+        ids.forEach(id => {
+          const r = reservations.find(x => x.id === id);
+          const input = debtsEl.querySelector(`[data-trip-input="${id}"]`);
+          if (r) { r.pagadoChofer = true; if (input) r.montoChofer = Number(input.value); }
+        });
+        renderChoferes();
+        toast(`✓ ${ids.length} viajes marcados como pagados`);
+      });
+    });
+  }
+
+  // Render config de tarifas (dentro del <details>)
+  const cfgList = el('driver-config-list');
+  const driverItems = Object.values(drivers).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+  if (!driverItems.length) {
+    cfgList.innerHTML = `<div class="empty-state" style="padding:20px"><p>Sin choferes en el admin</p></div>`;
+    return;
+  }
+  cfgList.innerHTML = driverItems.map(d => `
+    <div class="driver-config-item">
+      <div>
+        <div class="driver-config-name">${d.nombre}${d.esSocio ? ' <span class="socio-badge">Socio</span>' : ''}</div>
+        <div style="font-size:.78rem;color:var(--muted)">${d.activo !== false ? 'Activo' : 'Inactivo'}</div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)">
+        <input type="checkbox" ${d.esSocio ? 'checked' : ''} data-socio="${d.id}" style="accent-color:var(--gold);width:16px;height:16px">
+        Socio
+      </label>
+      <div class="driver-config-tarifa">
+        <span style="font-size:.8rem;color:var(--muted)">$</span>
+        <input type="number" value="${d.tarifaPorServicio ?? 20000}" min="0" step="1000" data-tarifa="${d.id}">
+        <button class="btn-secondary" style="padding:7px 11px;font-size:.8rem" data-save-driver="${d.id}">Guardar</button>
+      </div>
+    </div>`).join('');
+
+  cfgList.querySelectorAll('[data-save-driver]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id      = btn.dataset.saveDriver;
+      const tarifa  = Number(cfgList.querySelector(`[data-tarifa="${id}"]`).value) || 20000;
+      const esSocio = cfgList.querySelector(`[data-socio="${id}"]`).checked;
+      btn.disabled  = true;
+      try {
+        await fsPatch('drivers', id, { tarifaPorServicio: tarifa, esSocio });
+        drivers[id] = { ...drivers[id], tarifaPorServicio: tarifa, esSocio };
+        toast('✓ Chofer actualizado');
+        renderChoferes();
+      } finally { btn.disabled = false; }
+    });
+  });
+}
+
+// ── REPARTO ──────────────────────────────────────────────────────────────────
+el('week-picker-reparto').addEventListener('change', renderReparto);
+
+el('btn-save-pct').addEventListener('click', async () => {
+  const gabEl = document.querySelector('[data-pct="gabriel"]');
+  const vicEl = document.querySelector('[data-pct="vicente"]');
+  if (!gabEl || !vicEl) return;
+  const gab = Number(gabEl.value);
+  const vic = Number(vicEl.value);
+  if (isNaN(gab) || isNaN(vic) || gab + vic !== 50) {
+    toast('Gabriel + Vicente deben sumar exactamente 50%'); return;
+  }
+  if (gab < 0 || vic < 0) { toast('Los porcentajes no pueden ser negativos'); return; }
+  el('btn-save-pct').disabled = true;
+  try {
+    await fsSet('partnerConfig', 'current', {
+      joaco_pct: 50, gabriel_pct: gab, vicente_pct: vic,
+      tarifaDefault: partnerCfg.tarifaDefault || 20000,
+      updatedAt: new Date().toISOString(),
+    });
+    await fsAdd('partnerConfigHistory', {
+      fecha: new Date().toISOString(), gabriel_pct: gab, vicente_pct: vic,
+    });
+    partnerCfg.gabriel_pct = gab; partnerCfg.vicente_pct = vic;
+    toast('✓ Porcentajes guardados');
+    renderReparto();
+  } finally { el('btn-save-pct').disabled = false; }
+});
+
+function renderReparto() {
+  const week   = el('week-picker-reparto').value || currentWeek();
+  const range  = weekToRange(week);
+  const items  = getWeekItems(week, reservations).filter(r => r.status !== 'cancelled');
+  const gastosM = range
+    ? expenses.filter(g => (g.fecha || '') >= range.start && (g.fecha || '') <= range.end)
+    : [];
+
+  const ingresos = items.reduce((s, r) => s + (getPrecio(r) || 0), 0);
+  const gastosTot = gastosM.reduce((s, g) => s + (Number(g.monto) || 0), 0);
+
+  // Pago a choferes: por cada viaje no cancelado con chofer asignado
+  let pagoCh = 0;
+  items.forEach(r => {
+    if (!r.driverId) return;
+    const d = drivers[r.driverId];
+    pagoCh += d?.tarifaPorServicio ?? partnerCfg.tarifaDefault ?? 20000;
+  });
+
+  const utilidad = ingresos - pagoCh - gastosTot;
+
+  el('rep-ingresos').textContent = fmt(ingresos);
+  el('rep-choferes').textContent = `−${fmt(pagoCh)}`;
+  el('rep-gastos').textContent   = `−${fmt(gastosTot)}`;
+  el('rep-utilidad').textContent = fmt(utilidad);
+
+  const { joaco_pct: jp = 50, gabriel_pct: gp = 30, vicente_pct: vp = 20 } = partnerCfg;
+
+  el('partner-rows').innerHTML = `
+    <div class="partner-row">
+      <div><div class="partner-name">Joaco</div><div class="partner-pct">Fijo ${jp}%</div></div>
+      <span class="locked-badge">🔒 Bloqueado</span>
+      <div class="partner-total">${fmt(utilidad * jp / 100)}</div>
+    </div>
+    <div class="partner-row">
+      <div><div class="partner-name">Gabriel</div></div>
+      <input type="number" class="pct-input" value="${gp}" min="0" max="50" step="1" data-pct="gabriel">
+      <div class="partner-total">${fmt(utilidad * gp / 100)}</div>
+    </div>
+    <div class="partner-row">
+      <div><div class="partner-name">Vicente</div></div>
+      <input type="number" class="pct-input" value="${vp}" min="0" max="50" step="1" data-pct="vicente">
+      <div class="partner-total">${fmt(utilidad * vp / 100)}</div>
+    </div>`;
+
+  // Reembolsos por socio
+  const reembolsos = { joaco: 0, gabriel: 0, vicente: 0 };
+  gastosM.forEach(g => { if (g.reembolsoA && reembolsos[g.reembolsoA] !== undefined) reembolsos[g.reembolsoA] += Number(g.monto) || 0; });
+
+  const socios = [
+    { nombre: 'Joaco',   key: 'joaco',   pct: jp },
+    { nombre: 'Gabriel', key: 'gabriel', pct: gp },
+    { nombre: 'Vicente', key: 'vicente', pct: vp },
+  ];
+  el('resumen-socios').innerHTML = socios.map(s => {
+    const utilS  = utilidad * s.pct / 100;
+    const reemb  = reembolsos[s.key] || 0;
+    const total  = utilS + reemb;
+    return `<div class="partner-row">
+      <div>
+        <div class="partner-name">${s.nombre}</div>
+        <div class="partner-pct">${fmt(utilS)} utilidad${reemb ? ` + ${fmt(reemb)} reembolso` : ''}</div>
+      </div>
+      <div></div>
+      <div class="partner-total">${fmt(total)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── CUADRE ───────────────────────────────────────────────────────────────────
+el('week-picker-cuadre').addEventListener('change', renderCuadre);
+
+el('btn-save-cuadre').addEventListener('click', async () => {
+  const week  = el('week-picker-cuadre').value || currentWeek();
+  const saldoR = Number(el('cuadre-saldo-real').value);
+  if (isNaN(saldoR)) { toast('Ingresa un saldo válido'); return; }
+  await fsSet('bankReconciliation', week, { saldoReal: saldoR, semana: week, updatedAt: new Date().toISOString() });
+  bankData[week] = { saldoReal: saldoR };
+  renderCuadre();
+  toast('✓ Saldo guardado');
+});
+
+el('btn-save-nota').addEventListener('click', async () => {
+  const week = el('week-picker-cuadre').value || currentWeek();
+  const nota = el('cuadre-nota').value.trim();
+  await fsSet('bankReconciliation', week, { nota, semana: week, updatedAt: new Date().toISOString() });
+  toast('✓ Nota guardada');
+});
+
+async function renderCuadre() {
+  const week  = el('week-picker-cuadre').value || currentWeek();
+  const range = weekToRange(week);
+
+  const stored = await fsGet('bankReconciliation', week).catch(() => null);
+  if (stored) {
+    if (stored.saldoReal != null) el('cuadre-saldo-real').value = stored.saldoReal;
+    if (stored.nota)              el('cuadre-nota').value       = stored.nota;
+  } else {
+    el('cuadre-saldo-real').value = '';
+    el('cuadre-nota').value       = '';
+  }
+
+  const items    = getWeekItems(week, reservations);
+  const cobrado = items.reduce((s, r) => {
+    if (r.status === 'saldado')   return s + (getPrecio(r) || 0);
+    if (r.status === 'confirmed') return s + Math.round((getPrecio(r) || 0) * 0.5);
+    return s;
+  }, 0);
+  const porCobrar = items.filter(r => r.status === 'confirmed').reduce((s, r) => s + Math.round((getPrecio(r) || 0) * 0.5), 0);
+
+  const gastosM   = range
+    ? expenses.filter(g => (g.fecha || '') >= range.start && (g.fecha || '') <= range.end)
+    : [];
+  const gastosTot = gastosM.reduce((s, g) => s + (Number(g.monto) || 0), 0);
+  let pagoCh = 0;
+  items.filter(r => r.status !== 'cancelled' && r.driverId).forEach(r => {
+    const d = drivers[r.driverId];
+    pagoCh += d?.tarifaPorServicio ?? 20000;
+  });
+
+  const calculado = cobrado - gastosTot - pagoCh;
+  el('cuadre-calculado').textContent  = fmt(calculado);
+  el('cuadre-por-cobrar').textContent = fmt(porCobrar);
+
+  const saldoReal = stored?.saldoReal != null ? Number(stored.saldoReal) : null;
+  if (saldoReal != null) {
+    const diff = saldoReal - calculado;
+    const difEl = el('cuadre-diferencia');
+    difEl.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
+    difEl.className = `cuadre-card__value ${diff >= 0 ? 'cuadre-card__value--pos' : 'cuadre-card__value--neg'}`;
+  } else {
+    el('cuadre-diferencia').textContent = '—';
+    el('cuadre-diferencia').className   = 'cuadre-card__value';
+  }
+}
+
+// ── EXPORTAR EXCEL ────────────────────────────────────────────────────────────
+el('btn-export-excel').addEventListener('click', exportarExcel);
+
+function exportarExcel() {
+  if (!window.XLSX) { toast('Cargando librería Excel, intenta en un segundo...'); return; }
+  const week  = el('week-picker-reparto').value || currentWeek();
+  const range = weekToRange(week);
+  if (!range) { toast('Selecciona una semana válida'); return; }
+
+  const weekLabel = `${range.start} al ${range.end}`;
+  const XLSX = window.XLSX;
+  const wb   = XLSX.utils.book_new();
+  const CLP  = v => Math.round(Number(v) || 0);
+
+  // ── Hoja 1: Resumen ──
+  const items    = getWeekItems(week, reservations).filter(r => r.status !== 'cancelled');
+  const gastosW  = expenses.filter(g => (g.fecha||'') >= range.start && (g.fecha||'') <= range.end);
+  const ingresos = items.reduce((s,r) => s + (getPrecio(r)||0), 0);
+  const gastosTot = gastosW.reduce((s,g) => s + CLP(g.monto), 0);
+  let pagoCh = 0;
+  items.filter(r => r.driverId).forEach(r => {
+    const d = drivers[r.driverId];
+    pagoCh += r.montoChofer ?? d?.tarifaPorServicio ?? 20000;
+  });
+  const utilidad = ingresos - gastosTot - pagoCh;
+  const { joaco_pct: jp=50, gabriel_pct: gp=30, vicente_pct: vp=20 } = partnerCfg;
+
+  const wsRes = XLSX.utils.aoa_to_sheet([
+    ['TeLlevo — Resumen semanal'],
+    ['Semana', weekLabel],
+    [],
+    ['Concepto', 'Monto ($)'],
+    ['Ingresos', ingresos],
+    ['− Gastos', -gastosTot],
+    ['− Pago choferes', -pagoCh],
+    ['UTILIDAD NETA', utilidad],
+    [],
+    ['REPARTO'],
+    [`Joaco (${jp}%)`, Math.round(utilidad * jp / 100)],
+    [`Gabriel (${gp}%)`, Math.round(utilidad * gp / 100)],
+    [`Vicente (${vp}%)`, Math.round(utilidad * vp / 100)],
+  ]);
+  XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+
+  // ── Hoja 2: Gastos ──
+  const wsGRows = [['Fecha','Categoría','Monto ($)','Quién pagó','Reembolso a','Nota']];
+  gastosW.forEach(g => wsGRows.push([
+    g.fecha,
+    catLabel[g.categoria] || g.categoria,
+    CLP(g.monto),
+    g.quienPago || '',
+    g.reembolsoA || '',
+    g.nota || '',
+  ]));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsGRows), 'Gastos');
+
+  // ── Hoja 3: Choferes ──
+  const chTrips = getWeekItems(week, reservations).filter(r => r.status === 'completed' && r.driverId);
+  const wsChRows = [['Fecha','Chofer','Origen','Destino','Monto ($)','Pagado']];
+  chTrips.forEach(r => {
+    const d = drivers[r.driverId];
+    wsChRows.push([
+      toISODate(r.fecha),
+      d?.nombre || r.driverName || r.driverId,
+      (r.origen||'').split(',')[0],
+      (r.destino||'').split(',')[0],
+      r.montoChofer ?? d?.tarifaPorServicio ?? 20000,
+      r.pagadoChofer ? 'Sí' : 'No',
+    ]);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsChRows), 'Choferes');
+
+  XLSX.writeFile(wb, `TeLlevo_${week}.xlsx`);
+}
+</script>
+</body>
+</html>

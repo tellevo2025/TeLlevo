@@ -65,8 +65,10 @@ module.exports = async function handler(req, res) {
   const rawCode     = normalizeCode(params.get('codigoDescuento') || '');
   const discountPct = DISCOUNT_CODES[rawCode] || 0;
 
+  // El form envía 'cotizacionData' (camelCase)
   let cotizacion = null;
-  try { cotizacion = JSON.parse(params.get('cotizacion-data') || 'null'); } catch { /* noop */ }
+  try { cotizacion = JSON.parse(params.get('cotizacionData') || 'null'); } catch { /* noop */ }
+  const quoteId = cotizacion?.quoteId || null;
 
   // ── 1. Guardar en Firestore ──────────────────────────────────────────────
   if (db) {
@@ -92,8 +94,9 @@ module.exports = async function handler(req, res) {
         seguro:          params.get('seguro')           || '',
         personas:        params.get('personas')         || '',
         codigoDescuento: rawCode,
-        descuentoPct,
+        descuentoPct:    discountPct,
         cotizacion,
+        quoteId,
         ip,
       });
     } catch (e) { console.error('Error guardando en Firestore:', e.message); }
@@ -103,10 +106,20 @@ module.exports = async function handler(req, res) {
   // Debe ser await — en serverless, el proceso muere al enviar la respuesta
   if (GAS_URL) {
     try {
+      // Agregar campos de precio explícitos para que el GAS los encuentre
+      // sin importar el nombre que espere (precio, precioTotal, total, etc.)
+      const gasParams = new URLSearchParams(params);
+      if (cotizacion?.total      != null) gasParams.set('precio',      String(cotizacion.total));
+      if (cotizacion?.total      != null) gasParams.set('precioTotal', String(cotizacion.total));
+      if (cotizacion?.distanciaKm != null) gasParams.set('distanciaKm', String(cotizacion.distanciaKm));
+      if (cotizacion?.precioBase != null) gasParams.set('precioBase',  String(cotizacion.precioBase));
+      if (cotizacion?.descuento  != null) gasParams.set('descuento',   String(cotizacion.descuento));
+      if (discountPct > 0)                gasParams.set('descuentoPct', String(discountPct));
+
       await fetch(GAS_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    params.toString(),
+        body:    gasParams.toString(),
       });
     } catch (e) { console.error('GAS forward error:', e.message); }
   }

@@ -58,3 +58,15 @@ if (fs.existsSync(adminPath)) {
   fs.writeFileSync(adminPath, adminHtml);
   console.log('OK: Config Firebase inyectada en admin/index.html');
 }
+
+// Inyectar config Firebase en admin/finances.html
+const finPath = path.join(__dirname, '..', 'admin', 'finances.html');
+if (fs.existsSync(finPath)) {
+  let finHtml = fs.readFileSync(finPath, 'utf8');
+  for (const [k, v] of Object.entries({
+    '%%FIREBASE_API_KEY%%':    process.env.FIREBASE_API_KEY    || '',
+    '%%FIREBASE_PROJECT_ID%%': process.env.FIREBASE_PROJECT_ID || '',
+  })) { finHtml = finHtml.replaceAll(k, v); }
+  fs.writeFileSync(finPath, finHtml);
+  console.log('OK: Config Firebase inyectada en admin/finances.html');
+}
