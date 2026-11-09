@@ -818,7 +818,7 @@ async function autoCancelOldPending() {
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const toCancel = reservations.filter(r =>
-    r.status === 'pending' && toISODate(r.fecha) && toISODate(r.fecha) < today
+    r.status === 'pending' && !r.noAutoCancelar && toISODate(r.fecha) && toISODate(r.fecha) < today
   );
   if (!toCancel.length) return;
   await Promise.all(toCancel.map(r => fsPatch('reservations', r.id, { status: 'cancelled' })));

@@ -302,6 +302,7 @@
     .detail-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
     .detail-actions .row { display: flex; gap: 8px; }
     .detail-actions .row > * { flex: 1; }
+    .btn-undo { width: 100%; }
     .driver-select {
       width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
       padding: 9px 12px; color: var(--text); font-size: .875rem; outline: none; cursor: pointer;
@@ -1050,7 +1051,7 @@ async function _restRefresh() {
 async function _autoCancelOldPending(token) {
   const today = localToday();
   const toCancel = Object.values(reservations).filter(r =>
-    r.status === 'pending' && toISODate(r.fecha) && toISODate(r.fecha) < today
+    r.status === 'pending' && !r.noAutoCancelar && toISODate(r.fecha) && toISODate(r.fecha) < today
   );
   if (!toCancel.length) return;
   await Promise.all(toCancel.map(r =>
@@ -1203,6 +1204,64 @@ function updateBadges() {
   }
 }
 
+// ── Transiciones de estado ─────────────────────────────────────────────────
+// Pendiente, Confirmada y Saldada se calculan desde los pagos, de modo que quitar
+// un pago devuelve la reserva sola al apartado que le corresponde.
+const PAYMENT_DRIVEN_STATUSES = new Set(['pending', 'confirmed', 'saldado']);
+
+// Las reservas anteriores a este flujo no tienen confirmadaManual: se infiere de su estado.
+const wasConfirmed = (r) => r.confirmadaManual ?? ['confirmed', 'saldado', 'completed'].includes(r.status);
+
+const statusFromPayments = (abono, saldo, confirmed) => {
+  if (saldo) return 'saldado';
+  return abono || confirmed ? 'confirmed' : 'pending';
+};
+const statusFromReservation = (r) => statusFromPayments(!!r.abonoRecibido, !!r.saldoRecibido, wasConfirmed(r));
+
+// Sin esta marca, una reserva con fecha pasada devuelta a Pendiente se cancelaría sola de nuevo.
+const keepPendingPatch = (r, status) =>
+  status === 'pending' && toISODate(r.fecha) && toISODate(r.fecha) < localToday() ? { noAutoCancelar: true } : {};
+
+function paymentPatch(r, change) {
+  const abonoRecibido = change.abonoRecibido ?? !!r.abonoRecibido;
+  const saldoRecibido = change.saldoRecibido ?? !!r.saldoRecibido;
+  const confirmadaManual = wasConfirmed(r);
+  const patch = { abonoRecibido, saldoRecibido, confirmadaManual };
+  if (!PAYMENT_DRIVEN_STATUSES.has(r.status)) return patch;
+  const status = statusFromPayments(abonoRecibido, saldoRecibido, confirmadaManual);
+  return { ...patch, status, ...keepPendingPatch(r, status) };
+}
+
+function cancelPatch(r) {
+  return {
+    status: 'cancelled',
+    confirmadaManual: wasConfirmed(r),
+    cancelSnapshot: { status: r.status, driverId: r.driverId ?? null, driverName: r.driverName ?? null },
+    driverId: null,
+    driverName: null,
+  };
+}
+
+function reactivatePatch(r) {
+  const snapshot = r.cancelSnapshot || {};
+  const status = snapshot.status === 'completed' ? 'completed' : statusFromReservation(r);
+  return {
+    status,
+    driverId: snapshot.driverId ?? r.driverId ?? null,
+    driverName: snapshot.driverName ?? r.driverName ?? null,
+    cancelSnapshot: null,
+    ...keepPendingPatch(r, status),
+  };
+}
+
+// dbUpdate ya informa el error al usuario; aquí solo se evita el rechazo sin capturar.
+async function applyReservationPatch(r, patch) {
+  try {
+    await dbUpdate('reservations', r.id, patch);
+    if (patch.status && patch.status !== r.status) toast(`Movida a ${statusLabel[patch.status]}`, 'success');
+  } catch { /* noop */ }
+}
+
 // ── Agrupación de reservas ─────────────────────────────────────────────────
 const timeKey = (hora) => {
   const m = String(hora || '').match(/(\d{1,2}):(\d{2})/);
@@ -1227,10 +1286,9 @@ function renderResCard(r) {
   const precioNum  = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
   const precio     = precioNum != null ? fmt(precioNum) : '';
   const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${escHtml(r.driverName)}</div>` : '';
-  const pagoLine   = (r.abonoRecibido || r.saldoRecibido) ? `
+  const pagoLine   = r.status !== 'saldado' && (r.abonoRecibido || r.saldoRecibido) ? `
     <div class="res-card__pagos">
-      ${r.abonoRecibido ? '<span class="pago-badge pago-badge--ok">Abono ✓</span>' : ''}
-      ${r.saldoRecibido ? '<span class="pago-badge pago-badge--ok">Saldo ✓</span>' : ''}
+      <span class="pago-badge pago-badge--ok">${r.saldoRecibido ? 'Saldado' : 'Abono'} ✓</span>
     </div>` : '';
   const origen  = (r.origen  || '').split(',')[0];
   const destino = (r.destino || '').split(',')[0];
@@ -1395,6 +1453,7 @@ function renderDetail(r) {
         <div class="row">
           <button class="btn-danger" id="action-cancel">Cancelar viaje</button>
         </div>
+        ${r.abonoRecibido || r.saldoRecibido ? '' : '<button class="btn-secondary btn-undo" id="action-back-pending">↩ Volver a Pendientes</button>'}
         <button class="btn-wsp" id="action-wsp">${wspSvg} Notificar chofer por WhatsApp</button>
         ${wspClientBtn}
       </div>`;
@@ -1430,6 +1489,13 @@ function renderDetail(r) {
         <div class="row">
           <button class="btn-danger" id="action-cancel">Cancelar viaje</button>
         </div>
+        <button class="btn-secondary btn-undo" id="action-undo-done">↩ Deshacer viaje realizado</button>
+        ${wspClientBtn}
+      </div>`;
+  } else if (r.status === 'cancelled') {
+    actionsHtml = `
+      <div class="detail-actions">
+        <button class="btn-secondary btn-undo" id="action-reactivate">↩ Reactivar reserva</button>
         ${wspClientBtn}
       </div>`;
   }
@@ -1498,7 +1564,7 @@ function renderDetail(r) {
         </button>
         <button class="payment-toggle${r.saldoRecibido ? ' payment-toggle--paid' : ''}" id="toggle-saldo">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Saldo recibido
+          Saldo / pago total
         </button>
       </div>
     </div>
@@ -1506,21 +1572,20 @@ function renderDetail(r) {
     ${actionsHtml}`;
 
   // ── Wire up buttons ────────────────────────────────────────────────────────
-  el('toggle-abono')?.addEventListener('click', async () => {
-    const nuevoEstado = !r.abonoRecibido;
-    const fields = { abonoRecibido: nuevoEstado };
-    if (nuevoEstado && r.status === 'pending') fields.status = 'confirmed';
-    await dbUpdate('reservations', r.id, fields);
+  el('toggle-abono')?.addEventListener('click', () =>
+    applyReservationPatch(r, paymentPatch(r, { abonoRecibido: !r.abonoRecibido })));
+  el('toggle-saldo')?.addEventListener('click', () =>
+    applyReservationPatch(r, paymentPatch(r, { saldoRecibido: !r.saldoRecibido })));
+  el('action-done')?.addEventListener('click', () =>
+    applyReservationPatch(r, { status: 'completed' }));
+  el('action-undo-done')?.addEventListener('click', () => {
+    const status = statusFromReservation(r);
+    applyReservationPatch(r, { status, ...keepPendingPatch(r, status) });
   });
-  el('toggle-saldo')?.addEventListener('click', async () => {
-    const nuevoEstado = !r.saldoRecibido;
-    const fields = { saldoRecibido: nuevoEstado };
-    if (nuevoEstado && r.status === 'confirmed') fields.status = 'saldado';
-    await dbUpdate('reservations', r.id, fields);
-  });
-  el('action-done')?.addEventListener('click', async () => {
-    await dbUpdate('reservations', r.id, { status: 'completed' });
-  });
+  el('action-back-pending')?.addEventListener('click', () =>
+    applyReservationPatch(r, { status: 'pending', confirmadaManual: false, ...keepPendingPatch(r, 'pending') }));
+  el('action-reactivate')?.addEventListener('click', () =>
+    applyReservationPatch(r, reactivatePatch(r)));
 
   el('action-save-price')?.addEventListener('click', async () => {
     const val = Number(el('manual-price-input')?.value);
@@ -1531,12 +1596,12 @@ function renderDetail(r) {
   el('action-confirm')?.addEventListener('click', async () => {
     const dId = el('detail-driver-select')?.value || '';
     const driver = dId ? drivers[dId] : null;
-    const patch = { status: 'confirmed' };
+    const patch = { status: 'confirmed', confirmadaManual: true };
     if (dId) {
       patch.driverId   = driver?.id     || null;
       patch.driverName = driver?.nombre || null;
     }
-    await dbUpdate('reservations', r.id, patch);
+    await applyReservationPatch(r, patch);
   });
 
   // Función compartida: muestra el recuadro de confirmación para asignar chofer
@@ -1596,9 +1661,9 @@ function renderDetail(r) {
     showDriverConfirm(driver);
   });
 
-  el('action-cancel')?.addEventListener('click', async () => {
+  el('action-cancel')?.addEventListener('click', () => {
     if (!confirm('¿Cancelar esta reserva?')) return;
-    await dbUpdate('reservations', r.id, { status: 'cancelled', driverId: null, driverName: null });
+    applyReservationPatch(r, cancelPatch(r));
   });
 
   el('action-wsp')?.addEventListener('click', () => {
@@ -1804,7 +1869,6 @@ function readManualTrip() {
   const stops = value('mt-paradas').split('\n').map(s => s.trim()).filter(Boolean);
   const driver = drivers[value('mt-driver')];
   const status = value('mt-status');
-  const isSettled = status === 'saldado';
   const precio = value('mt-precio');
   return {
     status,
@@ -1831,8 +1895,9 @@ function readManualTrip() {
     seguro:          value('mt-seguro'),
     codigoDescuento: value('mt-alianza').toUpperCase(),
     precioManual:    precio === '' ? null : Number(precio),
-    abonoRecibido:   isSettled,
-    saldoRecibido:   isSettled,
+    abonoRecibido:   false,
+    saldoRecibido:   status === 'saldado',
+    confirmadaManual: status !== 'pending',
     cotizacion:      null,
   };
 }
