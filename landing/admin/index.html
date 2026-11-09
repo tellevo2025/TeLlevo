@@ -333,12 +333,37 @@
        DRIVERS VIEW
     ════════════════════════════════════ */
     .view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-    .service-list { display: flex; flex-direction: column; gap: 8px; padding: 0; list-style: none; }
-    .service-list__item {
-      padding: 12px 16px; font-size: .9rem; overflow-wrap: anywhere;
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    .service-list { display: flex; flex-direction: column; gap: 12px; padding: 0; list-style: none; }
+    .service-card {
+      display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; padding: 16px;
+      background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--gold);
+      border-radius: var(--radius);
     }
-    .service-list__item--unassigned { border-color: var(--pending); color: var(--pending); }
+    .service-card--unassigned { border-left-color: var(--pending); }
+    .service-card__time {
+      min-width: 64px; font-size: clamp(1.25rem, 5vw, 1.6rem); font-weight: 700; line-height: 1.1;
+      color: var(--gold); font-variant-numeric: tabular-nums;
+    }
+    .service-card__body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .service-card__driver { font-size: 1rem; font-weight: 700; overflow-wrap: anywhere; }
+    .service-card--unassigned .service-card__driver { color: var(--pending); }
+    .service-card__route { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+    .service-card__stop { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .service-card__label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--gold);
+    }
+    .service-card__stop--destination .service-card__label { color: var(--confirmed); }
+    .service-card__place { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; min-width: 0; }
+    .service-card__comuna {
+      padding: 2px 8px; border-radius: 6px; font-size: .85rem; font-weight: 800; overflow-wrap: anywhere;
+      background: var(--gold); color: #0A1628;
+    }
+    .service-card__stop--destination .service-card__comuna { background: var(--confirmed); }
+    .service-card__comuna--missing {
+      font-weight: 600; background: transparent; color: var(--muted); border: 1px dashed var(--muted);
+    }
+    .service-card__stop--destination .service-card__comuna--missing { background: transparent; }
+    .service-card__address { min-width: 0; font-size: .85rem; color: var(--text); overflow-wrap: anywhere; }
     .service-list__date-label { font-size: .85rem; color: var(--muted); }
     .btn-download:disabled { opacity: .5; cursor: not-allowed; }
     .manual-form { display: flex; flex-direction: column; gap: 16px; }
@@ -1890,15 +1915,45 @@ function renderEditForm(r) {
 // ── Lista de servicios por chofer ──────────────────────────────────────────
 const SERVICE_LIST_STATUSES = new Set(['confirmed', 'saldado', 'completed']);
 const UNASSIGNED_DRIVER = 'Sin chofer';
+const MISSING_COMUNA = 'Comuna sin indicar';
+
+const COMUNAS = [
+  'Alhué', 'Buin', 'Calera de Tango', 'Cerrillos', 'Cerro Navia', 'Colina', 'Conchalí', 'Curacaví', 'El Bosque',
+  'El Monte', 'Estación Central', 'Huechuraba', 'Independencia', 'Isla de Maipo', 'La Cisterna', 'La Florida',
+  'La Granja', 'La Pintana', 'La Reina', 'Lampa', 'Las Condes', 'Lo Barnechea', 'Lo Espejo', 'Lo Prado', 'Macul',
+  'Maipú', 'María Pinto', 'Melipilla', 'Ñuñoa', 'Padre Hurtado', 'Paine', 'Pedro Aguirre Cerda', 'Peñaflor',
+  'Peñalolén', 'Pirque', 'Providencia', 'Pudahuel', 'Puente Alto', 'Quilicura', 'Quinta Normal', 'Recoleta', 'Renca',
+  'San Bernardo', 'San Joaquín', 'San José de Maipo', 'San Miguel', 'San Pedro', 'San Ramón', 'Santiago', 'Talagante',
+  'Tiltil', 'Vitacura',
+];
+const normalizeText = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const COMUNA_BY_NAME = new Map([...COMUNAS.map(c => [normalizeText(c), c]), ['barnechea', 'Lo Barnechea']]);
+
+// Texto escrito a mano: solo se acepta una comuna inequívoca. "Av. Vitacura 5000" no dice
+// en qué comuna está, y una comuna equivocada es peor que ninguna.
+function parseTypedAddress(parts) {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const comuna = COMUNA_BY_NAME.get(normalizeText(parts[i]));
+    if (comuna) return { street: parts.filter((_, j) => j !== i).join(', '), comuna };
+  }
+  const full = parts.join(', ');
+  const trailing = [...COMUNA_BY_NAME.keys()]
+    .sort((a, b) => b.length - a.length)
+    .find(name => new RegExp(`\\d[\\s,-]+${name}$`).test(normalizeText(full)));
+  if (!trailing) return { street: full, comuna: '' };
+  const keep = full.length - trailing.length;
+  return { street: full.slice(0, keep).replace(/[\s,-]+$/, ''), comuna: COMUNA_BY_NAME.get(trailing) };
+}
 
 // Google entrega "Calle 123, 7550000 Las Condes, Región Metropolitana, Chile": la comuna
-// es el último tramo antes de región y país. El texto escrito a mano se deja tal cual.
-function placeLabel(address) {
+// es el último tramo antes de región y país.
+function parseAddress(address) {
   const parts = String(address || '').split(',').map(p => p.trim()).filter(Boolean);
   const isCountryOrRegion = (p) => /^chile$|^regi[oó]n\b|\bregion$/i.test(p);
-  if (!parts.some(isCountryOrRegion)) return parts.join(', ') || '—';
-  const locality = parts.filter(p => !isCountryOrRegion(p)).pop();
-  return locality ? locality.replace(/^\d+\s+/, '') : '—';
+  if (!parts.some(isCountryOrRegion)) return parseTypedAddress(parts);
+  const local = parts.filter(p => !isCountryOrRegion(p) && !/^\d+$/.test(p));
+  const comuna = (local.pop() || '').replace(/^\d+\s+/, '');
+  return { street: local.join(', '), comuna };
 }
 
 const serviceTimeLabel = (hora) => {
@@ -1908,22 +1963,60 @@ const serviceTimeLabel = (hora) => {
 
 function serviceListTrips(iso) {
   const compare = (a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' });
+  const placeKey = (r) => { const { street, comuna } = parseAddress(r.origen); return comuna || street; };
   return Object.values(reservations)
     .filter(r => SERVICE_LIST_STATUSES.has(r.status) && toISODate(r.fecha) === iso)
     .sort((a, b) => byServiceTime(a, b)
-      || compare(placeLabel(a.origen), placeLabel(b.origen))
+      || compare(placeKey(a), placeKey(b))
       || compare(a.driverName || '', b.driverName || ''));
 }
 
-const serviceLine = (r) =>
-  `${r.driverName || UNASSIGNED_DRIVER} -> ${serviceTimeLabel(r.hora)} (${placeLabel(r.origen)} → ${placeLabel(r.destino)})`;
+function renderServiceStop(label, modifier, address) {
+  const { street, comuna } = parseAddress(address);
+  const comunaHtml = comuna
+    ? `<span class="service-card__comuna">${escHtml(comuna)}</span>`
+    : `<span class="service-card__comuna service-card__comuna--missing">${MISSING_COMUNA}</span>`;
+  return `
+    <div class="service-card__stop service-card__stop--${modifier}">
+      <dt class="service-card__label">${label}</dt>
+      <dd class="service-card__place">${comunaHtml}${street ? `<span class="service-card__address">${escHtml(street)}</span>` : ''}</dd>
+    </div>`;
+}
+
+const renderServiceCard = (r) => `
+  <li class="service-card${r.driverName ? '' : ' service-card--unassigned'}">
+    <div class="service-card__time">${escHtml(serviceTimeLabel(r.hora))}</div>
+    <div class="service-card__body">
+      <p class="service-card__driver">${escHtml(r.driverName || UNASSIGNED_DRIVER)}</p>
+      <dl class="service-card__route">
+        ${renderServiceStop('Inicio', 'origin', r.origen)}
+        ${renderServiceStop('Destino', 'destination', r.destino)}
+      </dl>
+    </div>
+  </li>`;
+
+function serviceStopText(label, address) {
+  const { street, comuna } = parseAddress(address);
+  const place = (comuna || MISSING_COMUNA).toLocaleUpperCase('es');
+  return `      ${label}: ${place}${street ? ` — ${street}` : ''}`;
+}
+
+function buildServiceListText(iso, trips) {
+  const title = `SERVICIOS — ${fmtDayHeading(iso).toLocaleUpperCase('es')}`;
+  const blocks = trips.map(r => [
+    `${serviceTimeLabel(r.hora).padStart(5)} | ${(r.driverName || UNASSIGNED_DRIVER).toLocaleUpperCase('es')}`,
+    serviceStopText('Inicio ', r.origen),
+    serviceStopText('Destino', r.destino),
+  ].join('\r\n'));
+  return [`${title}\r\n${'='.repeat(title.length)}`, ...blocks].join('\r\n\r\n');
+}
 
 function renderServiceList() {
   const iso = el('service-list-date').value;
   const trips = iso ? serviceListTrips(iso) : [];
   el('btn-download-service-list').disabled = !trips.length;
   el('service-list-content').innerHTML = trips.length
-    ? `<ol class="service-list">${trips.map(r => `<li class="service-list__item${r.driverName ? '' : ' service-list__item--unassigned'}">${escHtml(serviceLine(r))}</li>`).join('')}</ol>`
+    ? `<ol class="service-list">${trips.map(renderServiceCard).join('')}</ol>`
     : '<div class="empty-state"><p>Sin servicios confirmados para este día</p></div>';
 }
 
@@ -1938,7 +2031,7 @@ el('service-list-date').addEventListener('change', renderServiceList);
 el('btn-download-service-list').addEventListener('click', () => {
   const iso = el('service-list-date').value;
   // El BOM y CRLF permiten abrir bien acentos y saltos de línea en el Bloc de notas.
-  const text = `\uFEFF${serviceListTrips(iso).map(serviceLine).join('\r\n')}\r\n`;
+  const text = `\uFEFF${buildServiceListText(iso, serviceListTrips(iso))}\r\n`;
   const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
