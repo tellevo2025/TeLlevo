@@ -243,6 +243,14 @@ function layoutCard(page, service, y, height = 0) {
   cursor += CARD.gap;
   cursor += layoutStop(page, { label: 'Destino', color: COLORS.blue, stop: service.destination, missingLabel }, bodyX, cursor, bodyWidth);
 
+  cursor += CARD.gap;
+  const arrivalWeight = service.hasArrival ? BOLD : REGULAR;
+  const arrivalColor = service.hasArrival ? COLORS.goldPale : COLORS.muted;
+  wrapText(service.arrival, bodyWidth, ADDRESS.size, arrivalWeight).forEach((line) => {
+    page?.text(line, bodyX, cursor + 24, ADDRESS.size, arrivalWeight, arrivalColor);
+    cursor += ADDRESS.lineHeight;
+  });
+
   return cursor + CARD.padding - y;
 }
 
@@ -344,7 +352,7 @@ function assemblePdf(pageContents) {
  * Genera el PDF de la lista de servicios.
  * @param {{ dayLabel: string, services: Array<{ time: string, driver: string, isUnassigned: boolean,
  *   origin: { street: string, comuna: string }, destination: { street: string, comuna: string },
- *   missingLabel: string }> }} details
+ *   missingLabel: string, arrival: string, hasArrival: boolean }> }} details
  * @returns {Blob}
  */
 export function buildServiceListPdf({ dayLabel, services }) {

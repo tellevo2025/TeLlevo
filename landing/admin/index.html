@@ -363,6 +363,8 @@
       font-weight: 600; background: transparent; color: var(--muted); border: 1px dashed var(--muted);
     }
     .service-card__stop--destination .service-card__comuna--missing { background: transparent; }
+    .service-card__eta { font-size: .85rem; font-weight: 700; color: #F5DFA0; overflow-wrap: anywhere; }
+    .service-card__eta--muted { font-weight: 500; color: var(--muted); }
     .service-card__address { min-width: 0; font-size: .85rem; color: var(--text); overflow-wrap: anywhere; }
     .service-list__date-label { font-size: .85rem; color: var(--muted); }
     .btn-download:disabled { opacity: .5; cursor: not-allowed; }
@@ -817,6 +819,8 @@
 // Toda la autenticación y Firestore se hace vía REST API directa.
 // El SDK de Firebase se omite completamente para evitar cuelgues de red.
 
+const GOOGLE_MAPS_KEY = '%%GOOGLE_MAPS_KEY%%';
+
 const firebaseConfig = {
   apiKey:    '%%FIREBASE_API_KEY%%',
   projectId: '%%FIREBASE_PROJECT_ID%%',
@@ -1102,6 +1106,7 @@ async function _restRefresh() {
     (drvData.documents || []).forEach(d => { const obj = _fsDocToObj(d); drivers[obj.id] = obj; });
     await _autoCancelOldPending(token);
     renderReservations(); updateBadges(); renderDrivers(); renderServiceList();
+    if (!el('view-service-list').hidden) loadServiceEtas(el('service-list-date').value);
     if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
   } catch (e) { console.error('REST refresh error:', e); }
 }
@@ -1983,6 +1988,104 @@ function renderServiceStop(label, modifier, address) {
     </div>`;
 }
 
+// ── Hora estimada de llegada ───────────────────────────────────────────────
+const NO_STOP_PLACEHOLDER = 'sin parada adicional';
+const etaResults = new Map();
+let etaQueue = Promise.resolve();
+
+const serviceStops = (r) => (r.paradaAdicional || '').split('|')
+  .map(stop => stop.trim())
+  .filter(stop => stop && stop.toLowerCase() !== NO_STOP_PLACEHOLDER);
+
+// El resultado solo vale mientras no cambie ningún dato que afecte la ruta.
+const etaKey = (r) => [r.origen, serviceStops(r).join('|'), r.destino, toISODate(r.fecha), timeKey(r.hora)].join('~');
+
+function serviceDeparture(r) {
+  const time = timeKey(r.hora);
+  const iso = toISODate(r.fecha);
+  return time === '99:99' || !iso ? null : new Date(`${iso}T${time}:00`);
+}
+
+function fmtDuration(seconds) {
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  const hours = Math.floor(minutes / 60);
+  return hours ? `${hours} h ${minutes % 60} min` : `${minutes} min`;
+}
+
+function serviceEta(r) {
+  const result = r.eta?.key === etaKey(r) ? { status: 'ok', seconds: r.eta.seconds } : etaResults.get(etaKey(r));
+  if (!result || result.status === 'loading') return { isAvailable: false, text: 'Calculando llegada…' };
+  if (result.status === 'failed') return { isAvailable: false, text: 'Llegada: sin estimación' };
+  const arrival = new Date(serviceDeparture(r).getTime() + result.seconds * 1000);
+  const time = `${arrival.getHours()}:${String(arrival.getMinutes()).padStart(2, '0')}`;
+  const stopCount = serviceStops(r).length;
+  const stopsNote = stopCount ? ` · ${stopCount} ${stopCount === 1 ? 'parada' : 'paradas'}` : '';
+  return { isAvailable: true, text: `Llegada aprox. ${time} · ${fmtDuration(result.seconds)}${stopsNote}` };
+}
+
+// Se escribe sin updatedAt ni updatedBy: calcular una ruta no es un cambio de la reserva.
+async function persistEta(r, eta) {
+  try {
+    await _ensureFreshToken();
+    await _fsCommit({
+      update: { name: _fsDocName('reservations', r.id), fields: _fsFields({ eta }) },
+      updateMask: { fieldPaths: ['eta'] },
+      currentDocument: { exists: true },
+    }, window._fbToken);
+    if (reservations[r.id]) reservations[r.id].eta = eta;
+  } catch (err) {
+    console.error('ETA persist error:', err);
+  }
+}
+
+async function estimateTrip(r, estimateDurationSeconds) {
+  const departure = serviceDeparture(r);
+  if (!departure || !r.origen || !r.destino) return { status: 'failed' };
+  try {
+    const seconds = await estimateDurationSeconds({
+      apiKey: GOOGLE_MAPS_KEY,
+      origin: r.origen,
+      destination: r.destino,
+      stops: serviceStops(r),
+      departure,
+    });
+    return { status: 'ok', seconds };
+  } catch (err) {
+    console.error('ETA error:', err);
+    return { status: 'failed' };
+  }
+}
+
+async function computeEtas(trips) {
+  let estimator;
+  try {
+    ({ estimateDurationSeconds: estimator } = await import('/admin/route-eta.js'));
+  } catch (err) {
+    console.error('ETA module error:', err);
+    trips.forEach(r => etaResults.set(etaKey(r), { status: 'failed' }));
+    renderServiceList();
+    return;
+  }
+  for (const r of trips) {
+    const key = etaKey(r);
+    const result = await estimateTrip(r, estimator);
+    etaResults.set(key, result);
+    renderServiceList();
+    if (result.status === 'ok') await persistEta(r, { key, seconds: result.seconds });
+  }
+}
+
+// Las consultas se hacen de a una para no chocar con el límite por segundo de Google.
+function loadServiceEtas(iso) {
+  if (!iso) return etaQueue;
+  const missing = serviceListTrips(iso).filter(r => r.eta?.key !== etaKey(r) && !etaResults.has(etaKey(r)));
+  if (!missing.length) return etaQueue;
+  missing.forEach(r => etaResults.set(etaKey(r), { status: 'loading' }));
+  renderServiceList();
+  etaQueue = etaQueue.then(() => computeEtas(missing));
+  return etaQueue;
+}
+
 const renderServiceCard = (r) => `
   <li class="service-card${r.driverName ? '' : ' service-card--unassigned'}">
     <div class="service-card__time">${escHtml(serviceTimeLabel(r.hora))}</div>
@@ -1992,6 +2095,7 @@ const renderServiceCard = (r) => `
         ${renderServiceStop('Inicio', 'origin', r.origen)}
         ${renderServiceStop('Destino', 'destination', r.destino)}
       </dl>
+      <p class="service-card__eta${serviceEta(r).isAvailable ? '' : ' service-card__eta--muted'}">${escHtml(serviceEta(r).text)}</p>
     </div>
   </li>`;
 
@@ -2002,6 +2106,8 @@ const toPdfService = (r) => ({
   origin: parseAddress(r.origen),
   destination: parseAddress(r.destino),
   missingLabel: MISSING_COMUNA,
+  arrival: serviceEta(r).text,
+  hasArrival: serviceEta(r).isAvailable,
 });
 
 function renderServiceList() {
@@ -2017,9 +2123,13 @@ function openServiceList() {
   const dateInput = el('service-list-date');
   if (!dateInput.value) dateInput.value = localToday();
   renderServiceList();
+  loadServiceEtas(dateInput.value);
 }
 
-el('service-list-date').addEventListener('change', renderServiceList);
+el('service-list-date').addEventListener('change', (e) => {
+  renderServiceList();
+  loadServiceEtas(e.target.value);
+});
 
 el('btn-download-service-list').addEventListener('click', async () => {
   const button = el('btn-download-service-list');
@@ -2028,6 +2138,7 @@ el('btn-download-service-list').addEventListener('click', async () => {
   button.disabled = true;
   label.textContent = 'Generando…';
   try {
+    await loadServiceEtas(iso);
     // Ruta absoluta: el panel se publica en /admin, sin barra final.
     const { buildServiceListPdf } = await import('/admin/service-list-pdf.js');
     const pdf = await buildServiceListPdf({

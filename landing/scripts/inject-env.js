@@ -51,6 +51,7 @@ if (fs.existsSync(adminPath)) {
     '%%FIREBASE_PROJECT_ID%%':        process.env.FIREBASE_PROJECT_ID        || '',
     '%%FIREBASE_APP_ID%%':            process.env.FIREBASE_APP_ID            || '',
     '%%FIREBASE_MESSAGING_SENDER_ID%%': process.env.FIREBASE_MESSAGING_SENDER_ID || '',
+    '%%GOOGLE_MAPS_KEY%%':            mapsKey                                || '',
   };
   for (const [k, v] of Object.entries(firebaseVars)) {
     adminHtml = adminHtml.replaceAll(k, v);
