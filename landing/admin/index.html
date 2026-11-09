@@ -690,6 +690,7 @@ el('login-form').addEventListener('submit', async (e) => {
     if (!r.ok) throw new Error(data.error?.message || 'Credenciales inválidas');
     window._fbToken = data.idToken;
     window._fbRefreshToken = data.refreshToken;
+    window._fbEmail = data.email || el('login-email').value.trim();
     el('login-screen').hidden = true;
     el('app').hidden = false;
     startListeners(data.idToken);
@@ -752,19 +753,35 @@ function _fsToVal(val) {
   return { stringValue: String(val) };
 }
 const _fsBase = () => `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+// Usa :commit porque solo ahí Firestore puede sellar updatedAt con la hora del servidor;
+// el reloj de cada dispositivo no sirve para detectar cuál cambio es el más reciente.
 async function _fsUpdate(coll, docId, fields, token) {
-  const mask = Object.keys(fields).map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
-  const res = await fetch(`${_fsBase()}/${coll}/${docId}?${mask}`, {
-    method: 'PATCH',
+  const write = {
+    update: {
+      name: `projects/${firebaseConfig.projectId}/databases/(default)/documents/${coll}/${docId}`,
+      fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, _fsToVal(v)])),
+    },
+    updateMask: { fieldPaths: Object.keys(fields) },
+    currentDocument: { exists: true },
+  };
+  if (coll === 'reservations') {
+    write.updateTransforms = [{ fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' }];
+  }
+  const res = await fetch(`${_fsBase()}:commit`, {
+    method: 'POST',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, _fsToVal(v)])) })
+    body: JSON.stringify({ writes: [write] }),
   });
   if (!res.ok) {
     const errBody = await res.json().catch(() => ({}));
     throw new Error(errBody.error?.message || `Error ${res.status}`);
   }
-  return _fsDocToObj(await res.json());
 }
+
+// Los ID tokens de Firebase duran 60 min; se renuevan con 10 min de margen.
+const TOKEN_MAX_AGE_MS = 50 * 60 * 1000;
+let _tokenAt = 0;
+let _tokenRefresh = null;
 
 async function _refreshFbToken() {
   if (!window._fbRefreshToken) return;
@@ -778,7 +795,16 @@ async function _refreshFbToken() {
     const data = await r.json();
     window._fbToken = data.id_token;
     window._fbRefreshToken = data.refresh_token;
+    _tokenAt = Date.now();
   } catch (e) { console.error('Token refresh error:', e); }
+}
+
+// Los celulares congelan los timers en segundo plano, así que el token se valida
+// justo antes de usarlo en vez de renovarlo con un intervalo.
+async function _ensureFreshToken() {
+  if (Date.now() - _tokenAt < TOKEN_MAX_AGE_MS) return;
+  _tokenRefresh ??= _refreshFbToken().finally(() => { _tokenRefresh = null; });
+  await _tokenRefresh;
 }
 async function _fsAdd(coll, data, token) {
   const r = await fetch(`${_fsBase()}/${coll}`, {
@@ -794,9 +820,10 @@ async function _fsDel(coll, docId, token) {
 
 async function dbUpdate(coll, docId, fields) {
   try {
-    const updated = await _fsUpdate(coll, docId, fields, window._fbToken);
-    if (updated && coll === 'reservations') {
-      reservations[updated.id] = updated;
+    await _ensureFreshToken();
+    await _fsUpdate(coll, docId, fields, window._fbToken);
+    if (coll === 'reservations' && reservations[docId]) {
+      reservations[docId] = { ...reservations[docId], ...fields };
       renderReservations(); updateBadges();
       if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
     }
@@ -808,19 +835,21 @@ async function dbUpdate(coll, docId, fields) {
   }
 }
 async function dbAdd(coll, data) {
+  await _ensureFreshToken();
   return await _fsAdd(coll, data, window._fbToken);
 }
 async function dbDel(coll, docId) {
+  await _ensureFreshToken();
   await _fsDel(coll, docId, window._fbToken);
   await _restRefresh();
 }
 
 let _restPoll = null;
-let _tokenPoll = null;
 async function _restRefresh() {
-  const token = window._fbToken;
-  if (!token) return;
+  if (!window._fbToken) return;
   try {
+    await _ensureFreshToken();
+    const token = window._fbToken;
     const fsBase = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
     const [resData, drvData] = await Promise.all([
       fetch(`${fsBase}:runQuery`, {
@@ -856,14 +885,13 @@ async function _autoCancelOldPending(token) {
 
 function startListeners(idToken) {
   window._fbToken = idToken;
+  _tokenAt = Date.now();
   _restRefresh();
-  _restPoll  = setInterval(_restRefresh, 30000);
-  _tokenPoll = setInterval(_refreshFbToken, 50 * 60 * 1000);
+  _restPoll = setInterval(_restRefresh, 30000);
 }
 
 function stopListeners() {
-  if (_restPoll)  { clearInterval(_restPoll);  _restPoll  = null; }
-  if (_tokenPoll) { clearInterval(_tokenPoll); _tokenPoll = null; }
+  if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
   reservations = {}; drivers = {};
 }
 
@@ -1582,6 +1610,7 @@ async function loadStats() {
   el('stats-loading').hidden = false;
   el('stats-content').hidden = true;
   try {
+    await _ensureFreshToken();
     const token = window._fbToken;
     const fsBase = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
     const data = await fetch(`${fsBase}:runQuery`, {

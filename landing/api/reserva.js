@@ -75,6 +75,7 @@ module.exports = async function handler(req, res) {
     try {
       await db.collection('reservations').add({
         createdAt:    admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt:    admin.firestore.FieldValue.serverTimestamp(),
         status:       'pending',
         driverId:     null,
         driverName:   null,
@@ -84,6 +85,9 @@ module.exports = async function handler(req, res) {
         telefono2:       params.get('telefono2')        || '',
         fecha:           params.get('fechaViaje')       || '',
         hora:            params.get('horaViaje')        || '',
+        // Copia inmutable de lo que eligió el cliente: el admin edita fecha/hora, nunca estos.
+        fechaCliente:    params.get('fechaViaje')       || '',
+        horaCliente:     params.get('horaViaje')        || '',
         origen:          params.get('centroEvento')     || '',
         destino:         params.get('destino')          || '',
         paradas:         params.get('paradas')          || '0',
