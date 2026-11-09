@@ -1979,7 +1979,7 @@ function renderServiceStop(label, modifier, address) {
   return `
     <div class="service-card__stop service-card__stop--${modifier}">
       <dt class="service-card__label">${label}</dt>
-      <dd class="service-card__place">${comunaHtml}${street ? `<span class="service-card__address">${escHtml(street)}</span>` : ''}</dd>
+      <dd class="service-card__place">${street ? `<span class="service-card__address">${escHtml(street)}${comuna ? ',' : ''}</span>` : ''}${comunaHtml}</dd>
     </div>`;
 }
 

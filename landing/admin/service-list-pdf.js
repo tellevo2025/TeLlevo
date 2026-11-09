@@ -1,13 +1,14 @@
 /*
   service-list-pdf.js — Genera el PDF de la lista de servicios por chofer.
-  Cada página se dibuja en un canvas con proporción de celular y se incrusta como
-  imagen en un PDF armado a mano, sin librerías y con acentos y colores exactos.
+  Las páginas tienen proporción de celular y todo el contenido es texto real, para
+  poder seleccionar y copiar las direcciones. El PDF se arma a mano con Helvetica,
+  fuente incluida en todo lector de PDF, así que no requiere librerías ni descargas.
   Se carga solo al descargar, para no afectar el inicio del panel.
 */
 
+// El diseño se expresa en unidades de una pantalla de 1080 de ancho; el PDF usa un tercio.
 const PAGE = { width: 1080, height: 1920, margin: 48 };
-const PIXELS_PER_POINT = 3;
-const JPEG_QUALITY = 0.92;
+const UNITS_PER_POINT = 3;
 
 const COLORS = {
   page: '#0A1628',
@@ -23,127 +24,198 @@ const COLORS = {
   onAccent: '#0A1628',
 };
 
-const CARD = { padding: 36, accent: 10, timeColumn: 190, gap: 24 };
-const CHIP = { height: 52, paddingX: 16, radius: 10, gapToAddress: 16 };
+const CARD = { padding: 36, accent: 10, timeColumn: 190, gap: 24, radius: 20 };
+const CHIP = { height: 52, paddingX: 12, radius: 10 };
+const ADDRESS = { size: 30, lineHeight: 40 };
+const DRIVER = { size: 44, lineHeight: 54 };
 const HEADER_HEIGHT = { first: 300, following: 120 };
 const FOOTER_HEIGHT = 80;
-const MAX_ADDRESS_LINES = 3;
 
-const FONT_FAMILY = 'Inter, "Helvetica Neue", Arial, sans-serif';
-const font = (size, weight = 400) => `${weight} ${size}px ${FONT_FAMILY}`;
+const REGULAR = 'regular';
+const BOLD = 'bold';
+const PDF_FONT_NAME = { [REGULAR]: 'F1', [BOLD]: 'F2' };
+
+// Anchos oficiales de Helvetica (por 1000 unidades) para los caracteres 32 a 126.
+const CHAR_WIDTHS = {
+  [REGULAR]: [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584],
+  [BOLD]: [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584],
+};
+const DEFAULT_CHAR_WIDTH = 556;
+
+// Caracteres de Windows-1252 que no coinciden con su posición en Unicode.
+const WIN_ANSI_SPECIALS = new Map([
+  ['€', 0x80], ['‚', 0x82], ['„', 0x84], ['…', 0x85], ['‘', 0x91], ['’', 0x92],
+  ['“', 0x93], ['”', 0x94], ['•', 0x95], ['–', 0x96], ['—', 0x97],
+]);
+const UNSUPPORTED_CHAR_CODE = 0x3F;
 
 const encoder = new TextEncoder();
 
-function roundedRectPath(ctx, x, y, width, height, radius) {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.arcTo(x + width, y, x + width, y + height, radius);
-  ctx.arcTo(x + width, y + height, x, y + height, radius);
-  ctx.arcTo(x, y + height, x, y, radius);
-  ctx.arcTo(x, y, x + width, y, radius);
-  ctx.closePath();
+const charWidth = (char, weight) => {
+  const code = char.normalize('NFD').charCodeAt(0);
+  return CHAR_WIDTHS[weight][code - 32] ?? DEFAULT_CHAR_WIDTH;
+};
+
+const textWidth = (text, size, weight) =>
+  [...text].reduce((total, char) => total + charWidth(char, weight), 0) * size / 1000;
+
+function toWinAnsiHex(text) {
+  return [...text].map((char) => {
+    const code = char.codePointAt(0);
+    const isLatin = (code >= 0x20 && code <= 0x7E) || (code >= 0xA0 && code <= 0xFF);
+    const byte = isLatin ? code : WIN_ANSI_SPECIALS.get(char) ?? UNSUPPORTED_CHAR_CODE;
+    return byte.toString(16).padStart(2, '0');
+  }).join('').toUpperCase();
 }
 
-function truncateToWidth(ctx, text, maxWidth) {
-  if (ctx.measureText(text).width <= maxWidth) return text;
-  let end = text.length;
-  while (end > 0 && ctx.measureText(`${text.slice(0, end).trimEnd()}…`).width > maxWidth) end--;
-  return `${text.slice(0, end).trimEnd()}…`;
+const hexToPdfColor = (hex) =>
+  [1, 3, 5].map(i => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(3)).join(' ');
+
+const toPoints = (units) => (units / UNITS_PER_POINT).toFixed(2);
+
+/** Acumula las instrucciones de dibujo de una página; recibe coordenadas desde arriba. */
+class PdfPage {
+  commands = [];
+
+  #y = (units) => toPoints(PAGE.height - units);
+
+  #roundedRectPath(x, y, width, height, radius) {
+    const k = radius * 0.4477;
+    const right = x + width, bottom = y + height;
+    const X = toPoints, Y = this.#y;
+    this.commands.push(
+      `${X(x + radius)} ${Y(y)} m`,
+      `${X(right - radius)} ${Y(y)} l`,
+      `${X(right - k)} ${Y(y)} ${X(right)} ${Y(y + k)} ${X(right)} ${Y(y + radius)} c`,
+      `${X(right)} ${Y(bottom - radius)} l`,
+      `${X(right)} ${Y(bottom - k)} ${X(right - k)} ${Y(bottom)} ${X(right - radius)} ${Y(bottom)} c`,
+      `${X(x + radius)} ${Y(bottom)} l`,
+      `${X(x + k)} ${Y(bottom)} ${X(x)} ${Y(bottom - k)} ${X(x)} ${Y(bottom - radius)} c`,
+      `${X(x)} ${Y(y + radius)} l`,
+      `${X(x)} ${Y(y + k)} ${X(x + k)} ${Y(y)} ${X(x + radius)} ${Y(y)} c`,
+      'h',
+    );
+  }
+
+  fillRect(x, y, width, height, color) {
+    this.commands.push(`${hexToPdfColor(color)} rg ${toPoints(x)} ${this.#y(y + height)} ${toPoints(width)} ${toPoints(height)} re f`);
+  }
+
+  fillRoundedRect(x, y, width, height, radius, color) {
+    this.commands.push(`${hexToPdfColor(color)} rg`);
+    this.#roundedRectPath(x, y, width, height, radius);
+    this.commands.push('f');
+  }
+
+  strokeRoundedRect(x, y, width, height, radius, color, dash = '') {
+    this.commands.push(`${hexToPdfColor(color)} RG ${toPoints(2)} w ${dash ? `[${dash}] 0 d` : '[] 0 d'}`);
+    this.#roundedRectPath(x, y, width, height, radius);
+    this.commands.push('S', '[] 0 d');
+  }
+
+  /** Rellena una banda vertical recortada por las esquinas redondeadas de un rectángulo. */
+  fillClippedBand(x, y, bandWidth, width, height, radius, color) {
+    this.commands.push('q');
+    this.#roundedRectPath(x, y, width, height, radius);
+    this.commands.push('W n');
+    this.fillRect(x, y, bandWidth, height, color);
+    this.commands.push('Q');
+  }
+
+  text(content, x, baseline, size, weight, color) {
+    this.commands.push(`BT ${hexToPdfColor(color)} rg /${PDF_FONT_NAME[weight]} ${toPoints(size)} Tf ${toPoints(x)} ${this.#y(baseline)} Td <${toWinAnsiHex(content)}> Tj ET`);
+  }
 }
 
-/**
- * Corta un texto en líneas que caben en maxWidth; lo que excede maxLines termina en "…".
- * @returns {string[]}
- */
-function wrapText(ctx, text, maxWidth, maxLines) {
+// Una dirección nunca se recorta: debe poder copiarse completa.
+function wrapText(text, maxWidth, size, weight) {
   const lines = [];
   let current = '';
+  const pushLongWord = (word) => {
+    let piece = '';
+    for (const char of word) {
+      if (piece && textWidth(piece + char, size, weight) > maxWidth) {
+        lines.push(piece);
+        piece = '';
+      }
+      piece += char;
+    }
+    return piece;
+  };
   for (const word of text.split(/\s+/).filter(Boolean)) {
     const candidate = current ? `${current} ${word}` : word;
-    if (ctx.measureText(candidate).width <= maxWidth) {
+    if (textWidth(candidate, size, weight) <= maxWidth) {
       current = candidate;
-    } else {
-      if (current) lines.push(current);
-      current = word;
+      continue;
     }
+    if (current) lines.push(current);
+    current = textWidth(word, size, weight) > maxWidth ? pushLongWord(word) : word;
   }
   if (current) lines.push(current);
-  if (lines.length <= maxLines) return lines.map(line => truncateToWidth(ctx, line, maxWidth));
-  const visible = lines.slice(0, maxLines);
-  visible[maxLines - 1] = truncateToWidth(ctx, `${visible[maxLines - 1]} ${lines[maxLines]}`, maxWidth - 1);
-  if (!visible[maxLines - 1].endsWith('…')) visible[maxLines - 1] += '…';
-  return visible;
+  return lines;
 }
 
-function fitFontSize(ctx, text, maxWidth, startSize, weight) {
+function fitFontSize(text, maxWidth, startSize, weight) {
   let size = startSize;
-  ctx.font = font(size, weight);
-  while (size > 24 && ctx.measureText(text).width > maxWidth) {
-    size -= 2;
-    ctx.font = font(size, weight);
-  }
+  while (size > 16 && textWidth(text, size, weight) > maxWidth) size -= 2;
   return size;
 }
 
-function drawChip(ctx, text, x, y, maxWidth, color, isMissing) {
-  ctx.font = font(30, isMissing ? 400 : 700);
-  const label = truncateToWidth(ctx, text, maxWidth - CHIP.paddingX * 2);
-  const width = ctx.measureText(label).width + CHIP.paddingX * 2;
-  roundedRectPath(ctx, x, y, width, CHIP.height, CHIP.radius);
+const chipBaseline = (y, size) => y + (CHIP.height + size * 0.72) / 2;
+
+function drawChip(page, { text, size, weight, width, color, isMissing }, x, y) {
   if (isMissing) {
-    ctx.setLineDash([8, 6]);
-    ctx.strokeStyle = COLORS.muted;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.setLineDash([]);
+    page.strokeRoundedRect(x, y, width, CHIP.height, CHIP.radius, COLORS.muted, '2.5 2');
   } else {
-    ctx.fillStyle = color;
-    ctx.fill();
+    page.fillRoundedRect(x, y, width, CHIP.height, CHIP.radius, color);
   }
-  ctx.fillStyle = isMissing ? COLORS.muted : COLORS.onAccent;
-  ctx.fillText(label, x + CHIP.paddingX, y + 12);
-  return width;
+  page.text(text, x + CHIP.paddingX, chipBaseline(y, size), size, weight, isMissing ? COLORS.muted : COLORS.onAccent);
 }
 
-function measureChipWidth(ctx, text, maxWidth, isMissing) {
-  ctx.font = font(30, isMissing ? 400 : 700);
-  return ctx.measureText(truncateToWidth(ctx, text, maxWidth - CHIP.paddingX * 2)).width + CHIP.paddingX * 2;
-}
-
-/** Dibuja (o solo mide, si draw es false) un tramo; devuelve su altura. */
-function layoutStop(ctx, { label, color, stop, missingLabel }, x, y, width, draw) {
+/** Dibuja un tramo o, si page es null, solo calcula su altura. */
+function layoutStop(page, { label, color, stop, missingLabel }, x, y, width) {
   let cursor = y;
-  if (draw) {
-    ctx.font = font(24, 700);
-    ctx.fillStyle = color;
-    ctx.fillText(label.toUpperCase(), x, cursor);
-  }
+  page?.text(label.toUpperCase(), x, cursor + 20, 24, BOLD, color);
   cursor += 36;
 
   const isMissing = !stop.comuna;
   const chipText = stop.comuna || missingLabel;
-  const chipWidth = draw
-    ? drawChip(ctx, chipText, x, cursor, width, color, isMissing)
-    : measureChipWidth(ctx, chipText, width, isMissing);
+  const weight = isMissing ? REGULAR : BOLD;
+  const size = fitFontSize(chipText, width - CHIP.paddingX * 2, 30, weight);
+  const chip = { text: chipText, size, weight, color, isMissing, width: textWidth(chipText, size, weight) + CHIP.paddingX * 2 };
 
-  if (!stop.street) return cursor + CHIP.height - y;
+  // La dirección va antes que la comuna para copiarla como "Calle 123, Comuna".
+  const streetText = stop.street ? `${stop.street}${isMissing ? '' : ','}` : '';
+  const lines = streetText ? wrapText(streetText, width, ADDRESS.size, REGULAR) : [];
 
-  ctx.font = font(30);
-  ctx.fillStyle = COLORS.text;
-  const inlineX = chipWidth + CHIP.gapToAddress;
-  if (inlineX + ctx.measureText(stop.street).width <= width) {
-    if (draw) ctx.fillText(stop.street, x + inlineX, cursor + 12);
+  lines.slice(0, -1).forEach((line) => {
+    page?.text(line, x, cursor + 30, ADDRESS.size, REGULAR, COLORS.text);
+    cursor += ADDRESS.lineHeight;
+  });
+
+  const lastLine = lines[lines.length - 1];
+  if (!lastLine) {
+    if (page) drawChip(page, chip, x, cursor);
     return cursor + CHIP.height - y;
   }
 
-  cursor += CHIP.height + 12;
-  const lines = wrapText(ctx, stop.street, width, MAX_ADDRESS_LINES);
-  lines.forEach((line, index) => { if (draw) ctx.fillText(line, x, cursor + index * 40); });
-  return cursor + lines.length * 40 - y;
+  // El espacio final y la misma línea base hacen que al copiar salga "Calle 123, Comuna" seguido.
+  // "Comuna sin indicar" va aparte para no ensuciar la dirección copiada.
+  const inlineLine = `${lastLine} `;
+  const inlineWidth = textWidth(inlineLine, ADDRESS.size, REGULAR);
+  if (!isMissing && inlineWidth + chip.width <= width) {
+    page?.text(inlineLine, x, chipBaseline(cursor, chip.size), ADDRESS.size, REGULAR, COLORS.text);
+    if (page) drawChip(page, chip, x + inlineWidth, cursor);
+  } else {
+    page?.text(lastLine, x, cursor + 30, ADDRESS.size, REGULAR, COLORS.text);
+    cursor += ADDRESS.lineHeight + 6;
+    if (page) drawChip(page, chip, x, cursor);
+  }
+  return cursor + CHIP.height - y;
 }
 
-/** Dibuja (o solo mide) la tarjeta de un servicio; devuelve su altura. */
-function layoutCard(ctx, service, y, draw, height = 0) {
+/** Dibuja la tarjeta de un servicio o, si page es null, solo calcula su altura. */
+function layoutCard(page, service, y, height = 0) {
   const x = PAGE.margin;
   const width = PAGE.width - PAGE.margin * 2;
   const accentColor = service.isUnassigned ? COLORS.orange : COLORS.gold;
@@ -151,153 +223,112 @@ function layoutCard(ctx, service, y, draw, height = 0) {
   const bodyX = timeX + CARD.timeColumn;
   const bodyWidth = width - (bodyX - x) - CARD.padding;
 
-  if (draw) {
-    ctx.save();
-    roundedRectPath(ctx, x, y, width, height, 20);
-    ctx.clip();
-    ctx.fillStyle = COLORS.card;
-    ctx.fillRect(x, y, width, height);
-    ctx.fillStyle = accentColor;
-    ctx.fillRect(x, y, CARD.accent, height);
-    ctx.restore();
-    roundedRectPath(ctx, x, y, width, height, 20);
-    ctx.strokeStyle = COLORS.border;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    const timeSize = fitFontSize(ctx, service.time, CARD.timeColumn - 16, 64, 700);
-    ctx.font = font(timeSize, 700);
-    ctx.fillStyle = COLORS.gold;
-    ctx.fillText(service.time, timeX, y + CARD.padding);
+  if (page) {
+    page.fillRoundedRect(x, y, width, height, CARD.radius, COLORS.card);
+    page.fillClippedBand(x, y, CARD.accent, width, height, CARD.radius, accentColor);
+    page.strokeRoundedRect(x, y, width, height, CARD.radius, COLORS.border);
+    const timeSize = fitFontSize(service.time, CARD.timeColumn - 16, 64, BOLD);
+    page.text(service.time, timeX, y + CARD.padding + timeSize * 0.76, timeSize, BOLD, COLORS.gold);
   }
 
   let cursor = y + CARD.padding;
-  ctx.font = font(44, 700);
-  const driverLines = wrapText(ctx, service.driver, bodyWidth, 2);
-  driverLines.forEach((line, index) => {
-    if (!draw) return;
-    ctx.fillStyle = service.isUnassigned ? COLORS.orange : COLORS.white;
-    ctx.fillText(line, bodyX, cursor + index * 54);
+  wrapText(service.driver, bodyWidth, DRIVER.size, BOLD).forEach((line) => {
+    page?.text(line, bodyX, cursor + 38, DRIVER.size, BOLD, service.isUnassigned ? COLORS.orange : COLORS.white);
+    cursor += DRIVER.lineHeight;
   });
-  cursor += driverLines.length * 54 + 16;
+  cursor += 16;
 
-  cursor += layoutStop(ctx, { label: 'Inicio', color: COLORS.gold, stop: service.origin, missingLabel: service.missingLabel }, bodyX, cursor, bodyWidth, draw);
+  const { missingLabel } = service;
+  cursor += layoutStop(page, { label: 'Inicio', color: COLORS.gold, stop: service.origin, missingLabel }, bodyX, cursor, bodyWidth);
   cursor += CARD.gap;
-  cursor += layoutStop(ctx, { label: 'Destino', color: COLORS.blue, stop: service.destination, missingLabel: service.missingLabel }, bodyX, cursor, bodyWidth, draw);
+  cursor += layoutStop(page, { label: 'Destino', color: COLORS.blue, stop: service.destination, missingLabel }, bodyX, cursor, bodyWidth);
 
   return cursor + CARD.padding - y;
 }
 
-function paginate(ctx, services) {
-  const cards = services.map(service => ({ service, height: layoutCard(ctx, service, 0, false) }));
+function paginate(services) {
   const pages = [[]];
   let used = HEADER_HEIGHT.first;
-  for (const card of cards) {
-    if (used + card.height + FOOTER_HEIGHT > PAGE.height && pages[pages.length - 1].length) {
+  for (const service of services) {
+    const height = layoutCard(null, service, 0);
+    if (used + height + FOOTER_HEIGHT > PAGE.height && pages[pages.length - 1].length) {
       pages.push([]);
       used = HEADER_HEIGHT.following;
     }
-    pages[pages.length - 1].push(card);
-    used += card.height + CARD.gap;
+    pages[pages.length - 1].push({ service, height });
+    used += height + CARD.gap;
   }
   return pages;
 }
 
-function drawHeader(ctx, { dayLabel, total }, isFirstPage) {
+function drawHeader(page, { dayLabel, total }, isFirstPage) {
   const x = PAGE.margin;
-  ctx.fillStyle = COLORS.gold;
-  ctx.fillRect(0, 0, PAGE.width, 8);
+  page.fillRect(0, 0, PAGE.width, 8, COLORS.gold);
 
   if (!isFirstPage) {
-    ctx.font = font(32, 700);
-    ctx.fillStyle = COLORS.goldPale;
-    ctx.fillText(truncateToWidth(ctx, dayLabel, PAGE.width - PAGE.margin * 2), x, 56);
+    page.text(dayLabel, x, 80, 32, BOLD, COLORS.goldPale);
     return;
   }
-
-  ctx.font = font(40, 700);
-  ctx.fillStyle = COLORS.gold;
-  ctx.fillText('TeLlevo', x, 52);
-  ctx.font = font(64, 700);
-  ctx.fillStyle = COLORS.white;
-  ctx.fillText('Servicios del día', x, 110);
-  ctx.font = font(36, 700);
-  ctx.fillStyle = COLORS.goldPale;
-  ctx.fillText(truncateToWidth(ctx, dayLabel, PAGE.width - PAGE.margin * 2), x, 192);
-  ctx.font = font(30);
-  ctx.fillStyle = COLORS.muted;
-  ctx.fillText(`${total} ${total === 1 ? 'servicio' : 'servicios'}`, x, 240);
+  page.text('TeLlevo', x, 84, 40, BOLD, COLORS.gold);
+  page.text('Servicios del día', x, 164, 64, BOLD, COLORS.white);
+  page.text(dayLabel, x, 224, 36, BOLD, COLORS.goldPale);
+  page.text(`${total} ${total === 1 ? 'servicio' : 'servicios'}`, x, 268, 30, REGULAR, COLORS.muted);
 }
 
-function drawPage(ctx, cards, details, pageIndex, pageCount) {
-  ctx.fillStyle = COLORS.page;
-  ctx.fillRect(0, 0, PAGE.width, PAGE.height);
-  ctx.textBaseline = 'top';
-  drawHeader(ctx, details, pageIndex === 0);
+function renderPage(cards, details, pageIndex, pageCount) {
+  const page = new PdfPage();
+  page.fillRect(0, 0, PAGE.width, PAGE.height, COLORS.page);
+  drawHeader(page, details, pageIndex === 0);
 
   let y = pageIndex === 0 ? HEADER_HEIGHT.first : HEADER_HEIGHT.following;
   for (const { service, height } of cards) {
-    layoutCard(ctx, service, y, true, height);
+    layoutCard(page, service, y, height);
     y += height + CARD.gap;
   }
 
-  ctx.font = font(26);
-  ctx.fillStyle = COLORS.muted;
   const footer = `Página ${pageIndex + 1} de ${pageCount}`;
-  ctx.fillText(footer, PAGE.width - PAGE.margin - ctx.measureText(footer).width, PAGE.height - 56);
-}
-
-async function canvasToJpeg(canvas) {
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY));
-  if (!blob) throw new Error('El navegador no pudo generar la página del PDF');
-  return new Uint8Array(await blob.arrayBuffer());
+  page.text(footer, PAGE.width - PAGE.margin - textWidth(footer, 26, REGULAR), PAGE.height - 36, 26, REGULAR, COLORS.muted);
+  return page.commands.join('\n');
 }
 
 /**
- * Arma un PDF con una imagen JPEG por página.
- * @param {Uint8Array[]} jpegPages
+ * Arma el archivo PDF a partir del contenido de cada página.
+ * @param {string[]} pageContents
  * @returns {Blob}
  */
-function assemblePdf(jpegPages) {
+function assemblePdf(pageContents) {
   const chunks = [];
   const offsets = [];
   let position = 0;
-  const write = (data) => {
-    const bytes = typeof data === 'string' ? encoder.encode(data) : data;
+  const write = (text) => {
+    const bytes = encoder.encode(text);
     chunks.push(bytes);
     position += bytes.length;
   };
-  const beginObject = (id) => {
+  const writeObject = (id, body) => {
     offsets[id] = position;
-    write(`${id} 0 obj\n`);
+    write(`${id} 0 obj\n${body}\nendobj\n`);
   };
 
-  const widthPoints = PAGE.width / PIXELS_PER_POINT;
-  const heightPoints = PAGE.height / PIXELS_PER_POINT;
-  const pageObjectId = (index) => 3 + index * 3;
-  const objectCount = 2 + jpegPages.length * 3;
+  const FONT_REGULAR_ID = 3;
+  const FONT_BOLD_ID = 4;
+  const pageObjectId = (index) => 5 + index * 2;
+  const objectCount = 4 + pageContents.length * 2;
+  const mediaBox = `[0 0 ${toPoints(PAGE.width)} ${toPoints(PAGE.height)}]`;
+  const fontDictionary = (baseFont) => `<< /Type /Font /Subtype /Type1 /BaseFont /${baseFont} /Encoding /WinAnsiEncoding >>`;
 
   write('%PDF-1.4\n');
-  beginObject(1);
-  write('<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
-  beginObject(2);
-  const kids = jpegPages.map((_, index) => `${pageObjectId(index)} 0 R`).join(' ');
-  write(`<< /Type /Pages /Kids [${kids}] /Count ${jpegPages.length} >>\nendobj\n`);
+  writeObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  const kids = pageContents.map((_, index) => `${pageObjectId(index)} 0 R`).join(' ');
+  writeObject(2, `<< /Type /Pages /Kids [${kids}] /Count ${pageContents.length} >>`);
+  writeObject(FONT_REGULAR_ID, fontDictionary('Helvetica'));
+  writeObject(FONT_BOLD_ID, fontDictionary('Helvetica-Bold'));
 
-  jpegPages.forEach((jpeg, index) => {
+  pageContents.forEach((content, index) => {
     const pageId = pageObjectId(index);
     const contentId = pageId + 1;
-    const imageId = pageId + 2;
-    const content = `q ${widthPoints} 0 0 ${heightPoints} 0 0 cm /Im0 Do Q`;
-
-    beginObject(pageId);
-    write(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${widthPoints} ${heightPoints}] /Contents ${contentId} 0 R /Resources << /XObject << /Im0 ${imageId} 0 R >> >> >>\nendobj\n`);
-    beginObject(contentId);
-    write(`<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj\n`);
-    beginObject(imageId);
-    write(`<< /Type /XObject /Subtype /Image /Width ${PAGE.width} /Height ${PAGE.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`);
-    write(jpeg);
-    write('\nendstream\nendobj\n');
+    writeObject(pageId, `<< /Type /Page /Parent 2 0 R /MediaBox ${mediaBox} /Contents ${contentId} 0 R /Resources << /Font << /F1 ${FONT_REGULAR_ID} 0 R /F2 ${FONT_BOLD_ID} 0 R >> >> >>`);
+    writeObject(contentId, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
   });
 
   const xrefPosition = position;
@@ -314,24 +345,10 @@ function assemblePdf(jpegPages) {
  * @param {{ dayLabel: string, services: Array<{ time: string, driver: string, isUnassigned: boolean,
  *   origin: { street: string, comuna: string }, destination: { street: string, comuna: string },
  *   missingLabel: string }> }} details
- * @returns {Promise<Blob>}
+ * @returns {Blob}
  */
-export async function buildServiceListPdf({ dayLabel, services }) {
-  // Sin esperar a Inter, el canvas dibujaría con la fuente de respaldo.
-  await Promise.allSettled([400, 700].map(weight => document.fonts.load(`${weight} 40px Inter`)));
-
-  const canvas = document.createElement('canvas');
-  canvas.width = PAGE.width;
-  canvas.height = PAGE.height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('El navegador no permite generar el PDF');
-  ctx.textBaseline = 'top';
-
-  const pages = paginate(ctx, services);
-  const jpegPages = [];
-  for (let index = 0; index < pages.length; index++) {
-    drawPage(ctx, pages[index], { dayLabel, total: services.length }, index, pages.length);
-    jpegPages.push(await canvasToJpeg(canvas));
-  }
-  return assemblePdf(jpegPages);
+export function buildServiceListPdf({ dayLabel, services }) {
+  const pages = paginate(services);
+  const details = { dayLabel, total: services.length };
+  return assemblePdf(pages.map((cards, index) => renderPage(cards, details, index, pages.length)));
 }
