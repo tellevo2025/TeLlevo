@@ -799,7 +799,13 @@ const fmtDateTime = (d) => d.toLocaleString('es-CL', { day: 'numeric', month: 's
 
 const AUTO_ACTOR = 'Automático';
 
-const STATUS_ORDER = ['pending', 'confirmed', 'saldado', 'completed', 'cancelled'];
+// Confirmadas y saldadas comparten grupo: ambas son viajes por realizar y se atienden por hora.
+const DATE_FILTER_GROUPS = [
+  { title: 'Pendientes',             statuses: ['pending'],              modifier: 'pending' },
+  { title: 'Confirmadas y saldadas', statuses: ['confirmed', 'saldado'], modifier: 'confirmed' },
+  { title: 'Completadas',            statuses: ['completed'],            modifier: 'completed' },
+  { title: 'Canceladas',             statuses: ['cancelled'],            modifier: 'cancelled' },
+];
 const HISTORY_STATUSES = new Set(['completed', 'cancelled']);
 
 // toISOString() usa UTC: en Chile cambia de día a las 21:00 y haría "pasado" el viaje de hoy.
@@ -1334,11 +1340,14 @@ function renderDayGroups(items) {
 }
 
 function renderStatusGroups(items) {
-  const groups = groupBy(items, r => r.status);
-  const statuses = [...STATUS_ORDER, ...[...groups.keys()].filter(s => !STATUS_ORDER.includes(s))];
-  return statuses
-    .filter(s => groups.has(s))
-    .map(s => renderResGroup(statusLabel[s] || s || 'Sin estado', groups.get(s), STATUS_ORDER.includes(s) ? s : ''))
+  const known = DATE_FILTER_GROUPS.flatMap(g => g.statuses);
+  const groups = [
+    ...DATE_FILTER_GROUPS.map(g => ({ ...g, items: items.filter(r => g.statuses.includes(r.status)) })),
+    { title: 'Otros', modifier: '', items: items.filter(r => !known.includes(r.status)) },
+  ];
+  return groups
+    .filter(g => g.items.length)
+    .map(g => renderResGroup(g.title, g.items, g.modifier))
     .join('');
 }
 
