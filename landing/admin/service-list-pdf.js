@@ -1,35 +1,44 @@
 /*
-  service-list-pdf.js — Genera el PDF de la lista de servicios por chofer.
-  Las páginas tienen proporción de celular y todo el contenido es texto real, para
-  poder seleccionar y copiar las direcciones. El PDF se arma a mano con Helvetica,
-  fuente incluida en todo lector de PDF, así que no requiere librerías ni descargas.
+  service-list-pdf.js — Genera la planilla PDF de servicios por chofer.
+  Es una tabla A4 horizontal cuyo contenido es texto real, para poder seleccionar y
+  copiar las direcciones. El PDF se arma a mano con Helvetica, fuente incluida en todo
+  lector de PDF, así que no requiere librerías ni descargas.
   Se carga solo al descargar, para no afectar el inicio del panel.
 */
 
-// El diseño se expresa en unidades de una pantalla de 1080 de ancho; el PDF usa un tercio.
-const PAGE = { width: 1080, height: 1920, margin: 48 };
-const UNITS_PER_POINT = 3;
+const PAGE = { width: 842, height: 595, margin: 24 };
 
 const COLORS = {
-  page: '#0A1628',
-  card: '#112240',
-  border: '#1B3A6B',
+  band: '#0A1628',
   gold: '#C9A84C',
   goldPale: '#F5DFA0',
-  blue: '#4A9EFF',
-  orange: '#F5A623',
   white: '#FFFFFF',
-  text: '#E8EAF0',
-  muted: '#8892A4',
-  onAccent: '#0A1628',
+  tableHeader: '#1B3A6B',
+  rowAlternate: '#F1F4F9',
+  rowUnassigned: '#FFF1DC',
+  rowLine: '#D3DBE8',
+  text: '#0A1628',
+  secondary: '#55617A',
+  unassigned: '#B4560A',
+  originChip: '#F5DFA0',
+  destinationChip: '#BFDBFF',
 };
 
-const CARD = { padding: 36, accent: 10, timeColumn: 190, gap: 24, radius: 20 };
-const CHIP = { height: 52, paddingX: 12, radius: 10 };
-const ADDRESS = { size: 30, lineHeight: 40 };
-const DRIVER = { size: 44, lineHeight: 54 };
-const HEADER_HEIGHT = { first: 300, following: 120 };
-const FOOTER_HEIGHT = 80;
+const BAND_HEIGHT = 58;
+const TABLE_HEADER_HEIGHT = 24;
+const FOOTER_HEIGHT = 24;
+const ROW_PADDING = { x: 8, y: 7 };
+const CHIP = { height: 16, paddingX: 5, radius: 3 };
+const ADDRESS = { size: 10, lineHeight: 14 };
+const DETAIL_SIZE = 8.5;
+
+const COLUMNS = [
+  { key: 'time', title: 'Hora', width: 56 },
+  { key: 'driver', title: 'Chofer', width: 128 },
+  { key: 'origin', title: 'Inicio', width: 243 },
+  { key: 'destination', title: 'Destino', width: 243 },
+  { key: 'arrival', title: 'Llegada aprox.', width: 124 },
+];
 
 const REGULAR = 'regular';
 const BOLD = 'bold';
@@ -71,18 +80,18 @@ function toWinAnsiHex(text) {
 const hexToPdfColor = (hex) =>
   [1, 3, 5].map(i => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(3)).join(' ');
 
-const toPoints = (units) => (units / UNITS_PER_POINT).toFixed(2);
+const num = (value) => value.toFixed(2);
 
 /** Acumula las instrucciones de dibujo de una página; recibe coordenadas desde arriba. */
 class PdfPage {
   commands = [];
 
-  #y = (units) => toPoints(PAGE.height - units);
+  #y = (top) => num(PAGE.height - top);
 
   #roundedRectPath(x, y, width, height, radius) {
     const k = radius * 0.4477;
     const right = x + width, bottom = y + height;
-    const X = toPoints, Y = this.#y;
+    const X = num, Y = this.#y;
     this.commands.push(
       `${X(x + radius)} ${Y(y)} m`,
       `${X(right - radius)} ${Y(y)} l`,
@@ -98,7 +107,7 @@ class PdfPage {
   }
 
   fillRect(x, y, width, height, color) {
-    this.commands.push(`${hexToPdfColor(color)} rg ${toPoints(x)} ${this.#y(y + height)} ${toPoints(width)} ${toPoints(height)} re f`);
+    this.commands.push(`${hexToPdfColor(color)} rg ${num(x)} ${this.#y(y + height)} ${num(width)} ${num(height)} re f`);
   }
 
   fillRoundedRect(x, y, width, height, radius, color) {
@@ -107,23 +116,14 @@ class PdfPage {
     this.commands.push('f');
   }
 
-  strokeRoundedRect(x, y, width, height, radius, color, dash = '') {
-    this.commands.push(`${hexToPdfColor(color)} RG ${toPoints(2)} w ${dash ? `[${dash}] 0 d` : '[] 0 d'}`);
+  strokeRoundedRect(x, y, width, height, radius, color) {
+    this.commands.push(`${hexToPdfColor(color)} RG 0.75 w [2 1.5] 0 d`);
     this.#roundedRectPath(x, y, width, height, radius);
     this.commands.push('S', '[] 0 d');
   }
 
-  /** Rellena una banda vertical recortada por las esquinas redondeadas de un rectángulo. */
-  fillClippedBand(x, y, bandWidth, width, height, radius, color) {
-    this.commands.push('q');
-    this.#roundedRectPath(x, y, width, height, radius);
-    this.commands.push('W n');
-    this.fillRect(x, y, bandWidth, height, color);
-    this.commands.push('Q');
-  }
-
   text(content, x, baseline, size, weight, color) {
-    this.commands.push(`BT ${hexToPdfColor(color)} rg /${PDF_FONT_NAME[weight]} ${toPoints(size)} Tf ${toPoints(x)} ${this.#y(baseline)} Td <${toWinAnsiHex(content)}> Tj ET`);
+    this.commands.push(`BT ${hexToPdfColor(color)} rg /${PDF_FONT_NAME[weight]} ${num(size)} Tf ${num(x)} ${this.#y(baseline)} Td <${toWinAnsiHex(content)}> Tj ET`);
   }
 }
 
@@ -155,41 +155,32 @@ function wrapText(text, maxWidth, size, weight) {
   return lines;
 }
 
-function fitFontSize(text, maxWidth, startSize, weight) {
-  let size = startSize;
-  while (size > 16 && textWidth(text, size, weight) > maxWidth) size -= 2;
-  return size;
-}
-
 const chipBaseline = (y, size) => y + (CHIP.height + size * 0.72) / 2;
 
-function drawChip(page, { text, size, weight, width, color, isMissing }, x, y) {
+function drawChip(page, { text, size, weight, width, fill, isMissing }, x, y) {
   if (isMissing) {
-    page.strokeRoundedRect(x, y, width, CHIP.height, CHIP.radius, COLORS.muted, '2.5 2');
+    page.strokeRoundedRect(x, y, width, CHIP.height, CHIP.radius, COLORS.secondary);
   } else {
-    page.fillRoundedRect(x, y, width, CHIP.height, CHIP.radius, color);
+    page.fillRoundedRect(x, y, width, CHIP.height, CHIP.radius, fill);
   }
-  page.text(text, x + CHIP.paddingX, chipBaseline(y, size), size, weight, isMissing ? COLORS.muted : COLORS.onAccent);
+  page.text(text, x + CHIP.paddingX, chipBaseline(y, size), size, weight, isMissing ? COLORS.secondary : COLORS.text);
 }
 
-/** Dibuja un tramo o, si page es null, solo calcula su altura. */
-function layoutStop(page, { label, color, stop, missingLabel }, x, y, width) {
-  let cursor = y;
-  page?.text(label.toUpperCase(), x, cursor + 20, 24, BOLD, color);
-  cursor += 36;
-
+/** Dibuja una dirección con su comuna o, si page es null, solo calcula su altura. */
+function layoutPlace(page, stop, fill, missingLabel, x, y, width) {
   const isMissing = !stop.comuna;
-  const chipText = stop.comuna || missingLabel;
+  const text = stop.comuna || missingLabel;
   const weight = isMissing ? REGULAR : BOLD;
-  const size = fitFontSize(chipText, width - CHIP.paddingX * 2, 30, weight);
-  const chip = { text: chipText, size, weight, color, isMissing, width: textWidth(chipText, size, weight) + CHIP.paddingX * 2 };
+  const size = isMissing ? DETAIL_SIZE : ADDRESS.size;
+  const chip = { text, size, weight, fill, isMissing, width: Math.min(textWidth(text, size, weight) + CHIP.paddingX * 2, width) };
 
   // La dirección va antes que la comuna para copiarla como "Calle 123, Comuna".
   const streetText = stop.street ? `${stop.street}${isMissing ? '' : ','}` : '';
   const lines = streetText ? wrapText(streetText, width, ADDRESS.size, REGULAR) : [];
+  let cursor = y;
 
   lines.slice(0, -1).forEach((line) => {
-    page?.text(line, x, cursor + 30, ADDRESS.size, REGULAR, COLORS.text);
+    page?.text(line, x, cursor + 10, ADDRESS.size, REGULAR, COLORS.text);
     cursor += ADDRESS.lineHeight;
   });
 
@@ -200,102 +191,115 @@ function layoutStop(page, { label, color, stop, missingLabel }, x, y, width) {
   }
 
   // El espacio final y la misma línea base hacen que al copiar salga "Calle 123, Comuna" seguido.
-  // "Comuna sin indicar" va aparte para no ensuciar la dirección copiada.
   const inlineLine = `${lastLine} `;
   const inlineWidth = textWidth(inlineLine, ADDRESS.size, REGULAR);
   if (!isMissing && inlineWidth + chip.width <= width) {
-    page?.text(inlineLine, x, chipBaseline(cursor, chip.size), ADDRESS.size, REGULAR, COLORS.text);
+    page?.text(inlineLine, x, chipBaseline(cursor, ADDRESS.size), ADDRESS.size, REGULAR, COLORS.text);
     if (page) drawChip(page, chip, x + inlineWidth, cursor);
-  } else {
-    page?.text(lastLine, x, cursor + 30, ADDRESS.size, REGULAR, COLORS.text);
-    cursor += ADDRESS.lineHeight + 6;
-    if (page) drawChip(page, chip, x, cursor);
+    return cursor + CHIP.height - y;
   }
+
+  page?.text(lastLine, x, cursor + 10, ADDRESS.size, REGULAR, COLORS.text);
+  cursor += ADDRESS.lineHeight + 1;
+  if (page) drawChip(page, chip, x, cursor);
   return cursor + CHIP.height - y;
 }
 
-/** Dibuja la tarjeta de un servicio o, si page es null, solo calcula su altura. */
-function layoutCard(page, service, y, height = 0) {
-  const x = PAGE.margin;
-  const width = PAGE.width - PAGE.margin * 2;
-  const accentColor = service.isUnassigned ? COLORS.orange : COLORS.gold;
-  const timeX = x + CARD.accent + CARD.padding;
-  const bodyX = timeX + CARD.timeColumn;
-  const bodyWidth = width - (bodyX - x) - CARD.padding;
+const columnContentWidth = (column) => column.width - ROW_PADDING.x * 2;
+
+function layoutWrapped(page, text, x, y, width, size, weight, color, lineHeight) {
+  const lines = wrapText(text, width, size, weight);
+  lines.forEach((line, index) => page?.text(line, x, y + size * 0.85 + index * lineHeight, size, weight, color));
+  return lines.length * lineHeight;
+}
+
+/** Dibuja una fila o, si page es null, solo calcula su altura. */
+function layoutRow(page, service, y, height, isAlternate) {
+  const { missingLabel } = service;
+  const left = PAGE.margin;
+  const tableWidth = PAGE.width - PAGE.margin * 2;
+  const top = y + ROW_PADDING.y;
 
   if (page) {
-    page.fillRoundedRect(x, y, width, height, CARD.radius, COLORS.card);
-    page.fillClippedBand(x, y, CARD.accent, width, height, CARD.radius, accentColor);
-    page.strokeRoundedRect(x, y, width, height, CARD.radius, COLORS.border);
-    const timeSize = fitFontSize(service.time, CARD.timeColumn - 16, 64, BOLD);
-    page.text(service.time, timeX, y + CARD.padding + timeSize * 0.76, timeSize, BOLD, COLORS.gold);
+    if (service.isUnassigned) page.fillRect(left, y, tableWidth, height, COLORS.rowUnassigned);
+    else if (isAlternate) page.fillRect(left, y, tableWidth, height, COLORS.rowAlternate);
+    page.fillRect(left, y + height - 0.5, tableWidth, 0.5, COLORS.rowLine);
   }
 
-  let cursor = y + CARD.padding;
-  wrapText(service.driver, bodyWidth, DRIVER.size, BOLD).forEach((line) => {
-    page?.text(line, bodyX, cursor + 38, DRIVER.size, BOLD, service.isUnassigned ? COLORS.orange : COLORS.white);
-    cursor += DRIVER.lineHeight;
-  });
-  cursor += 16;
-
-  const { missingLabel } = service;
-  cursor += layoutStop(page, { label: 'Inicio', color: COLORS.gold, stop: service.origin, missingLabel }, bodyX, cursor, bodyWidth);
-  cursor += CARD.gap;
-  cursor += layoutStop(page, { label: 'Destino', color: COLORS.blue, stop: service.destination, missingLabel }, bodyX, cursor, bodyWidth);
-
-  cursor += CARD.gap;
-  const arrivalWeight = service.hasArrival ? BOLD : REGULAR;
-  const arrivalColor = service.hasArrival ? COLORS.goldPale : COLORS.muted;
-  wrapText(service.arrival, bodyWidth, ADDRESS.size, arrivalWeight).forEach((line) => {
-    page?.text(line, bodyX, cursor + 24, ADDRESS.size, arrivalWeight, arrivalColor);
-    cursor += ADDRESS.lineHeight;
-  });
-
-  return cursor + CARD.padding - y;
+  const cellHeights = [];
+  let x = left;
+  for (const column of COLUMNS) {
+    const cellX = x + ROW_PADDING.x;
+    const width = columnContentWidth(column);
+    if (column.key === 'time') {
+      cellHeights.push(layoutWrapped(page, service.time, cellX, top, width, 13, BOLD, COLORS.text, 16));
+    } else if (column.key === 'driver') {
+      const color = service.isUnassigned ? COLORS.unassigned : COLORS.text;
+      cellHeights.push(layoutWrapped(page, service.driver, cellX, top, width, 11, BOLD, color, 14));
+    } else if (column.key === 'origin') {
+      cellHeights.push(layoutPlace(page, service.origin, COLORS.originChip, missingLabel, cellX, top, width));
+    } else if (column.key === 'destination') {
+      cellHeights.push(layoutPlace(page, service.destination, COLORS.destinationChip, missingLabel, cellX, top, width));
+    } else {
+      let arrivalHeight = 0;
+      if (service.arrivalTime) arrivalHeight = layoutWrapped(page, service.arrivalTime, cellX, top, width, 13, BOLD, COLORS.text, 16);
+      arrivalHeight += layoutWrapped(page, service.arrivalDetail, cellX, top + arrivalHeight, width, DETAIL_SIZE, REGULAR, COLORS.secondary, 11);
+      cellHeights.push(arrivalHeight);
+    }
+    x += column.width;
+  }
+  return Math.max(...cellHeights) + ROW_PADDING.y * 2;
 }
 
 function paginate(services) {
+  const available = PAGE.height - BAND_HEIGHT - TABLE_HEADER_HEIGHT - FOOTER_HEIGHT;
   const pages = [[]];
-  let used = HEADER_HEIGHT.first;
+  let used = 0;
   for (const service of services) {
-    const height = layoutCard(null, service, 0);
-    if (used + height + FOOTER_HEIGHT > PAGE.height && pages[pages.length - 1].length) {
+    const height = layoutRow(null, service, 0, 0, false);
+    if (used + height > available && pages[pages.length - 1].length) {
       pages.push([]);
-      used = HEADER_HEIGHT.following;
+      used = 0;
     }
     pages[pages.length - 1].push({ service, height });
-    used += height + CARD.gap;
+    used += height;
   }
   return pages;
 }
 
-function drawHeader(page, { dayLabel, total }, isFirstPage) {
+function drawBand(page, { dayLabel, total }) {
   const x = PAGE.margin;
-  page.fillRect(0, 0, PAGE.width, 8, COLORS.gold);
-
-  if (!isFirstPage) {
-    page.text(dayLabel, x, 80, 32, BOLD, COLORS.goldPale);
-    return;
-  }
-  page.text('TeLlevo', x, 84, 40, BOLD, COLORS.gold);
-  page.text('Servicios del día', x, 164, 64, BOLD, COLORS.white);
-  page.text(dayLabel, x, 224, 36, BOLD, COLORS.goldPale);
-  page.text(`${total} ${total === 1 ? 'servicio' : 'servicios'}`, x, 268, 30, REGULAR, COLORS.muted);
+  page.fillRect(0, 0, PAGE.width, BAND_HEIGHT, COLORS.band);
+  page.fillRect(0, BAND_HEIGHT - 2, PAGE.width, 2, COLORS.gold);
+  page.text('TeLlevo', x, 25, 12, BOLD, COLORS.gold);
+  page.text(`Servicios del día · ${dayLabel}`, x, 45, 15, BOLD, COLORS.white);
+  const count = `${total} ${total === 1 ? 'servicio' : 'servicios'}`;
+  page.text(count, PAGE.width - PAGE.margin - textWidth(count, 12, BOLD), 45, 12, BOLD, COLORS.goldPale);
 }
 
-function renderPage(cards, details, pageIndex, pageCount) {
-  const page = new PdfPage();
-  page.fillRect(0, 0, PAGE.width, PAGE.height, COLORS.page);
-  drawHeader(page, details, pageIndex === 0);
-
-  let y = pageIndex === 0 ? HEADER_HEIGHT.first : HEADER_HEIGHT.following;
-  for (const { service, height } of cards) {
-    layoutCard(page, service, y, height);
-    y += height + CARD.gap;
+function drawTableHeader(page) {
+  const left = PAGE.margin;
+  page.fillRect(left, BAND_HEIGHT, PAGE.width - PAGE.margin * 2, TABLE_HEADER_HEIGHT, COLORS.tableHeader);
+  let x = left;
+  for (const column of COLUMNS) {
+    page.text(column.title.toUpperCase(), x + ROW_PADDING.x, BAND_HEIGHT + 16, 9, BOLD, COLORS.white);
+    x += column.width;
   }
+}
+
+function renderPage(rows, details, pageIndex, pageCount) {
+  const page = new PdfPage();
+  drawBand(page, details);
+  drawTableHeader(page);
+
+  let y = BAND_HEIGHT + TABLE_HEADER_HEIGHT;
+  rows.forEach(({ service, height }, index) => {
+    layoutRow(page, service, y, height, index % 2 === 1);
+    y += height;
+  });
 
   const footer = `Página ${pageIndex + 1} de ${pageCount}`;
-  page.text(footer, PAGE.width - PAGE.margin - textWidth(footer, 26, REGULAR), PAGE.height - 36, 26, REGULAR, COLORS.muted);
+  page.text(footer, PAGE.width - PAGE.margin - textWidth(footer, 8.5, REGULAR), PAGE.height - 9, 8.5, REGULAR, COLORS.secondary);
   return page.commands.join('\n');
 }
 
@@ -322,7 +326,7 @@ function assemblePdf(pageContents) {
   const FONT_BOLD_ID = 4;
   const pageObjectId = (index) => 5 + index * 2;
   const objectCount = 4 + pageContents.length * 2;
-  const mediaBox = `[0 0 ${toPoints(PAGE.width)} ${toPoints(PAGE.height)}]`;
+  const mediaBox = `[0 0 ${PAGE.width} ${PAGE.height}]`;
   const fontDictionary = (baseFont) => `<< /Type /Font /Subtype /Type1 /BaseFont /${baseFont} /Encoding /WinAnsiEncoding >>`;
 
   write('%PDF-1.4\n');
@@ -349,14 +353,14 @@ function assemblePdf(pageContents) {
 }
 
 /**
- * Genera el PDF de la lista de servicios.
+ * Genera la planilla PDF de servicios.
  * @param {{ dayLabel: string, services: Array<{ time: string, driver: string, isUnassigned: boolean,
  *   origin: { street: string, comuna: string }, destination: { street: string, comuna: string },
- *   missingLabel: string, arrival: string, hasArrival: boolean }> }} details
+ *   missingLabel: string, arrivalTime: string, arrivalDetail: string }> }} details
  * @returns {Blob}
  */
 export function buildServiceListPdf({ dayLabel, services }) {
   const pages = paginate(services);
   const details = { dayLabel, total: services.length };
-  return assemblePdf(pages.map((cards, index) => renderPage(cards, details, index, pages.length)));
+  return assemblePdf(pages.map((rows, index) => renderPage(rows, details, index, pages.length)));
 }

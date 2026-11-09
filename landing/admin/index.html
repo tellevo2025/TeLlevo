@@ -2020,7 +2020,8 @@ function serviceEta(r) {
   const time = `${arrival.getHours()}:${String(arrival.getMinutes()).padStart(2, '0')}`;
   const stopCount = serviceStops(r).length;
   const stopsNote = stopCount ? ` · ${stopCount} ${stopCount === 1 ? 'parada' : 'paradas'}` : '';
-  return { isAvailable: true, text: `Llegada aprox. ${time} · ${fmtDuration(result.seconds)}${stopsNote}` };
+  const detail = `${fmtDuration(result.seconds)}${stopsNote}`;
+  return { isAvailable: true, text: `Llegada aprox. ${time} · ${detail}`, time, detail };
 }
 
 // Se escribe sin updatedAt ni updatedBy: calcular una ruta no es un cambio de la reserva.
@@ -2106,8 +2107,8 @@ const toPdfService = (r) => ({
   origin: parseAddress(r.origen),
   destination: parseAddress(r.destino),
   missingLabel: MISSING_COMUNA,
-  arrival: serviceEta(r).text,
-  hasArrival: serviceEta(r).isAvailable,
+  arrivalTime: serviceEta(r).time || '',
+  arrivalDetail: serviceEta(r).detail || 'Sin estimación',
 });
 
 function renderServiceList() {
