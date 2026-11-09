@@ -116,10 +116,11 @@
 
     /* ═══ CONTROLES PERÍODO ═══ */
     .period-bar {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px;
     }
     .period-bar h2 { font-size: .95rem; font-weight: 700; flex: 1; margin: 0; line-height: 1.2; }
     .month-picker, .week-picker {
+      max-width: 100%; min-width: 0;
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
       color: var(--text); font-family: inherit; font-size: .875rem; padding: 8px 11px; outline: none;
       transition: border-color .2s; flex-shrink: 0; box-sizing: border-box; min-width: 160px;
@@ -308,8 +309,9 @@
     .utilidad-row--total .utilidad-row__value { color: var(--gold); font-weight: 700; font-size: 1.1rem; }
 
     /* ═══ CUADRE ═══ */
-    .cuadre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    @media (max-width: 480px) { .cuadre-grid { grid-template-columns: 1fr; } }
+    .cuadre-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 480px) { .cuadre-grid { grid-template-columns: minmax(0, 1fr); } }
+    .cuadre-card input { min-width: 0; }
     .cuadre-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
     .cuadre-card__label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: 8px; }
     .cuadre-card__value { font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em; }

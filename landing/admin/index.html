@@ -189,7 +189,7 @@
     .res-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 14px 16px; cursor: pointer; transition: border-color .2s, box-shadow .2s;
-      display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; align-items: start;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; align-items: start;
       border-left: 4px solid transparent;
     }
     .res-card:hover { border-color: rgba(201,168,76,.5); box-shadow: 0 2px 16px rgba(0,0,0,.3); }
@@ -199,16 +199,17 @@
     .res-card--completed { border-left-color: var(--completed); background: linear-gradient(90deg, rgba(72,187,120,.07) 0%, transparent 55%); }
     .res-card--cancelled { border-left-color: var(--cancelled); background: linear-gradient(90deg, rgba(252,129,129,.05) 0%, transparent 55%); }
     .res-card:active { box-shadow: none; }
-    .res-card__name { font-weight: 600; font-size: .92rem; }
+    .res-card__main { min-width: 0; }
+    .res-card__name { font-weight: 600; font-size: .92rem; overflow-wrap: anywhere; }
     .res-card__datetime { font-size: .78rem; color: var(--muted); margin-top: 2px; }
     .res-card__route {
       font-size: .78rem; color: var(--muted); margin-top: 5px; grid-column: 1;
       display: flex; align-items: center; gap: 5px; overflow: hidden;
     }
-    .res-card__route span:not(.res-card__route-arrow) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .res-card__route span:not(.res-card__route-arrow) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .res-card__route-arrow { color: var(--gold); flex-shrink: 0; font-size: .7rem; }
-    .res-card__driver { font-size: .75rem; color: var(--confirmed); margin-top: 4px; grid-column: 1; }
-    .res-card__right { grid-column: 2; grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .res-card__driver { font-size: .75rem; color: var(--confirmed); margin-top: 4px; grid-column: 1; overflow-wrap: anywhere; }
+    .res-card__right { grid-column: 2; grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; white-space: nowrap; }
     .status-badge {
       font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 10px;
       text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
@@ -453,7 +454,6 @@
       /* Cards */
       .res-card { padding: 12px 13px; }
       .res-card__name { font-size: .875rem; }
-      .res-card__route { max-width: calc(100vw - 130px); }
 
       /* Detail — full screen desde abajo */
       .detail-panel {
@@ -1236,7 +1236,7 @@ function renderResCard(r) {
   const destino = (r.destino || '').split(',')[0];
   return `
     <div class="res-card res-card--${escHtml(r.status)}" data-id="${escHtml(r.id)}">
-      <div>
+      <div class="res-card__main">
         <div class="res-card__name">${escHtml(r.nombre || 'Sin nombre')}</div>
         <div class="res-card__datetime">${escHtml(fmtDate(r.fecha, r.hora))}</div>
         <div class="res-card__route">
