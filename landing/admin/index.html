@@ -715,7 +715,7 @@
       <input type="date" id="service-list-date">
       <button id="btn-download-service-list" class="btn-download" disabled>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar lista
+        <span id="service-list-download-label">Descargar PDF</span>
       </button>
     </div>
     <div id="service-list-content"></div>
@@ -1995,21 +1995,14 @@ const renderServiceCard = (r) => `
     </div>
   </li>`;
 
-function serviceStopText(label, address) {
-  const { street, comuna } = parseAddress(address);
-  const place = (comuna || MISSING_COMUNA).toLocaleUpperCase('es');
-  return `      ${label}: ${place}${street ? ` — ${street}` : ''}`;
-}
-
-function buildServiceListText(iso, trips) {
-  const title = `SERVICIOS — ${fmtDayHeading(iso).toLocaleUpperCase('es')}`;
-  const blocks = trips.map(r => [
-    `${serviceTimeLabel(r.hora).padStart(5)} | ${(r.driverName || UNASSIGNED_DRIVER).toLocaleUpperCase('es')}`,
-    serviceStopText('Inicio ', r.origen),
-    serviceStopText('Destino', r.destino),
-  ].join('\r\n'));
-  return [`${title}\r\n${'='.repeat(title.length)}`, ...blocks].join('\r\n\r\n');
-}
+const toPdfService = (r) => ({
+  time: serviceTimeLabel(r.hora),
+  driver: r.driverName || UNASSIGNED_DRIVER,
+  isUnassigned: !r.driverName,
+  origin: parseAddress(r.origen),
+  destination: parseAddress(r.destino),
+  missingLabel: MISSING_COMUNA,
+});
 
 function renderServiceList() {
   const iso = el('service-list-date').value;
@@ -2028,16 +2021,33 @@ function openServiceList() {
 
 el('service-list-date').addEventListener('change', renderServiceList);
 
-el('btn-download-service-list').addEventListener('click', () => {
+el('btn-download-service-list').addEventListener('click', async () => {
+  const button = el('btn-download-service-list');
+  const label = el('service-list-download-label');
   const iso = el('service-list-date').value;
-  // El BOM y CRLF permiten abrir bien acentos y saltos de línea en el Bloc de notas.
-  const text = `\uFEFF${buildServiceListText(iso, serviceListTrips(iso))}\r\n`;
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `tellevo-servicios-${iso}.txt`;
-  link.click();
-  URL.revokeObjectURL(url);
+  button.disabled = true;
+  label.textContent = 'Generando…';
+  try {
+    // Ruta absoluta: el panel se publica en /admin, sin barra final.
+    const { buildServiceListPdf } = await import('/admin/service-list-pdf.js');
+    const pdf = await buildServiceListPdf({
+      dayLabel: fmtDayHeading(iso),
+      services: serviceListTrips(iso).map(toPdfService),
+    });
+    const url = URL.createObjectURL(pdf);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tellevo-servicios-${iso}.pdf`;
+    link.click();
+    // iOS sigue leyendo el archivo después del clic: revocar de inmediato cancela la descarga.
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (err) {
+    console.error('Service list PDF error:', err);
+    toast('⚠ No se pudo generar el PDF. Intenta de nuevo.', 'error');
+  } finally {
+    label.textContent = 'Descargar PDF';
+    renderServiceList();
+  }
 });
 
 // ── Ingreso manual de viajes ───────────────────────────────────────────────
