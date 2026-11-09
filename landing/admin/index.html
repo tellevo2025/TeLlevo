@@ -102,10 +102,12 @@
     .header__logo { font-size: .95rem; font-weight: 700; color: var(--gold); letter-spacing: -.01em; white-space: nowrap; }
     .header__title { font-size: .65rem; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; white-space: nowrap; }
     .header__sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
-    .header__nav { display: flex; gap: 2px; flex: 1; }
+    .header__nav { display: flex; gap: 2px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    .header__nav::-webkit-scrollbar { display: none; }
     .header__nav-btn {
       background: transparent; border: none; color: var(--muted); font-size: .85rem; font-weight: 500;
       padding: 6px 13px; border-radius: 18px; cursor: pointer; transition: background .18s, color .18s;
+      flex-shrink: 0; white-space: nowrap;
     }
     .header__nav-btn:hover { color: var(--text); background: rgba(255,255,255,.06); }
     .header__nav-btn.active { background: rgba(201,168,76,.14); color: var(--gold); font-weight: 600; }
@@ -172,6 +174,18 @@
        RESERVATION CARDS
     ════════════════════════════════════ */
     .reservations-list { display: flex; flex-direction: column; gap: 8px; }
+    .res-group { margin-bottom: 24px; }
+    .res-group__title {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+      font-size: .85rem; font-weight: 700; color: var(--gold);
+    }
+    .res-group__title--pending   { color: var(--pending); }
+    .res-group__title--confirmed { color: var(--confirmed); }
+    .res-group__title--saldado   { color: var(--saldado); }
+    .res-group__title--completed { color: var(--completed); }
+    .res-group__title--cancelled { color: var(--cancelled); }
+    .res-group__count { color: var(--muted); font-size: .78rem; font-weight: 500; }
     .res-card {
       background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 14px 16px; cursor: pointer; transition: border-color .2s, box-shadow .2s;
@@ -194,7 +208,7 @@
     .res-card__route span:not(.res-card__route-arrow) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .res-card__route-arrow { color: var(--gold); flex-shrink: 0; font-size: .7rem; }
     .res-card__driver { font-size: .75rem; color: var(--confirmed); margin-top: 4px; grid-column: 1; }
-    .res-card__right { grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .res-card__right { grid-column: 2; grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
     .status-badge {
       font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 10px;
       text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
@@ -317,6 +331,22 @@
        DRIVERS VIEW
     ════════════════════════════════════ */
     .view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .manual-form { display: flex; flex-direction: column; gap: 16px; }
+    .manual-form__section {
+      display: grid; grid-template-columns: 1fr; gap: 12px; padding: 16px; margin: 0; min-width: 0;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .manual-form__legend { padding: 0 8px; font-size: .78rem; font-weight: 700; color: var(--gold); }
+    .manual-form__error {
+      padding: 8px 12px; border-radius: 8px; font-size: .85rem; color: var(--cancelled);
+      background: rgba(252,129,129,.08);
+    }
+    .manual-form__submit { align-self: stretch; justify-content: center; }
+    @media (min-width: 768px) {
+      .manual-form__section { grid-template-columns: 1fr 1fr; }
+      .manual-form__field--full { grid-column: 1 / -1; }
+      .manual-form__submit { align-self: flex-end; min-width: 200px; }
+    }
     .view-header h2 { font-size: 1rem; font-weight: 700; }
     .add-driver-form { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .add-driver-form input {
@@ -488,6 +518,7 @@
     <div class="header__sep" aria-hidden="true"></div>
     <nav class="header__nav">
       <button class="header__nav-btn active" data-view="reservations">Reservas</button>
+      <button class="header__nav-btn" data-view="manual">Nuevo viaje</button>
       <button class="header__nav-btn" data-view="drivers">Choferes</button>
       <button class="header__nav-btn" data-view="stats">Estadísticas</button>
     </nav>
@@ -527,6 +558,116 @@
     <div id="reservations-list">
       <div class="loading-center"><div class="spinner"></div></div>
     </div>
+  </main>
+
+  <!-- Ingreso manual -->
+  <main id="view-manual" class="view" hidden>
+    <div class="view-header">
+      <h2>Ingresar viaje manualmente</h2>
+    </div>
+    <form id="manual-trip-form" class="manual-form">
+      <fieldset class="manual-form__section">
+        <legend class="manual-form__legend">Cliente</legend>
+        <div class="edit-field">
+          <label for="mt-nombre">Nombre *</label>
+          <input id="mt-nombre" type="text" required autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="mt-telefono">Teléfono *</label>
+          <input id="mt-telefono" type="tel" required autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="mt-telefono2">Teléfono 2</label>
+          <input id="mt-telefono2" type="tel" autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="mt-email">Email</label>
+          <input id="mt-email" type="email" autocomplete="off">
+        </div>
+      </fieldset>
+      <fieldset class="manual-form__section">
+        <legend class="manual-form__legend">Viaje</legend>
+        <div class="edit-field">
+          <label for="mt-fecha">Fecha del servicio *</label>
+          <input id="mt-fecha" type="date" required>
+        </div>
+        <div class="edit-field">
+          <label for="mt-hora">Hora del servicio *</label>
+          <input id="mt-hora" type="time" required>
+        </div>
+        <div class="edit-field manual-form__field--full">
+          <label for="mt-origen">Centro de eventos / origen *</label>
+          <textarea id="mt-origen" required></textarea>
+        </div>
+        <div class="edit-field manual-form__field--full">
+          <label for="mt-destino">Destino final *</label>
+          <textarea id="mt-destino" required></textarea>
+        </div>
+        <div class="edit-field manual-form__field--full">
+          <label for="mt-paradas">Paradas adicionales (una por línea)</label>
+          <textarea id="mt-paradas"></textarea>
+        </div>
+        <div class="edit-field">
+          <label for="mt-personas">Personas</label>
+          <input id="mt-personas" type="number" min="1" step="1">
+        </div>
+      </fieldset>
+      <fieldset class="manual-form__section">
+        <legend class="manual-form__legend">Vehículo</legend>
+        <div class="edit-field">
+          <label for="mt-marcamodelo">Marca y modelo</label>
+          <input id="mt-marcamodelo" type="text" autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="mt-patente">Patente</label>
+          <input id="mt-patente" type="text" autocomplete="off">
+        </div>
+        <div class="edit-field">
+          <label for="mt-transmision">Transmisión</label>
+          <select id="mt-transmision">
+            <option value="">—</option>
+            <option value="Automático">Automático</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label for="mt-seguro">Seguro</label>
+          <select id="mt-seguro">
+            <option value="">—</option>
+            <option value="Sí">Sí</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </fieldset>
+      <fieldset class="manual-form__section">
+        <legend class="manual-form__legend">Gestión</legend>
+        <div class="edit-field">
+          <label for="mt-precio">Precio (CLP)</label>
+          <input id="mt-precio" type="number" min="0" step="1000">
+        </div>
+        <div class="edit-field">
+          <label for="mt-status">Estado</label>
+          <select id="mt-status">
+            <option value="pending">Pendiente</option>
+            <option value="confirmed" selected>Confirmada</option>
+            <option value="saldado">Saldada</option>
+            <option value="completed">Completada</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label for="mt-driver">Chofer</label>
+          <select id="mt-driver">
+            <option value="">Sin asignar</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label for="mt-alianza">Alianza / código</label>
+          <input id="mt-alianza" type="text" autocomplete="off">
+        </div>
+      </fieldset>
+      <p id="manual-error" class="manual-form__error" role="alert" hidden></p>
+      <button type="submit" id="manual-submit" class="btn-primary manual-form__submit">Guardar viaje</button>
+    </form>
   </main>
 
   <!-- Choferes -->
@@ -645,7 +786,7 @@ const fmt = (n) => n != null ? new Intl.NumberFormat('es-CL', { style: 'currency
 
 const fmtDate = (fecha, hora) => {
   if (!fecha) return '—';
-  const d = new Date(fecha + 'T12:00:00');
+  const d = new Date(`${toISODate(fecha) || fecha}T12:00:00`);
   const day = d.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
   return hora ? `${day} · ${hora}` : day;
 };
@@ -656,6 +797,15 @@ const escHtml = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCod
 const fmtDateTime = (d) => d.toLocaleString('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 const AUTO_ACTOR = 'Automático';
+
+const STATUS_ORDER = ['pending', 'confirmed', 'saldado', 'completed', 'cancelled'];
+const HISTORY_STATUSES = new Set(['completed', 'cancelled']);
+
+// toISOString() usa UTC: en Chile cambia de día a las 21:00 y haría "pasado" el viaje de hoy.
+const localToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 const statusLabel = { pending: 'Pendiente', confirmed: 'Confirmada', saldado: 'Saldada', completed: 'Completada', cancelled: 'Cancelada' };
 
@@ -723,9 +873,11 @@ document.querySelectorAll('.header__nav-btn').forEach(btn => {
     btn.classList.add('active');
     const view = btn.dataset.view;
     el('view-reservations').hidden = view !== 'reservations';
+    el('view-manual').hidden       = view !== 'manual';
     el('view-drivers').hidden      = view !== 'drivers';
     el('view-stats').hidden        = view !== 'stats';
     if (view === 'stats') loadStats();
+    if (view === 'manual') renderManualDriverOptions();
   });
 });
 
@@ -762,18 +914,7 @@ function _fsToVal(val) {
 const _fsBase = () => `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
 // Usa :commit porque solo ahí Firestore puede sellar updatedAt con la hora del servidor;
 // el reloj de cada dispositivo no sirve para detectar cuál cambio es el más reciente.
-async function _fsUpdate(coll, docId, fields, token) {
-  const write = {
-    update: {
-      name: `projects/${firebaseConfig.projectId}/databases/(default)/documents/${coll}/${docId}`,
-      fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, _fsToVal(v)])),
-    },
-    updateMask: { fieldPaths: Object.keys(fields) },
-    currentDocument: { exists: true },
-  };
-  if (coll === 'reservations') {
-    write.updateTransforms = [{ fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' }];
-  }
+async function _fsCommit(write, token) {
   const res = await fetch(`${_fsBase()}:commit`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -783,6 +924,33 @@ async function _fsUpdate(coll, docId, fields, token) {
     const errBody = await res.json().catch(() => ({}));
     throw new Error(errBody.error?.message || `Error ${res.status}`);
   }
+}
+const _fsDocName = (coll, docId) => `projects/${firebaseConfig.projectId}/databases/(default)/documents/${coll}/${docId}`;
+const _fsFields  = (data) => Object.fromEntries(Object.entries(data).map(([k, v]) => [k, _fsToVal(v)]));
+
+async function _fsCreateReservation(data, token) {
+  const docId = crypto.randomUUID().replace(/-/g, '');
+  await _fsCommit({
+    update: { name: _fsDocName('reservations', docId), fields: _fsFields(data) },
+    currentDocument: { exists: false },
+    updateTransforms: [
+      { fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' },
+      { fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' },
+    ],
+  }, token);
+  return docId;
+}
+
+async function _fsUpdate(coll, docId, fields, token) {
+  const write = {
+    update: { name: _fsDocName(coll, docId), fields: _fsFields(fields) },
+    updateMask: { fieldPaths: Object.keys(fields) },
+    currentDocument: { exists: true },
+  };
+  if (coll === 'reservations') {
+    write.updateTransforms = [{ fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' }];
+  }
+  await _fsCommit(write, token);
 }
 
 // Los ID tokens de Firebase duran 60 min; se renuevan con 10 min de margen.
@@ -880,7 +1048,7 @@ async function _restRefresh() {
 }
 
 async function _autoCancelOldPending(token) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const toCancel = Object.values(reservations).filter(r =>
     r.status === 'pending' && toISODate(r.fecha) && toISODate(r.fecha) < today
   );
@@ -1035,6 +1203,87 @@ function updateBadges() {
   }
 }
 
+// ── Agrupación de reservas ─────────────────────────────────────────────────
+const timeKey = (hora) => {
+  const m = String(hora || '').match(/(\d{1,2}):(\d{2})/);
+  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : '99:99';
+};
+const byServiceTime = (a, b) => timeKey(a.hora).localeCompare(timeKey(b.hora));
+
+const groupBy = (items, keyOf) => items.reduce((groups, item) => {
+  const key = keyOf(item);
+  groups.set(key, [...(groups.get(key) || []), item]);
+  return groups;
+}, new Map());
+
+function fmtDayHeading(iso) {
+  if (!iso) return 'Sin fecha';
+  const label = new Date(`${iso}T12:00:00`)
+    .toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function renderResCard(r) {
+  const precioNum  = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
+  const precio     = precioNum != null ? fmt(precioNum) : '';
+  const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${escHtml(r.driverName)}</div>` : '';
+  const pagoLine   = (r.abonoRecibido || r.saldoRecibido) ? `
+    <div class="res-card__pagos">
+      ${r.abonoRecibido ? '<span class="pago-badge pago-badge--ok">Abono ✓</span>' : ''}
+      ${r.saldoRecibido ? '<span class="pago-badge pago-badge--ok">Saldo ✓</span>' : ''}
+    </div>` : '';
+  const origen  = (r.origen  || '').split(',')[0];
+  const destino = (r.destino || '').split(',')[0];
+  return `
+    <div class="res-card res-card--${escHtml(r.status)}" data-id="${escHtml(r.id)}">
+      <div>
+        <div class="res-card__name">${escHtml(r.nombre || 'Sin nombre')}</div>
+        <div class="res-card__datetime">${escHtml(fmtDate(r.fecha, r.hora))}</div>
+        <div class="res-card__route">
+          <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(origen)}</span>
+          <span class="res-card__route-arrow">→</span>
+          <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(destino)}</span>
+        </div>
+        ${driverLine}${pagoLine}
+      </div>
+      <div class="res-card__right">
+        <span class="status-badge status-badge--${escHtml(r.status)}">${statusLabel[r.status]}</span>
+        ${precio ? `<span class="res-card__price">${precio}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderResGroup(title, items, modifier = '') {
+  const modifierClass = modifier ? ` res-group__title--${modifier}` : '';
+  return `
+    <section class="res-group">
+      <h3 class="res-group__title${modifierClass}">
+        <span>${escHtml(title)}</span>
+        <span class="res-group__count">${items.length}</span>
+      </h3>
+      <div class="reservations-list">${[...items].sort(byServiceTime).map(renderResCard).join('')}</div>
+    </section>`;
+}
+
+// Las pestañas activas muestran primero lo próximo; el historial, lo más reciente.
+function renderDayGroups(items) {
+  const newestFirst = HISTORY_STATUSES.has(currentStatus);
+  const days = [...groupBy(items, r => toISODate(r.fecha)).entries()].sort(([a], [b]) => {
+    if (!a || !b) return a ? -1 : b ? 1 : 0;
+    return newestFirst ? b.localeCompare(a) : a.localeCompare(b);
+  });
+  return days.map(([iso, dayItems]) => renderResGroup(fmtDayHeading(iso), dayItems)).join('');
+}
+
+function renderStatusGroups(items) {
+  const groups = groupBy(items, r => r.status);
+  const statuses = [...STATUS_ORDER, ...[...groups.keys()].filter(s => !STATUS_ORDER.includes(s))];
+  return statuses
+    .filter(s => groups.has(s))
+    .map(s => renderResGroup(statusLabel[s] || s || 'Sin estado', groups.get(s), STATUS_ORDER.includes(s) ? s : ''))
+    .join('');
+}
+
 // ── Render reservations ────────────────────────────────────────────────────
 function renderReservations() {
   const list = el('reservations-list');
@@ -1053,7 +1302,6 @@ function renderReservations() {
     el('day-earnings-value').textContent = fmt(total);
     el('day-earnings-count').textContent = `(${dayItems.length} viaje${dayItems.length !== 1 ? 's' : ''})`;
     el('btn-download-csv').hidden = false;
-    items.sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
   } else {
     items = Object.values(reservations).filter(r => r.status === currentStatus);
     el('day-earnings-box').hidden = true;
@@ -1068,35 +1316,7 @@ function renderReservations() {
     return;
   }
 
-  list.innerHTML = items.map(r => {
-    const precioNum  = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
-    const precio     = precioNum != null ? fmt(precioNum) : '';
-    const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${escHtml(r.driverName)}</div>` : '';
-    const pagoLine   = (r.abonoRecibido || r.saldoRecibido) ? `
-      <div class="res-card__pagos">
-        ${r.abonoRecibido ? '<span class="pago-badge pago-badge--ok">Abono ✓</span>' : ''}
-        ${r.saldoRecibido ? '<span class="pago-badge pago-badge--ok">Saldo ✓</span>' : ''}
-      </div>` : '';
-    const origen  = (r.origen  || '').split(',')[0];
-    const destino = (r.destino || '').split(',')[0];
-    return `
-      <div class="res-card res-card--${escHtml(r.status)}" data-id="${escHtml(r.id)}">
-        <div>
-          <div class="res-card__name">${escHtml(r.nombre || 'Sin nombre')}</div>
-          <div class="res-card__datetime">${escHtml(fmtDate(r.fecha, r.hora))}</div>
-          <div class="res-card__route">
-            <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(origen)}</span>
-            <span class="res-card__route-arrow">→</span>
-            <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(destino)}</span>
-          </div>
-          ${driverLine}${pagoLine}
-        </div>
-        <div class="res-card__right">
-          <span class="status-badge status-badge--${escHtml(r.status)}">${statusLabel[r.status]}</span>
-          ${precio ? `<span class="res-card__price">${precio}</span>` : ''}
-        </div>
-      </div>`;
-  }).join('');
+  list.innerHTML = currentDateFilter ? renderStatusGroups(items) : renderDayGroups(items);
 
   list.querySelectorAll('.res-card').forEach(card => {
     card.addEventListener('click', () => openDetail(card.dataset.id));
@@ -1220,6 +1440,7 @@ function renderDetail(r) {
       <div class="detail-meta">
         <span class="status-badge status-badge--${escHtml(r.status)}">${statusLabel[r.status]}</span>
         <span>${escHtml(fmtDate(r.fecha, r.hora))}</span>
+        ${r.fuente === 'manual' ? '<span>Ingreso manual</span>' : ''}
       </div>
       ${lastChange ? `<div class="detail-meta">${lastChange}</div>` : ''}
     </div>
@@ -1564,6 +1785,101 @@ function renderEditForm(r) {
     await dbUpdate('reservations', r.id, fields);
   });
 }
+
+// ── Ingreso manual de viajes ───────────────────────────────────────────────
+function renderManualDriverOptions() {
+  const select = el('mt-driver');
+  const selected = select.value;
+  const options = Object.values(drivers)
+    .filter(d => d.activo !== false)
+    .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+    .map(d => `<option value="${escHtml(d.id)}">${escHtml(d.nombre)}</option>`)
+    .join('');
+  select.innerHTML = `<option value="">Sin asignar</option>${options}`;
+  select.value = selected;
+}
+
+function readManualTrip() {
+  const value = (id) => el(id).value.trim();
+  const stops = value('mt-paradas').split('\n').map(s => s.trim()).filter(Boolean);
+  const driver = drivers[value('mt-driver')];
+  const status = value('mt-status');
+  const isSettled = status === 'saldado';
+  const precio = value('mt-precio');
+  return {
+    status,
+    fuente:          'manual',
+    updatedBy:       window._fbEmail || '',
+    driverId:        driver?.id ?? null,
+    driverName:      driver?.nombre ?? null,
+    nombre:          value('mt-nombre'),
+    telefono:        value('mt-telefono'),
+    telefono2:       value('mt-telefono2'),
+    email:           value('mt-email'),
+    fecha:           value('mt-fecha'),
+    hora:            value('mt-hora'),
+    fechaCliente:    value('mt-fecha'),
+    horaCliente:     value('mt-hora'),
+    origen:          value('mt-origen'),
+    destino:         value('mt-destino'),
+    paradaAdicional: stops.join(' | '),
+    paradas:         String(stops.length),
+    personas:        value('mt-personas'),
+    marcaModelo:     value('mt-marcamodelo'),
+    patente:         value('mt-patente'),
+    transmision:     value('mt-transmision'),
+    seguro:          value('mt-seguro'),
+    codigoDescuento: value('mt-alianza').toUpperCase(),
+    precioManual:    precio === '' ? null : Number(precio),
+    abonoRecibido:   isSettled,
+    saldoRecibido:   isSettled,
+    cotizacion:      null,
+  };
+}
+
+function validateManualTrip(trip) {
+  const required = ['nombre', 'telefono', 'fecha', 'hora', 'origen', 'destino'];
+  if (required.some(k => !trip[k])) return 'Completa todos los campos obligatorios.';
+  if (trip.status === 'pending' && trip.fecha < localToday()) {
+    return 'Un viaje con fecha pasada no puede quedar Pendiente porque se cancelaría automáticamente. Elige otro estado.';
+  }
+  return '';
+}
+
+function showManualTrip(status) {
+  if (currentDateFilter) el('date-filter-clear').click();
+  document.querySelector('.header__nav-btn[data-view="reservations"]').click();
+  document.querySelector(`.status-tab[data-status="${status}"]`).click();
+}
+
+el('manual-trip-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = el('manual-error');
+  const submit  = el('manual-submit');
+  const trip    = readManualTrip();
+  const problem = validateManualTrip(trip);
+  errorEl.hidden = !problem;
+  errorEl.textContent = problem;
+  if (problem) return;
+
+  submit.disabled = true;
+  submit.textContent = 'Guardando…';
+  try {
+    await _ensureFreshToken();
+    await _fsCreateReservation(trip, window._fbToken);
+    el('manual-trip-form').reset();
+    await _restRefresh();
+    showManualTrip(trip.status);
+    toast('✓ Viaje ingresado', 'success');
+  } catch (err) {
+    console.error('Manual trip error:', err);
+    errorEl.textContent = `No se pudo guardar el viaje: ${err.message || 'intenta de nuevo'}`;
+    errorEl.hidden = false;
+  } finally {
+    submit.disabled = false;
+    submit.textContent = 'Guardar viaje';
+  }
+});
 
 // ── Drivers ────────────────────────────────────────────────────────────────
 el('add-driver-form').addEventListener('submit', async (e) => {
