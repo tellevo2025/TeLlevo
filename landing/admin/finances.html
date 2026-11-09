@@ -615,6 +615,8 @@ const firebaseConfig = {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const el  = id => document.getElementById(id);
+// Las reservas llegan del formulario público: todo valor insertado en HTML pasa por aquí.
+const escHtml = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = n => n != null
   ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
   : '—';
@@ -937,13 +939,13 @@ function renderViajes() {
     const orig = (r.origen || '').split(',')[0];
     const dest = (r.destino || '').split(',')[0];
     const km   = r.cotizacion?.distanciaKm ? `${r.cotizacion.distanciaKm} km` : '—';
-    return `<tr data-status="${r.status}">
-      <td class="td-mono">${fmtDate(r.fecha)}${r.hora ? `<br><span style="color:var(--muted);font-size:.75rem">${r.hora}</span>` : ''}</td>
-      <td><div style="font-weight:500">${r.nombre || '—'}</div><div style="font-size:.75rem;color:var(--muted)">${r.telefono || ''}</div></td>
-      <td class="route-cell"><span>${orig}</span><span class="route-arrow">↓</span><span>${dest}</span></td>
-      <td class="td-muted">${km}</td>
-      <td class="td-muted">${r.driverName || '—'}</td>
-      <td><span class="status-chip ${chipClass[r.status] || ''}">${statusLabel[r.status] || r.status}</span></td>
+    return `<tr data-status="${escHtml(r.status)}">
+      <td class="td-mono">${fmtDate(r.fecha)}${r.hora ? `<br><span style="color:var(--muted);font-size:.75rem">${escHtml(r.hora)}</span>` : ''}</td>
+      <td><div style="font-weight:500">${escHtml(r.nombre || '—')}</div><div style="font-size:.75rem;color:var(--muted)">${escHtml(r.telefono || '')}</div></td>
+      <td class="route-cell"><span>${escHtml(orig)}</span><span class="route-arrow">↓</span><span>${escHtml(dest)}</span></td>
+      <td class="td-muted">${escHtml(km)}</td>
+      <td class="td-muted">${escHtml(r.driverName || '—')}</td>
+      <td><span class="status-chip ${chipClass[r.status] || ''}">${escHtml(statusLabel[r.status] || r.status)}</span></td>
       <td class="td-price">${precio != null ? fmt(precio) : '—'}</td>
     </tr>`;
   }).join('');
@@ -1010,15 +1012,15 @@ function renderGastos() {
   el('gastos-list').innerHTML = items.map(g => `
     <div class="expense-item">
       <div>
-        <div class="expense-name">${catLabel[g.categoria] || g.categoria}${g.nota ? ` — ${g.nota}` : ''}</div>
-        <div class="expense-meta">${fmtDate(g.fecha)} · Pagó: <strong>${g.quienPago}</strong>${g.reembolsoA ? ` · Reembolsar a: ${g.reembolsoA}` : ''}</div>
+        <div class="expense-name">${escHtml(catLabel[g.categoria] || g.categoria)}${g.nota ? ` — ${escHtml(g.nota)}` : ''}</div>
+        <div class="expense-meta">${fmtDate(g.fecha)} · Pagó: <strong>${escHtml(g.quienPago)}</strong>${g.reembolsoA ? ` · Reembolsar a: ${escHtml(g.reembolsoA)}` : ''}</div>
       </div>
       <div>
         <div class="expense-amount">−${fmt(g.monto)}</div>
-        ${g.reembolsoA ? `<div class="expense-reembolso">↩ ${g.reembolsoA}</div>` : ''}
+        ${g.reembolsoA ? `<div class="expense-reembolso">↩ ${escHtml(g.reembolsoA)}</div>` : ''}
       </div>
       <div class="expense-actions">
-        <button class="btn-ghost" style="font-size:.75rem;color:var(--cancelled)" data-del-gasto="${g.id}">Eliminar</button>
+        <button class="btn-ghost" style="font-size:.75rem;color:var(--cancelled)" data-del-gasto="${escHtml(g.id)}">Eliminar</button>
       </div>
     </div>`).join('');
 
@@ -1096,18 +1098,18 @@ function renderChoferes() {
             return `<div class="driver-trip-row">
               <div class="driver-trip-date">${fmtDate(r.fecha)}</div>
               <div class="driver-trip-route">
-                <span>${orig}</span>
-                <span style="color:var(--muted);font-size:.72rem">→ ${dest}</span>
+                <span>${escHtml(orig)}</span>
+                <span style="color:var(--muted);font-size:.72rem">→ ${escHtml(dest)}</span>
               </div>
               ${paid
                 ? `<div class="driver-trip-amount driver-trip-amount--paid">${fmt(monto)}</div>`
-                : `<input type="number" class="trip-monto-input" data-trip-input="${r.id}"
-                    value="${monto}" min="0" step="1000"
+                : `<input type="number" class="trip-monto-input" data-trip-input="${escHtml(r.id)}"
+                    value="${escHtml(monto)}" min="0" step="1000"
                     style="width:88px;background:var(--bg);border:1px solid var(--border);border-radius:6px;
                            padding:5px 7px;color:var(--text);font-family:inherit;font-size:.82rem;text-align:right;outline:none">`
               }
               <button class="pay-btn ${paid ? 'pay-btn--paid' : 'pay-btn--pending'}"
-                data-pay-trip="${r.id}" data-paid="${paid}">
+                data-pay-trip="${escHtml(r.id)}" data-paid="${paid}">
                 ${paid ? '✓' : 'Pagar'}
               </button>
             </div>`;
@@ -1119,7 +1121,7 @@ function renderChoferes() {
               ${weekAllPaid
                 ? `<span style="font-size:.78rem;color:var(--completed);font-weight:600">✓ Pagado</span>`
                 : `<button class="pay-btn pay-btn--pending" style="font-size:.75rem;padding:5px 10px"
-                    data-pay-all="${driverId}" data-ids="${pending.map(r=>r.id).join(',')}">
+                    data-pay-all="${escHtml(driverId)}" data-ids="${escHtml(pending.map(r=>r.id).join(','))}">
                     Pagar semana ${fmt(weekPendingAmt)}
                   </button>`
               }
@@ -1131,7 +1133,7 @@ function renderChoferes() {
       return `<div class="driver-debt-card">
         <div class="driver-debt-header">
           <div>
-            <div class="driver-debt-name">${driverName}</div>
+            <div class="driver-debt-name">${escHtml(driverName)}</div>
             <div class="driver-debt-meta">${allTrips.length} viaje${allTrips.length !== 1 ? 's' : ''} · ${fmt(tarifa)}/servicio</div>
           </div>
           <div class="driver-debt-total ${allPaid ? 'driver-debt-total--paid' : ''}">
@@ -1193,17 +1195,17 @@ function renderChoferes() {
   cfgList.innerHTML = driverItems.map(d => `
     <div class="driver-config-item">
       <div>
-        <div class="driver-config-name">${d.nombre}${d.esSocio ? ' <span class="socio-badge">Socio</span>' : ''}</div>
+        <div class="driver-config-name">${escHtml(d.nombre)}${d.esSocio ? ' <span class="socio-badge">Socio</span>' : ''}</div>
         <div style="font-size:.78rem;color:var(--muted)">${d.activo !== false ? 'Activo' : 'Inactivo'}</div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)">
-        <input type="checkbox" ${d.esSocio ? 'checked' : ''} data-socio="${d.id}" style="accent-color:var(--gold);width:16px;height:16px">
+        <input type="checkbox" ${d.esSocio ? 'checked' : ''} data-socio="${escHtml(d.id)}" style="accent-color:var(--gold);width:16px;height:16px">
         Socio
       </label>
       <div class="driver-config-tarifa">
         <span style="font-size:.8rem;color:var(--muted)">$</span>
-        <input type="number" value="${d.tarifaPorServicio ?? 20000}" min="0" step="1000" data-tarifa="${d.id}">
-        <button class="btn-secondary" style="padding:7px 11px;font-size:.8rem" data-save-driver="${d.id}">Guardar</button>
+        <input type="number" value="${escHtml(d.tarifaPorServicio ?? 20000)}" min="0" step="1000" data-tarifa="${escHtml(d.id)}">
+        <button class="btn-secondary" style="padding:7px 11px;font-size:.8rem" data-save-driver="${escHtml(d.id)}">Guardar</button>
       </div>
     </div>`).join('');
 

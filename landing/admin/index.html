@@ -650,7 +650,7 @@ const fmtDate = (fecha, hora) => {
   return hora ? `${day} · ${hora}` : day;
 };
 
-// fechaCliente y horaCliente llegan del formulario público: nunca insertarlas sin escapar.
+// Las reservas y cotizaciones llegan del formulario público: todo valor insertado en HTML pasa por aquí.
 const escHtml = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 const fmtDateTime = (d) => d.toLocaleString('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -1071,7 +1071,7 @@ function renderReservations() {
   list.innerHTML = items.map(r => {
     const precioNum  = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
     const precio     = precioNum != null ? fmt(precioNum) : '';
-    const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${r.driverName}</div>` : '';
+    const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${escHtml(r.driverName)}</div>` : '';
     const pagoLine   = (r.abonoRecibido || r.saldoRecibido) ? `
       <div class="res-card__pagos">
         ${r.abonoRecibido ? '<span class="pago-badge pago-badge--ok">Abono ✓</span>' : ''}
@@ -1080,19 +1080,19 @@ function renderReservations() {
     const origen  = (r.origen  || '').split(',')[0];
     const destino = (r.destino || '').split(',')[0];
     return `
-      <div class="res-card res-card--${r.status}" data-id="${r.id}">
+      <div class="res-card res-card--${escHtml(r.status)}" data-id="${escHtml(r.id)}">
         <div>
-          <div class="res-card__name">${r.nombre || 'Sin nombre'}</div>
-          <div class="res-card__datetime">${fmtDate(r.fecha, r.hora)}</div>
+          <div class="res-card__name">${escHtml(r.nombre || 'Sin nombre')}</div>
+          <div class="res-card__datetime">${escHtml(fmtDate(r.fecha, r.hora))}</div>
           <div class="res-card__route">
-            <span style="overflow:hidden;text-overflow:ellipsis">${origen}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(origen)}</span>
             <span class="res-card__route-arrow">→</span>
-            <span style="overflow:hidden;text-overflow:ellipsis">${destino}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(destino)}</span>
           </div>
           ${driverLine}${pagoLine}
         </div>
         <div class="res-card__right">
-          <span class="status-badge status-badge--${r.status}">${statusLabel[r.status]}</span>
+          <span class="status-badge status-badge--${escHtml(r.status)}">${statusLabel[r.status]}</span>
           ${precio ? `<span class="res-card__price">${precio}</span>` : ''}
         </div>
       </div>`;
@@ -1136,7 +1136,7 @@ function renderDetail(r) {
 
   const driverOptions = Object.values(drivers)
     .filter(d => d.activo !== false)
-    .map(d => `<option value="${d.id}" ${r.driverId === d.id ? 'selected' : ''}>${d.nombre}</option>`)
+    .map(d => `<option value="${escHtml(d.id)}" ${r.driverId === d.id ? 'selected' : ''}>${escHtml(d.nombre)}</option>`)
     .join('');
 
   const wspSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
@@ -1216,10 +1216,10 @@ function renderDetail(r) {
 
   body.innerHTML = `
     <div class="detail-header-info">
-      <div class="detail-name">${r.nombre || 'Sin nombre'}</div>
+      <div class="detail-name">${escHtml(r.nombre || 'Sin nombre')}</div>
       <div class="detail-meta">
-        <span class="status-badge status-badge--${r.status}">${statusLabel[r.status]}</span>
-        <span>${fmtDate(r.fecha, r.hora)}</span>
+        <span class="status-badge status-badge--${escHtml(r.status)}">${statusLabel[r.status]}</span>
+        <span>${escHtml(fmtDate(r.fecha, r.hora))}</span>
       </div>
       ${lastChange ? `<div class="detail-meta">${lastChange}</div>` : ''}
     </div>
@@ -1227,22 +1227,22 @@ function renderDetail(r) {
     <div class="detail-section">
       <div class="detail-section__title">Viaje</div>
       ${clientDateChanged ? `<div class="detail-row"><span class="detail-row__label">Fecha pedida por el cliente</span><span class="detail-row__value">${escHtml(fmtDate(r.fechaCliente, r.horaCliente))}</span></div>` : ''}
-      <div class="detail-row detail-row--block"><span class="detail-row__label">Origen</span><span class="detail-row__value">${r.origen || '—'}</span></div>
-      <div class="detail-row detail-row--block"><span class="detail-row__label">Destino</span><span class="detail-row__value">${r.destino || '—'}</span></div>
-      ${dist ? `<div class="detail-row"><span class="detail-row__label">Distancia</span><span class="detail-row__value">${dist}</span></div>` : ''}
-      ${r.paradaAdicional ? `<div class="detail-row detail-row--block"><span class="detail-row__label">Parada adicional</span><span class="detail-row__value">${r.paradaAdicional}</span></div>` : ''}
-      ${r.personas ? `<div class="detail-row"><span class="detail-row__label">Personas</span><span class="detail-row__value">${r.personas}</span></div>` : ''}
-      ${r.patente ? `<div class="detail-row"><span class="detail-row__label">Patente</span><span class="detail-row__value">${r.patente}</span></div>` : ''}
-      ${r.marcaModelo ? `<div class="detail-row"><span class="detail-row__label">Vehículo</span><span class="detail-row__value">${r.marcaModelo}</span></div>` : ''}
-      ${r.transmision ? `<div class="detail-row"><span class="detail-row__label">Transmisión</span><span class="detail-row__value">${r.transmision}</span></div>` : ''}
-      ${r.seguro ? `<div class="detail-row"><span class="detail-row__label">Seguro</span><span class="detail-row__value">${r.seguro}</span></div>` : ''}
+      <div class="detail-row detail-row--block"><span class="detail-row__label">Origen</span><span class="detail-row__value">${escHtml(r.origen || '—')}</span></div>
+      <div class="detail-row detail-row--block"><span class="detail-row__label">Destino</span><span class="detail-row__value">${escHtml(r.destino || '—')}</span></div>
+      ${dist ? `<div class="detail-row"><span class="detail-row__label">Distancia</span><span class="detail-row__value">${escHtml(dist)}</span></div>` : ''}
+      ${r.paradaAdicional ? `<div class="detail-row detail-row--block"><span class="detail-row__label">Parada adicional</span><span class="detail-row__value">${escHtml(r.paradaAdicional)}</span></div>` : ''}
+      ${r.personas ? `<div class="detail-row"><span class="detail-row__label">Personas</span><span class="detail-row__value">${escHtml(r.personas)}</span></div>` : ''}
+      ${r.patente ? `<div class="detail-row"><span class="detail-row__label">Patente</span><span class="detail-row__value">${escHtml(r.patente)}</span></div>` : ''}
+      ${r.marcaModelo ? `<div class="detail-row"><span class="detail-row__label">Vehículo</span><span class="detail-row__value">${escHtml(r.marcaModelo)}</span></div>` : ''}
+      ${r.transmision ? `<div class="detail-row"><span class="detail-row__label">Transmisión</span><span class="detail-row__value">${escHtml(r.transmision)}</span></div>` : ''}
+      ${r.seguro ? `<div class="detail-row"><span class="detail-row__label">Seguro</span><span class="detail-row__value">${escHtml(r.seguro)}</span></div>` : ''}
     </div>
 
     <div class="detail-section">
       <div class="detail-section__title">Cliente</div>
-      <div class="detail-row"><span class="detail-row__label">Email</span><span class="detail-row__value">${r.email || '—'}</span></div>
-      <div class="detail-row"><span class="detail-row__label">Teléfono</span><span class="detail-row__value">${r.telefono || '—'}</span></div>
-      ${r.telefono2 ? `<div class="detail-row"><span class="detail-row__label">Teléfono 2</span><span class="detail-row__value">${r.telefono2}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-row__label">Email</span><span class="detail-row__value">${escHtml(r.email || '—')}</span></div>
+      <div class="detail-row"><span class="detail-row__label">Teléfono</span><span class="detail-row__value">${escHtml(r.telefono || '—')}</span></div>
+      ${r.telefono2 ? `<div class="detail-row"><span class="detail-row__label">Teléfono 2</span><span class="detail-row__value">${escHtml(r.telefono2)}</span></div>` : ''}
     </div>
 
     <div class="detail-section">
@@ -1254,7 +1254,7 @@ function renderDetail(r) {
       ${precioManual != null ? `<div class="detail-row"><span class="detail-row__label">Precio manual</span><span class="detail-row__value detail-row__value--gold">${fmt(precioManual)}</span></div>` : ''}
       <p class="action-label" style="margin-top:10px">${precioFinal != null ? 'Ajustar precio:' : 'Sin precio — ingresa uno manualmente:'}</p>
       <div class="price-manual-row">
-        <input type="number" id="manual-price-input" placeholder="Ej: 35000" value="${r.precioManual != null ? r.precioManual : (precioAuto != null ? precioAuto : '')}" min="0" step="1000">
+        <input type="number" id="manual-price-input" placeholder="Ej: 35000" value="${escHtml(r.precioManual ?? precioAuto ?? '')}" min="0" step="1000">
         <button class="btn-secondary" id="action-save-price">Guardar</button>
       </div>
     </div>
@@ -1330,7 +1330,7 @@ function renderDetail(r) {
     box.id = 'driver-confirm-box';
     box.style.cssText = 'background:rgba(201,168,76,.1);border:1px solid var(--gold);border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;flex-direction:column;gap:8px';
     box.innerHTML = `
-      <div style="font-size:.83rem;color:var(--text)">¿Asignar <strong style="color:var(--gold)">${driver.nombre}</strong> a este viaje?</div>
+      <div style="font-size:.83rem;color:var(--text)">¿Asignar <strong style="color:var(--gold)">${escHtml(driver.nombre)}</strong> a este viaje?</div>
       <div style="display:flex;gap:8px">
         <button id="assign-confirm-yes" class="btn-primary" style="flex:1;padding:7px 0;font-size:.82rem">✓ Confirmar</button>
         <button id="assign-confirm-no" class="btn-secondary" style="flex:1;padding:7px 0;font-size:.82rem">✗ Cancelar</button>
@@ -1451,7 +1451,6 @@ el('detail-edit-btn').addEventListener('click', () => {
 function renderEditForm(r) {
   isEditing = true;
   const body = el('detail-body');
-  const esc  = (v) => String(v ?? '').replace(/"/g, '&quot;');
 
   // Parse existing stops from paradaAdicional ("addr1 | addr2 | ...")
   const existingStops = (r.paradaAdicional || '')
@@ -1460,32 +1459,32 @@ function renderEditForm(r) {
   body.innerHTML = `
     <div class="edit-form">
       <div class="edit-field"><label>Nombre</label>
-        <input id="ef-nombre" value="${esc(r.nombre)}"></div>
+        <input id="ef-nombre" value="${escHtml(r.nombre)}"></div>
       <div class="edit-field"><label>Teléfono</label>
-        <input id="ef-telefono" type="tel" value="${esc(r.telefono)}"></div>
+        <input id="ef-telefono" type="tel" value="${escHtml(r.telefono)}"></div>
       <div class="edit-field"><label>Teléfono 2</label>
-        <input id="ef-telefono2" type="tel" value="${esc(r.telefono2)}"></div>
+        <input id="ef-telefono2" type="tel" value="${escHtml(r.telefono2)}"></div>
       <div class="edit-field"><label>Email</label>
-        <input id="ef-email" type="email" value="${esc(r.email)}"></div>
+        <input id="ef-email" type="email" value="${escHtml(r.email)}"></div>
       <div class="edit-field"><label>Fecha (dd/mm/aaaa)</label>
-        <input id="ef-fecha" value="${esc(r.fecha)}"></div>
+        <input id="ef-fecha" value="${escHtml(r.fecha)}"></div>
       <div class="edit-field"><label>Hora</label>
-        <input id="ef-hora" value="${esc(r.hora)}"></div>
+        <input id="ef-hora" value="${escHtml(r.hora)}"></div>
       <div class="edit-field"><label>Origen (Centro de eventos)</label>
-        <textarea id="ef-origen">${r.origen ?? ''}</textarea></div>
+        <textarea id="ef-origen">${escHtml(r.origen)}</textarea></div>
       <div class="edit-field"><label>Destino</label>
-        <textarea id="ef-destino">${r.destino ?? ''}</textarea></div>
+        <textarea id="ef-destino">${escHtml(r.destino)}</textarea></div>
       <div class="edit-field">
         <label>Paradas <span id="ef-stops-count" style="color:var(--gold);font-weight:700">${existingStops.length}</span></label>
         <div id="ef-stops-list"></div>
         <button type="button" class="btn-secondary" id="ef-add-stop" style="margin-top:6px;width:100%">+ Añadir parada</button>
       </div>
       <div class="edit-field"><label>Nº personas</label>
-        <input id="ef-personas" type="number" min="1" value="${esc(r.personas)}"></div>
+        <input id="ef-personas" type="number" min="1" value="${escHtml(r.personas)}"></div>
       <div class="edit-field"><label>Vehículo (Marca y Modelo)</label>
-        <input id="ef-marcamodelo" value="${esc(r.marcaModelo)}"></div>
+        <input id="ef-marcamodelo" value="${escHtml(r.marcaModelo)}"></div>
       <div class="edit-field"><label>Patente</label>
-        <input id="ef-patente" value="${esc(r.patente)}"></div>
+        <input id="ef-patente" value="${escHtml(r.patente)}"></div>
       <div class="edit-field"><label>Transmisión</label>
         <select id="ef-transmision">
           <option value="">No especifica</option>
@@ -1499,7 +1498,7 @@ function renderEditForm(r) {
           <option value="No" ${r.seguro === 'No' ? 'selected' : ''}>No</option>
         </select></div>
       <div class="edit-field"><label>Alianza / Código descuento</label>
-        <input id="ef-alianza" value="${esc(r.codigoDescuento)}"></div>
+        <input id="ef-alianza" value="${escHtml(r.codigoDescuento)}"></div>
       <div class="edit-actions">
         <button class="btn-secondary" id="ef-cancel">Cancelar</button>
         <button class="btn-primary" id="ef-save">Guardar cambios</button>
@@ -1513,7 +1512,7 @@ function renderEditForm(r) {
     const list = el('ef-stops-list');
     list.innerHTML = stopsData.map((s, i) => `
       <div style="display:flex;gap:6px;margin-bottom:6px" data-stop-row="${i}">
-        <input class="ef-stop-inp" data-idx="${i}" value="${s.replace(/"/g, '&quot;')}"
+        <input class="ef-stop-inp" data-idx="${i}" value="${escHtml(s)}"
           placeholder="Dirección de parada ${i + 1}" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:16px;font-family:inherit;outline:none">
         <button type="button" class="ef-stop-del btn-danger" data-idx="${i}"
           style="padding:8px 11px;border-radius:8px;flex-shrink:0">✕</button>
@@ -1589,15 +1588,15 @@ function renderDrivers() {
   }
   list.innerHTML = items.map(d => `
     <div class="driver-item">
-      <div class="driver-avatar">${(d.nombre || '?')[0].toUpperCase()}</div>
+      <div class="driver-avatar">${escHtml((d.nombre || '?')[0].toUpperCase())}</div>
       <div class="driver-info">
-        <div class="driver-name">${d.nombre}</div>
-        ${d.telefono ? `<div class="driver-phone">${d.telefono}</div>` : ''}
+        <div class="driver-name">${escHtml(d.nombre)}</div>
+        ${d.telefono ? `<div class="driver-phone">${escHtml(d.telefono)}</div>` : ''}
       </div>
-      <button class="driver-toggle driver-toggle--${d.activo !== false ? 'active' : 'inactive'}" data-id="${d.id}">
+      <button class="driver-toggle driver-toggle--${d.activo !== false ? 'active' : 'inactive'}" data-id="${escHtml(d.id)}">
         ${d.activo !== false ? 'Activo' : 'Inactivo'}
       </button>
-      <button class="driver-delete" data-id="${d.id}" title="Eliminar">
+      <button class="driver-delete" data-id="${escHtml(d.id)}" title="Eliminar">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </button>
     </div>`).join('');
