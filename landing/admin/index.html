@@ -650,6 +650,13 @@ const fmtDate = (fecha, hora) => {
   return hora ? `${day} · ${hora}` : day;
 };
 
+// fechaCliente y horaCliente llegan del formulario público: nunca insertarlas sin escapar.
+const escHtml = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+const fmtDateTime = (d) => d.toLocaleString('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+const AUTO_ACTOR = 'Automático';
+
 const statusLabel = { pending: 'Pendiente', confirmed: 'Confirmada', saldado: 'Saldada', completed: 'Completada', cancelled: 'Cancelada' };
 
 const el  = (id) => document.getElementById(id);
@@ -821,9 +828,10 @@ async function _fsDel(coll, docId, token) {
 async function dbUpdate(coll, docId, fields) {
   try {
     await _ensureFreshToken();
-    await _fsUpdate(coll, docId, fields, window._fbToken);
+    const stamped = coll === 'reservations' ? { ...fields, updatedBy: window._fbEmail || '' } : fields;
+    await _fsUpdate(coll, docId, stamped, window._fbToken);
     if (coll === 'reservations' && reservations[docId]) {
-      reservations[docId] = { ...reservations[docId], ...fields };
+      reservations[docId] = { ...reservations[docId], ...stamped, updatedAt: new Date() };
       renderReservations(); updateBadges();
       if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
     }
@@ -878,9 +886,9 @@ async function _autoCancelOldPending(token) {
   );
   if (!toCancel.length) return;
   await Promise.all(toCancel.map(r =>
-    _fsUpdate('reservations', r.id, { status: 'cancelled' }, token)
+    _fsUpdate('reservations', r.id, { status: 'cancelled', updatedBy: AUTO_ACTOR }, token)
   ));
-  toCancel.forEach(r => { reservations[r.id].status = 'cancelled'; });
+  toCancel.forEach(r => { reservations[r.id].status = 'cancelled'; reservations[r.id].updatedBy = AUTO_ACTOR; });
 }
 
 function startListeners(idToken) {
@@ -1120,6 +1128,11 @@ function renderDetail(r) {
   const precioManual = r.precioManual != null ? Number(r.precioManual) : null;
   const precioFinal  = precioManual ?? precioAuto;
   const dist         = r.cotizacion?.distanciaKm ? `${r.cotizacion.distanciaKm} km` : null;
+  const clientDateChanged = r.fechaCliente
+    && (toISODate(r.fechaCliente) !== toISODate(r.fecha) || (r.horaCliente || '') !== (r.hora || ''));
+  const lastChange = r.updatedBy && r.updatedAt instanceof Date
+    ? `Último cambio: ${escHtml(r.updatedBy)} · ${fmtDateTime(r.updatedAt)}`
+    : '';
 
   const driverOptions = Object.values(drivers)
     .filter(d => d.activo !== false)
@@ -1208,10 +1221,12 @@ function renderDetail(r) {
         <span class="status-badge status-badge--${r.status}">${statusLabel[r.status]}</span>
         <span>${fmtDate(r.fecha, r.hora)}</span>
       </div>
+      ${lastChange ? `<div class="detail-meta">${lastChange}</div>` : ''}
     </div>
 
     <div class="detail-section">
       <div class="detail-section__title">Viaje</div>
+      ${clientDateChanged ? `<div class="detail-row"><span class="detail-row__label">Fecha pedida por el cliente</span><span class="detail-row__value">${escHtml(fmtDate(r.fechaCliente, r.horaCliente))}</span></div>` : ''}
       <div class="detail-row detail-row--block"><span class="detail-row__label">Origen</span><span class="detail-row__value">${r.origen || '—'}</span></div>
       <div class="detail-row detail-row--block"><span class="detail-row__label">Destino</span><span class="detail-row__value">${r.destino || '—'}</span></div>
       ${dist ? `<div class="detail-row"><span class="detail-row__label">Distancia</span><span class="detail-row__value">${dist}</span></div>` : ''}
