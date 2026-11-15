@@ -392,6 +392,7 @@ const showResult = (type) => {
   });
 
   if (type === 'success') {
+    fillBookingTicket();
     try {
       const q = JSON.parse(document.getElementById('cotizacion-data').value || '{}');
       const quoteEl = document.getElementById('result-quote');
@@ -528,7 +529,8 @@ const initForm = () => {
       return;
     }
 
-    const result = await sendReservation({
+    // La secuencia animada corre en paralelo al envío y fija su duración mínima
+    const [result] = await Promise.all([sendReservation({
       _token:       FORM_TOKEN,
       codigoDescuento: (document.getElementById('codigoDescuento')?.value || '').trim().toUpperCase(),
       fechaViaje:   document.getElementById('fechaViaje').value,
@@ -553,7 +555,7 @@ const initForm = () => {
       transmision:  document.getElementById('transmision').value,
       seguro:       document.getElementById('seguro').value,
       cotizacionData: document.getElementById('cotizacion-data').value,
-    });
+    }), playBookingSequence()]);
     setLoading(false);
     showResult(result === '✅' ? 'success' : result === '⛔' ? 'full' : 'error');
   });

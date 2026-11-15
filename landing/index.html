@@ -16,8 +16,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/main.css">
+  <link rel="stylesheet" href="src/styles/premium.css">
 </head>
 <body>
+
+  <div class="scroll-progress" aria-hidden="true"></div>
 
   <!-- ==========================================
      NAVBAR
@@ -149,6 +152,12 @@
        HERO
     ========================================== -->
     <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__scene" aria-hidden="true">
+        <span class="hero__streak hero__streak--1"></span>
+        <span class="hero__streak hero__streak--2"></span>
+        <span class="hero__streak hero__streak--3"></span>
+        <span class="hero__streak hero__streak--4"></span>
+      </div>
       <div class="hero__container">
         <p class="hero__eyebrow">Choferes de Reemplazo · Chile</p>
         <h1 class="hero__title" id="hero-title">
@@ -168,23 +177,70 @@
             Cotizar precio
           </a>
         </div>
+        <div class="hero-route" aria-hidden="true">
+          <span class="hero-route__label">Tu evento</span>
+          <svg class="hero-route__map" viewBox="0 0 300 48" xmlns="http://www.w3.org/2000/svg">
+            <path class="hero-route__path" d="M10 36 C 90 0, 210 0, 290 36"/>
+            <path class="hero-route__progress" d="M10 36 C 90 0, 210 0, 290 36" pathLength="1"/>
+            <circle class="hero-route__pin" cx="10" cy="36" r="5"/>
+            <circle class="hero-route__pin hero-route__pin--home" cx="290" cy="36" r="5"/>
+            <circle class="hero-route__car" r="5"/>
+          </svg>
+          <span class="hero-route__label">Tu casa</span>
+        </div>
         <ul class="hero__stats" role="list" aria-label="Estadísticas del servicio">
           <li class="hero__stat">
-            <span class="hero__stat-number">+250</span>
+            <span class="hero__stat-number" data-count-to="250" data-count-prefix="+">+250</span>
             <span class="hero__stat-label">Clientes felices</span>
           </li>
           <li class="hero__stat-divider" aria-hidden="true"></li>
           <li class="hero__stat">
-            <span class="hero__stat-number">94.8%</span>
+            <span class="hero__stat-number" data-count-to="94.8" data-count-decimals="1" data-count-suffix="%">94.8%</span>
             <span class="hero__stat-label">Puntualidad</span>
           </li>
           <li class="hero__stat-divider" aria-hidden="true"></li>
           <li class="hero__stat">
-            <span class="hero__stat-number">4.87★</span>
+            <span class="hero__stat-number" data-count-to="4.87" data-count-decimals="2" data-count-suffix="★">4.87★</span>
             <span class="hero__stat-label">Calificación</span>
           </li>
         </ul>
       </div>
+    </section>
+
+    <!-- ==========================================
+       FRANJA DE CONFIANZA
+    ========================================== -->
+    <section class="trust" aria-label="Garantías del servicio">
+      <ul class="trust__list" role="list">
+        <li class="trust__item">
+          <span class="trust__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+          <div>
+            <p class="trust__title">Choferes verificados</p>
+            <p class="trust__text">Antecedentes revisados antes de sumarse al equipo.</p>
+          </div>
+        </li>
+        <li class="trust__item">
+          <span class="trust__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M5 11l2-5h10l2 5"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg></span>
+          <div>
+            <p class="trust__title">Tu auto protegido</p>
+            <p class="trust__text">Cubrimos el deducible de tu seguro si el siniestro es imputable al chofer.</p>
+          </div>
+        </li>
+        <li class="trust__item">
+          <span class="trust__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></span>
+          <div>
+            <p class="trust__title">Disponibles 24/7</p>
+            <p class="trust__text">Madrugadas, fines de semana y festivos.</p>
+          </div>
+        </li>
+        <li class="trust__item">
+          <span class="trust__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+          <div>
+            <p class="trust__title">Precio claro</p>
+            <p class="trust__text">Cotiza al instante, sin cargos ocultos.</p>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <!-- ==========================================
@@ -199,7 +255,7 @@
         </header>
 
         <ol class="steps" role="list">
-          <li class="step reveal reveal--d1">
+          <li data-spotlight class="step reveal reveal--d1">
             <span class="step__num" aria-hidden="true">1</span>
             <div class="step__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
@@ -215,7 +271,7 @@
               <p class="step__text">Ingresa fecha, horario, direcciones y datos de tu vehículo en minutos.</p>
             </div>
           </li>
-          <li class="step reveal reveal--d2">
+          <li data-spotlight class="step reveal reveal--d2">
             <span class="step__num" aria-hidden="true">2</span>
             <div class="step__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
@@ -230,7 +286,7 @@
               <p class="step__text">Te contactamos por WhatsApp con el valor y los detalles de tu servicio.</p>
             </div>
           </li>
-          <li class="step reveal reveal--d3">
+          <li data-spotlight class="step reveal reveal--d3">
             <span class="step__num" aria-hidden="true">3</span>
             <div class="step__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
@@ -244,7 +300,7 @@
               <p class="step__text">Confirma tu reserva con un pago simple y seguro por transferencia.</p>
             </div>
           </li>
-          <li class="step reveal reveal--d4">
+          <li data-spotlight class="step reveal reveal--d4">
             <span class="step__num" aria-hidden="true">4</span>
             <div class="step__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
@@ -278,7 +334,7 @@
 
         <div class="services__grid">
 
-          <a href="#reserva" class="service-card service-card--sm reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
+          <a href="#reserva" data-spotlight class="service-card service-card--sm reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
             <div class="service-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
                 <rect x="3" y="13" width="26" height="12" rx="3" stroke="currentColor" stroke-width="2"/>
@@ -294,7 +350,7 @@
             </div>
           </a>
 
-          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--sm service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
+          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" data-spotlight class="service-card service-card--sm service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
             <div class="service-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
                 <circle cx="11" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
@@ -309,7 +365,7 @@
             </div>
           </a>
 
-          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20cotizar%20el%20servicio%20de%20Valet%20Parking.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--sm service-card--alt reveal reveal--d3" aria-label="Valet Parking — Contactar por WhatsApp">
+          <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20cotizar%20el%20servicio%20de%20Valet%20Parking.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" data-spotlight class="service-card service-card--sm service-card--alt reveal reveal--d3" aria-label="Valet Parking — Contactar por WhatsApp">
             <div class="service-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
                 <rect x="2" y="10" width="28" height="14" rx="3" stroke="currentColor" stroke-width="2"/>
@@ -885,15 +941,92 @@
 
         </form>
 
-        <div class="booking-loading" id="booking-loading" hidden aria-live="polite" aria-label="Enviando reserva">
-          <img src="src/assets/logo.png.png" alt="TeLlevo" class="booking-loading__logo">
-          <p class="booking-loading__text">Reservando…</p>
+        <div class="booking-loading" id="booking-loading" hidden role="status" aria-live="polite" data-stage="0">
+          <div class="journey" aria-hidden="true">
+            <span class="journey__light journey__light--1"></span>
+            <span class="journey__light journey__light--2"></span>
+            <span class="journey__light journey__light--3"></span>
+            <svg class="journey__car" viewBox="0 0 270 64" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="journey-beam" x1="0" x2="1" y1="0" y2="0">
+                  <stop class="journey__beam-stop" offset="0" stop-opacity=".5"/>
+                  <stop class="journey__beam-stop" offset="1" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path class="journey__beam" d="M191 38 L268 22 L268 60 L191 43 Z" fill="url(#journey-beam)"/>
+              <path class="journey__body" d="M8 44 C8 38 12 34 20 33 L46 30 C58 19 72 13 92 13 L114 13 C130 13 142 20 154 29 L178 33 C188 34.5 192 38 192 43 L192 46 Q192 49 189 49 L164 49 A12 12 0 0 0 140 49 L60 49 A12 12 0 0 0 36 49 L11 49 Q8 49 8 46 Z"/>
+              <path class="journey__glass" d="M56 29 C66 21 76 17.5 92 17 L100 17 L100 29 Z"/>
+              <path class="journey__glass" d="M105 17 L114 17 C126 17.5 136 22 146 29 L105 29 Z"/>
+              <g class="journey__wheel">
+                <circle class="journey__tyre" cx="48" cy="49" r="9"/>
+                <path class="journey__spokes" d="M48 42v14M41 49h14"/>
+              </g>
+              <g class="journey__wheel">
+                <circle class="journey__tyre" cx="152" cy="49" r="9"/>
+                <path class="journey__spokes" d="M152 42v14M145 49h14"/>
+              </g>
+              <circle class="journey__headlight" cx="189" cy="40" r="2.5"/>
+              <rect class="journey__taillight" x="8.5" y="37" width="3" height="5" rx="1"/>
+            </svg>
+            <span class="journey__road"></span>
+          </div>
+          <p class="booking-loading__text" id="booking-loading-text">Recibiendo tu solicitud…</p>
+          <div class="booking-loading__steps" aria-hidden="true">
+            <span class="booking-loading__dot"></span>
+            <span class="booking-loading__dot"></span>
+            <span class="booking-loading__dot"></span>
+          </div>
+          <p class="booking-loading__sub">Estamos preparando tu viaje.</p>
         </div>
 
         <div class="booking-result booking-result--success" id="result-success" hidden role="status" aria-live="polite">
-          <div class="booking-result__icon" aria-hidden="true">✦</div>
+          <div class="success-seal" aria-hidden="true">
+            <svg class="success-seal__svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+              <circle class="success-seal__ring" cx="40" cy="40" r="36" pathLength="1" transform="rotate(-90 40 40)"/>
+              <path class="success-seal__check" d="M25 41 L36 52 L56 30" pathLength="1"/>
+            </svg>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+            <span class="success-seal__spark"></span>
+          </div>
           <h3 class="booking-result__title">¡Gracias por reservar!</h3>
           <p class="booking-result__text">Recibimos tu solicitud. En unos momentos te contactaremos por WhatsApp con los detalles de tu servicio.</p>
+
+          <!-- Ticket con el resumen del viaje — poblado por JS -->
+          <div class="ticket" id="booking-ticket" hidden>
+            <div class="ticket__head">
+              <span class="ticket__brand">TeLlevo</span>
+              <span class="ticket__tag">Solicitud recibida</span>
+            </div>
+            <div class="ticket__route">
+              <div class="ticket__stop">
+                <span class="ticket__dot" aria-hidden="true"></span>
+                <div>
+                  <span class="ticket__label">Origen</span>
+                  <span class="ticket__value" data-ticket="origin">—</span>
+                </div>
+              </div>
+              <div class="ticket__stop">
+                <span class="ticket__dot ticket__dot--destination" aria-hidden="true"></span>
+                <div>
+                  <span class="ticket__label">Destino</span>
+                  <span class="ticket__value" data-ticket="destination">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="ticket__divider" aria-hidden="true"></div>
+            <dl class="ticket__meta">
+              <div><dt class="ticket__label">Fecha</dt><dd class="ticket__value" data-ticket="date">—</dd></div>
+              <div><dt class="ticket__label">Hora de recogida</dt><dd class="ticket__value" data-ticket="time">—</dd></div>
+              <div><dt class="ticket__label">Vehículo</dt><dd class="ticket__value" data-ticket="vehicle">—</dd></div>
+              <div><dt class="ticket__label">Pasajeros</dt><dd class="ticket__value" data-ticket="passengers">—</dd></div>
+            </dl>
+          </div>
 
           <!-- Desglose de cotización — visible solo tras confirmar reserva -->
           <div class="result-quote" id="result-quote" hidden>
@@ -1108,6 +1241,7 @@
     <span class="whatsapp-fab__label">CONVERSEMOS</span>
   </a>
 
+  <script src="src/js/effects.js" defer></script>
   <script src="src/js/main.js" defer></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=%%GOOGLE_MAPS_KEY%%&libraries=places&callback=initGoogleMaps" async defer></script>
 </body>
