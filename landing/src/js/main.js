@@ -470,7 +470,7 @@ const showResult = (type) => {
       if (telefono2) lines.push(`📞 Segundo Tel: ${telefono2}`);
       lines.push(`📧 Correo: ${correo || '—'}`);
       lines.push(`🤝 Alianza: ${codigo || 'Sin alianza'}`);
-      lines.push(`📅 Fecha: ${fecha || '—'} a las ${hora || '—'}`);
+      lines.push(`📅 Fecha: ${formatTicketDate(fecha) || fecha || '—'} a las ${hora ? `${hora} hrs` : '—'}`);
       lines.push(`🏛 Centro de eventos: ${origen || '—'}`);
       lines.push(`🏠 Destino final: ${destino || '—'}`);
       lines.push(`👥 Nº personas: ${personas || '—'}`);

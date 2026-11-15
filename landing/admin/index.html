@@ -519,6 +519,25 @@
       .funnel-card { min-width: calc(50% - 4px); flex: none; }
       .stats-table th:last-child, .stats-table td:last-child { display: none; }
     }
+    /* ── Datos siempre visibles y sincronización ── */
+    .res-card__meta { font-size: .75rem; color: var(--muted); margin-top: 3px; overflow-wrap: anywhere; }
+    .res-card__meta--missing { color: var(--pending); }
+    .res-card--flash { animation: cardFlash 1.8s ease-out; }
+    @keyframes cardFlash {
+      0%   { box-shadow: 0 0 0 2px var(--gold), 0 0 24px rgba(201,168,76,.5); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    .detail-row__value--missing { color: var(--pending); font-style: italic; }
+    .service-card__client { font-size: .85rem; color: var(--text); overflow-wrap: anywhere; }
+    .service-card__client--missing { color: var(--pending); }
+    .sync-status {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      font-size: .68rem; font-weight: 600; color: var(--muted); white-space: nowrap;
+    }
+    .sync-status__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--completed); box-shadow: 0 0 0 3px rgba(72,187,120,.18); }
+    .sync-status[data-state="offline"] { color: var(--cancelled); }
+    .sync-status[data-state="offline"] .sync-status__dot { background: var(--cancelled); box-shadow: 0 0 0 3px rgba(252,129,129,.18); }
+    @media (max-width: 600px) { .sync-status__label { display: none; } }
   </style>
 </head>
 <body>
@@ -559,6 +578,10 @@
       <button class="header__nav-btn" data-view="drivers">Choferes</button>
       <button class="header__nav-btn" data-view="stats">Estadísticas</button>
     </nav>
+    <span class="sync-status" id="sync-status" data-state="live" role="status">
+      <span class="sync-status__dot" aria-hidden="true"></span>
+      <span class="sync-status__label" id="sync-status-label">En vivo</span>
+    </span>
     <button class="header__logout" id="logout-btn" title="Cerrar sesión">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </button>
@@ -664,7 +687,7 @@
           <select id="mt-transmision">
             <option value="">—</option>
             <option value="Automático">Automático</option>
-            <option value="Manual">Manual</option>
+            <option value="Mecánico">Mecánico</option>
           </select>
         </div>
         <div class="edit-field">
@@ -819,6 +842,11 @@
 // Toda la autenticación y Firestore se hace vía REST API directa.
 // El SDK de Firebase se omite completamente para evitar cuelgues de red.
 
+import {
+  MISSING_LABEL, toISODate, timeKey, hasTime, tripStops, fmtMoney as fmt, tripPrice,
+  transmissionLabel, plateLabel, vehicleSummary, buildDriverMessage, buildClientMessage,
+} from '/admin/trip-format.js';
+
 const GOOGLE_MAPS_KEY = '%%GOOGLE_MAPS_KEY%%';
 
 const firebaseConfig = {
@@ -837,13 +865,11 @@ let unsubReservations = null;
 let unsubDrivers      = null;
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const fmt = (n) => n != null ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n) : '—';
-
 const fmtDate = (fecha, hora) => {
   if (!fecha) return '—';
   const d = new Date(`${toISODate(fecha) || fecha}T12:00:00`);
   const day = d.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
-  return hora ? `${day} · ${hora}` : day;
+  return hasTime(hora) ? `${day} · ${timeKey(hora)}` : day;
 };
 
 // Las reservas y cotizaciones llegan del formulario público: todo valor insertado en HTML pasa por aquí.
@@ -1059,14 +1085,15 @@ async function _fsDel(coll, docId, token) {
 async function dbUpdate(coll, docId, fields) {
   try {
     await _ensureFreshToken();
-    const stamped = coll === 'reservations' ? { ...fields, updatedBy: window._fbEmail || '' } : fields;
+    const stamped = coll === 'reservations' ? { ...fields, updatedBy: window._fbEmail || '', updatedVia: SESSION_ID } : fields;
     await _fsUpdate(coll, docId, stamped, window._fbToken);
     if (coll === 'reservations' && reservations[docId]) {
       reservations[docId] = { ...reservations[docId], ...stamped, updatedAt: new Date() };
       renderReservations(); updateBadges();
       if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
     }
-    _restRefresh().catch(() => {});
+    if (coll === 'drivers') { await _loadDrivers(); renderDrivers(); }
+    else syncChanges();
   } catch (e) {
     console.error('dbUpdate error:', e);
     toast('⚠ Error al guardar: ' + (e.message || 'intenta de nuevo'), 'error');
@@ -1075,7 +1102,9 @@ async function dbUpdate(coll, docId, fields) {
 }
 async function dbAdd(coll, data) {
   await _ensureFreshToken();
-  return await _fsAdd(coll, data, window._fbToken);
+  const id = await _fsAdd(coll, data, window._fbToken);
+  if (coll === 'drivers') { await _loadDrivers(); renderDrivers(); }
+  return id;
 }
 async function dbDel(coll, docId) {
   await _ensureFreshToken();
@@ -1083,32 +1112,94 @@ async function dbDel(coll, docId) {
   await _restRefresh();
 }
 
-let _restPoll = null;
+// ── Sincronización entre dispositivos ──────────────────────────────────────
+// Firestore no ofrece escucha en vivo por REST, así que cada dispositivo pregunta
+// cada pocos segundos solo por las reservas modificadas desde el último cambio visto.
+const SYNC_INTERVAL_MS      = 5000;
+const FALLBACK_INTERVAL_MS  = 30000;
+const FULL_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+const DRIVERS_SYNC_MS       = 60000;
+const SYNC_OVERLAP_MS       = 15000;
+const SYNC_FRESH_MS         = SYNC_INTERVAL_MS + 2000;
+const MAX_CHANGE_TOASTS     = 3;
+// Identifica esta pestaña: varias personas pueden compartir la misma cuenta.
+const SESSION_ID            = crypto.randomUUID();
+
+let _syncTimer        = null;
+let _syncRunning      = null;
+let _lastServerChange = 0;   // updatedAt más reciente visto, según el reloj de Firestore
+let _lastFullSync     = 0;
+let _lastSyncOk       = 0;
+let _lastDriversSync  = 0;
+let _incrementalOk    = true;
+const serverStamps    = new Map();   // id → updatedAt del servidor (ms)
+
+const stampOf = (doc) => (doc.updatedAt instanceof Date ? doc.updatedAt.getTime() : 0);
+
+function trackServerDoc(doc) {
+  reservations[doc.id] = doc;
+  serverStamps.set(doc.id, stampOf(doc));
+  _lastServerChange = Math.max(_lastServerChange, stampOf(doc));
+}
+
+function setSyncState(state) {
+  const badge = el('sync-status');
+  if (!badge) return;
+  badge.dataset.state = state;
+  el('sync-status-label').textContent = state === 'live' ? 'En vivo' : 'Sin conexión';
+}
+
+async function _fsQuery(structuredQuery) {
+  const res = await fetch(`${_fsBase()}:runQuery`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ structuredQuery }),
+  });
+  if (!res.ok) throw new Error(`Firestore ${res.status}`);
+  const rows = await res.json();
+  return (Array.isArray(rows) ? rows : []).filter(x => x.document).map(x => _fsDocToObj(x.document));
+}
+
+async function _loadDrivers() {
+  const res = await fetch(`${_fsBase()}/drivers`, { headers: { 'Authorization': `Bearer ${window._fbToken}` } });
+  if (!res.ok) throw new Error(`Firestore ${res.status}`);
+  const data = await res.json();
+  drivers = {};
+  (data.documents || []).forEach(d => { const obj = _fsDocToObj(d); drivers[obj.id] = obj; });
+  _lastDriversSync = Date.now();
+}
+
+// El detalle solo se redibuja si su reserva cambió, para no borrar lo que el usuario está tocando.
+function renderAll({ detail = false } = {}) {
+  renderReservations(); updateBadges(); renderDrivers(); renderServiceList();
+  if (!el('view-service-list').hidden) loadServiceEtas(el('service-list-date').value);
+  if (detail && selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
+}
+
 async function _restRefresh() {
   if (!window._fbToken) return;
   try {
     await _ensureFreshToken();
-    const token = window._fbToken;
-    const fsBase = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-    const [resData, drvData] = await Promise.all([
-      fetch(`${fsBase}:runQuery`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'reservations' }], orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }], limit: 500 } }),
-      }).then(r => r.json()),
-      fetch(`${fsBase}/drivers`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+    const [docs] = await Promise.all([
+      _fsQuery({
+        from: [{ collectionId: 'reservations' }],
+        orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
+        limit: 500,
+      }),
+      _loadDrivers(),
     ]);
+    const selectedStamp = serverStamps.get(selectedId);
     reservations = {};
-    (Array.isArray(resData) ? resData : []).filter(x => x.document).forEach(x => {
-      const obj = _fsDocToObj(x.document); reservations[obj.id] = obj;
-    });
-    drivers = {};
-    (drvData.documents || []).forEach(d => { const obj = _fsDocToObj(d); drivers[obj.id] = obj; });
-    await _autoCancelOldPending(token);
-    renderReservations(); updateBadges(); renderDrivers(); renderServiceList();
-    if (!el('view-service-list').hidden) loadServiceEtas(el('service-list-date').value);
-    if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
-  } catch (e) { console.error('REST refresh error:', e); }
+    serverStamps.clear();
+    docs.forEach(trackServerDoc);
+    _lastFullSync = _lastSyncOk = Date.now();
+    await _autoCancelOldPending(window._fbToken);
+    renderAll({ detail: serverStamps.get(selectedId) !== selectedStamp });
+    setSyncState('live');
+  } catch (e) {
+    console.error('REST refresh error:', e);
+    setSyncState('offline');
+  }
 }
 
 async function _autoCancelOldPending(token) {
@@ -1118,33 +1209,109 @@ async function _autoCancelOldPending(token) {
   );
   if (!toCancel.length) return;
   await Promise.all(toCancel.map(r =>
-    _fsUpdate('reservations', r.id, { status: 'cancelled', updatedBy: AUTO_ACTOR }, token)
+    _fsUpdate('reservations', r.id, { status: 'cancelled', updatedBy: AUTO_ACTOR, updatedVia: SESSION_ID }, token)
   ));
   toCancel.forEach(r => { reservations[r.id].status = 'cancelled'; reservations[r.id].updatedBy = AUTO_ACTOR; });
+}
+
+function describeChange(before, after) {
+  const name = after.nombre || 'Sin nombre';
+  if (!before) return `🔔 Nueva reserva: ${name}`;
+  const whenChanged = toISODate(before.fecha) !== toISODate(after.fecha) || timeKey(before.hora) !== timeKey(after.hora);
+  if (whenChanged) return `🕐 ${name}: ahora ${fmtDate(after.fecha, after.hora)}`;
+  if (before.status !== after.status) return `${name}: ${statusLabel[after.status] ?? after.status}`;
+  return `Reserva de ${name} actualizada`;
+}
+
+function flashCards(ids) {
+  ids.forEach(id => {
+    document.querySelector(`.res-card[data-id="${CSS.escape(id)}"]`)?.classList.add('res-card--flash');
+  });
+}
+
+function applyRemoteChanges(changed) {
+  const foreign = changed.filter(doc => doc.updatedVia !== SESSION_ID);
+  const messages = foreign.map(doc => describeChange(reservations[doc.id], doc));
+  changed.forEach(trackServerDoc);
+  renderAll({ detail: changed.some(doc => doc.id === selectedId) });
+  flashCards(foreign.map(doc => doc.id));
+  messages.slice(0, MAX_CHANGE_TOASTS).forEach(msg => toast(msg));
+  if (isEditing && foreign.some(doc => doc.id === selectedId)) {
+    toast('⚠ Otra persona modificó esta reserva. Al guardar solo se envían los campos que cambies.', 'error');
+  }
+}
+
+async function _fetchChangedReservations() {
+  const since = new Date(_lastServerChange - SYNC_OVERLAP_MS).toISOString();
+  const docs = await _fsQuery({
+    from: [{ collectionId: 'reservations' }],
+    where: { fieldFilter: { field: { fieldPath: 'updatedAt' }, op: 'GREATER_THAN', value: { timestampValue: since } } },
+    orderBy: [{ field: { fieldPath: 'updatedAt' }, direction: 'ASCENDING' }],
+    limit: 200,
+  });
+  return docs.filter(doc => serverStamps.get(doc.id) !== stampOf(doc));
+}
+
+function scheduleSync() {
+  clearInterval(_syncTimer);
+  const interval = _incrementalOk ? SYNC_INTERVAL_MS : FALLBACK_INTERVAL_MS;
+  _syncTimer = setInterval(() => { if (!document.hidden) syncChanges(); }, interval);
+}
+
+async function _syncOnce() {
+  const needsFull = !_incrementalOk || !_lastServerChange || Date.now() - _lastFullSync > FULL_SYNC_INTERVAL_MS;
+  if (needsFull) return _restRefresh();
+  try {
+    await _ensureFreshToken();
+    let changed;
+    try {
+      changed = await _fetchChangedReservations();
+    } catch (err) {
+      // Si Firestore rechaza la consulta por cambios, se vuelve a la recarga completa periódica.
+      if (!/^Firestore (400|403)$/.test(err.message)) throw err;
+      _incrementalOk = false;
+      scheduleSync();
+      return _restRefresh();
+    }
+    if (Date.now() - _lastDriversSync > DRIVERS_SYNC_MS) { await _loadDrivers(); renderDrivers(); }
+    if (changed.length) applyRemoteChanges(changed);
+    _lastSyncOk = Date.now();
+    setSyncState('live');
+  } catch (e) {
+    console.error('Sync error:', e);
+    setSyncState('offline');
+  }
+}
+
+function syncChanges() {
+  if (!window._fbToken) return Promise.resolve();
+  _syncRunning ??= _syncOnce().finally(() => { _syncRunning = null; });
+  return _syncRunning;
 }
 
 function startListeners(idToken) {
   window._fbToken = idToken;
   _tokenAt = Date.now();
-  _restRefresh();
-  _restPoll = setInterval(_restRefresh, 30000);
+  syncChanges();
+  scheduleSync();
 }
 
 function stopListeners() {
-  if (_restPoll) { clearInterval(_restPoll); _restPoll = null; }
+  clearInterval(_syncTimer);
+  _syncTimer = null;
   reservations = {}; drivers = {};
+  serverStamps.clear();
+  _lastServerChange = 0;
 }
+
+// Los celulares congelan los timers en segundo plano: al volver se sincroniza de inmediato.
+const syncOnResume = () => { if (!document.hidden) syncChanges(); };
+document.addEventListener('visibilitychange', syncOnResume);
+window.addEventListener('focus', syncOnResume);
+window.addEventListener('online', syncOnResume);
+window.addEventListener('pageshow', syncOnResume);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function toISODate(fecha) {
-  if (!fecha) return '';
-  const dmy = fecha.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (dmy) return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
-  const d = new Date(fecha + 'T12:00:00');
-  return isNaN(d) ? '' : d.toISOString().slice(0, 10);
-}
-
 function formatWspPhone(phone) {
   if (!phone) return '';
   const p = phone.replace(/[^0-9]/g, '');
@@ -1154,31 +1321,37 @@ function formatWspPhone(phone) {
   return p;
 }
 
-function buildWspMsg(driver, r) {
-  const stops = (r.paradaAdicional || '').split('|').map(s => s.trim()).filter(Boolean);
-  const l = [];
-  l.push(`Hola ${r.nombre || 'estimado/a'}! `);
-  l.push(`Soy ${driver.nombre}, tu angelito designado😇`);
-  l.push(``);
-  l.push(`🤝 Alianza: ${r.codigoDescuento || 'Sin alianza'}`);
-  l.push(`📅 Fecha: ${r.fecha || '—'} a las ${r.hora || '—'}`);
-  l.push(`📞 Teléfono: ${r.telefono || '—'}`);
-  if (r.telefono2) l.push(`📞 Segundo Tel: ${r.telefono2}`);
-  if (r.email)     l.push(`📧 Correo: ${r.email}`);
-  l.push(`🏛 Centro de eventos: ${r.origen || '—'}`);
-  l.push(`🏠 Destino final: ${r.destino || '—'}`);
-  l.push(`👥 Nº personas: ${r.personas || '—'}`);
-  l.push(`🛑 Nº paradas: ${r.paradas || '0'}`);
-  stops.forEach((s, i) => l.push(`   📍 Parada ${i + 1}: ${s}`));
-  if (r.marcaModelo) l.push(`🚘 Auto: ${r.marcaModelo}`);
-  if (r.patente)     l.push(`🔖 Patente: ${r.patente}`);
-  if (r.transmision) l.push(`⚙️ Transmisión: ${r.transmision}`);
-  if (r.seguro)      l.push(`🛡 Seguro: ${r.seguro}`);
-  l.push(``);
-  l.push(`Gracias por confiar en TeLlevo,`);
-  l.push(`¡Nos vemos!`);
+async function fetchReservation(id) {
+  await _ensureFreshToken();
+  const res = await fetch(`${_fsBase()}/reservations/${id}`, { headers: { 'Authorization': `Bearer ${window._fbToken}` } });
+  if (!res.ok) throw new Error(`Firestore ${res.status}`);
+  return _fsDocToObj(await res.json());
+}
 
-  return l.join('\n');
+const FRESH_FETCH_TIMEOUT_MS = 2500;
+const whatsappUrl = (phone, text) =>
+  `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
+
+/** Abre WhatsApp con el mensaje armado desde la versión más reciente de la reserva. */
+async function openWhatsApp(phone, reservationId, buildMessage) {
+  const isFresh = !document.hidden && Date.now() - _lastSyncOk < SYNC_FRESH_MS;
+  if (isFresh) {
+    window.open(whatsappUrl(phone, buildMessage(reservations[reservationId])), '_blank');
+    return;
+  }
+  // La ventana se abre dentro del clic para que el navegador no la bloquee tras la espera.
+  const win = window.open('', '_blank');
+  let latest = reservations[reservationId];
+  try {
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), FRESH_FETCH_TIMEOUT_MS));
+    latest = await Promise.race([fetchReservation(reservationId), timeout]);
+    trackServerDoc(latest);
+    renderAll({ detail: true });
+  } catch (err) {
+    console.error('Fresh reservation error:', err);
+  }
+  if (win) win.location.href = whatsappUrl(phone, buildMessage(latest));
+  else toast('⚠ El navegador bloqueó la ventana de WhatsApp. Intenta de nuevo.', 'error');
 }
 
 // ── Status tabs ────────────────────────────────────────────────────────────
@@ -1212,11 +1385,11 @@ el('btn-download-csv').addEventListener('click', () => {
   const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const cols = ['Nombre','Teléfono','Teléfono 2','Email','Alianza','Fecha','Hora','Origen','Destino','Personas','Nº Paradas','Parada adicional','Vehículo','Patente','Transmisión','Seguro','Precio','Abono recibido','Saldo recibido','Estado'];
   const rows = items.map(r => {
-    const precio = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio ?? '';
+    const precio = tripPrice(r) ?? '';
     return [
       r.nombre, r.telefono, r.telefono2, r.email, r.codigoDescuento,
-      r.fecha, r.hora, r.origen, r.destino, r.personas, r.paradas, r.paradaAdicional,
-      r.marcaModelo, r.patente, r.transmision, r.seguro,
+      toISODate(r.fecha) || r.fecha, hasTime(r.hora) ? timeKey(r.hora) : r.hora, r.origen, r.destino, r.personas, tripStops(r).length || r.paradas, tripStops(r).join(' | '),
+      r.marcaModelo, plateLabel(r.patente), transmissionLabel(r.transmision), r.seguro,
       precio, r.abonoRecibido ? 'Sí' : 'No', r.saldoRecibido ? 'Sí' : 'No',
       statusLabel[r.status] ?? r.status,
     ].map(esc).join(',');
@@ -1236,11 +1409,11 @@ el('btn-download-all').addEventListener('click', () => {
     const rows = items
       .sort((a, b) => (a.fecha || '').localeCompare(b.fecha || '') || (a.hora || '').localeCompare(b.hora || ''))
       .map(r => {
-        const precio = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio ?? '';
+        const precio = tripPrice(r) ?? '';
         return [
           r.nombre, r.telefono, r.telefono2, r.email, r.codigoDescuento,
-          r.fecha, r.hora, r.origen, r.destino, r.personas, r.paradas, r.paradaAdicional,
-          r.marcaModelo, r.patente, r.transmision, r.seguro,
+          toISODate(r.fecha) || r.fecha, hasTime(r.hora) ? timeKey(r.hora) : r.hora, r.origen, r.destino, r.personas, tripStops(r).length || r.paradas, tripStops(r).join(' | '),
+          r.marcaModelo, plateLabel(r.patente), transmissionLabel(r.transmision), r.seguro,
           precio, r.abonoRecibido ? 'Sí' : 'No', r.saldoRecibido ? 'Sí' : 'No',
           statusLabel[r.status] ?? r.status,
         ].map(esc).join(',');
@@ -1326,10 +1499,6 @@ async function applyReservationPatch(r, patch) {
 }
 
 // ── Agrupación de reservas ─────────────────────────────────────────────────
-const timeKey = (hora) => {
-  const m = String(hora || '').match(/(\d{1,2}):(\d{2})/);
-  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : '99:99';
-};
 const byServiceTime = (a, b) => timeKey(a.hora).localeCompare(timeKey(b.hora));
 
 const groupBy = (items, keyOf) => items.reduce((groups, item) => {
@@ -1346,8 +1515,9 @@ function fmtDayHeading(iso) {
 }
 
 function renderResCard(r) {
-  const precioNum  = r.precioManual ?? r.cotizacion?.total ?? r.cotizacion?.precio;
+  const precioNum  = tripPrice(r);
   const precio     = precioNum != null ? fmt(precioNum) : '';
+  const vehicle    = vehicleSummary(r);
   const driverLine = r.driverName ? `<div class="res-card__driver">🚗 ${escHtml(r.driverName)}</div>` : '';
   const pagoLine   = r.status !== 'saldado' && (r.abonoRecibido || r.saldoRecibido) ? `
     <div class="res-card__pagos">
@@ -1365,6 +1535,8 @@ function renderResCard(r) {
           <span class="res-card__route-arrow">→</span>
           <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(destino)}</span>
         </div>
+        <div class="res-card__meta${r.telefono ? '' : ' res-card__meta--missing'}">📞 ${escHtml(r.telefono || 'Teléfono por confirmar')}</div>
+        <div class="res-card__meta${vehicle ? '' : ' res-card__meta--missing'}">🚘 ${escHtml(vehicle || 'Vehículo por confirmar')}</div>
         ${driverLine}${pagoLine}
       </div>
       <div class="res-card__right">
@@ -1464,6 +1636,15 @@ function closeDetail() {
 el('detail-close').addEventListener('click', closeDetail);
 el('detail-overlay').addEventListener('click', closeDetail);
 
+// Cliente y vehículo se muestran siempre; si falta un dato queda marcado en vez de ocultarse.
+const detailRow = (label, value, modifier = '') => `
+  <div class="detail-row${modifier ? ` detail-row--${modifier}` : ''}">
+    <span class="detail-row__label">${label}</span>
+    ${String(value ?? '').trim()
+      ? `<span class="detail-row__value">${escHtml(value)}</span>`
+      : `<span class="detail-row__value detail-row__value--missing">${MISSING_LABEL}</span>`}
+  </div>`;
+
 function renderDetail(r) {
   if (!r) return;
   const body = el('detail-body');
@@ -1472,8 +1653,8 @@ function renderDetail(r) {
   const precioManual = r.precioManual != null ? Number(r.precioManual) : null;
   const precioFinal  = precioManual ?? precioAuto;
   const dist         = r.cotizacion?.distanciaKm ? `${r.cotizacion.distanciaKm} km` : null;
-  const clientDateChanged = r.fechaCliente
-    && (toISODate(r.fechaCliente) !== toISODate(r.fecha) || (r.horaCliente || '') !== (r.hora || ''));
+  const stops        = tripStops(r);
+  const basePrice    = r.cotizacion?.precioBase ?? r.cotizacion?.base ?? null;
   const lastChange = r.updatedBy && r.updatedAt instanceof Date
     ? `Último cambio: ${escHtml(r.updatedBy)} · ${fmtDateTime(r.updatedAt)}`
     : '';
@@ -1579,28 +1760,33 @@ function renderDetail(r) {
 
     <div class="detail-section">
       <div class="detail-section__title">Viaje</div>
-      ${clientDateChanged ? `<div class="detail-row"><span class="detail-row__label">Fecha pedida por el cliente</span><span class="detail-row__value">${escHtml(fmtDate(r.fechaCliente, r.horaCliente))}</span></div>` : ''}
-      <div class="detail-row detail-row--block"><span class="detail-row__label">Origen</span><span class="detail-row__value">${escHtml(r.origen || '—')}</span></div>
-      <div class="detail-row detail-row--block"><span class="detail-row__label">Destino</span><span class="detail-row__value">${escHtml(r.destino || '—')}</span></div>
+      <div class="detail-row"><span class="detail-row__label">Fecha y hora del servicio</span><span class="detail-row__value detail-row__value--gold">${escHtml(fmtDate(r.fecha, r.hora))}</span></div>
+      ${detailRow('Origen', r.origen, 'block')}
+      ${detailRow('Destino', r.destino, 'block')}
       ${dist ? `<div class="detail-row"><span class="detail-row__label">Distancia</span><span class="detail-row__value">${escHtml(dist)}</span></div>` : ''}
-      ${r.paradaAdicional ? `<div class="detail-row detail-row--block"><span class="detail-row__label">Parada adicional</span><span class="detail-row__value">${escHtml(r.paradaAdicional)}</span></div>` : ''}
-      ${r.personas ? `<div class="detail-row"><span class="detail-row__label">Personas</span><span class="detail-row__value">${escHtml(r.personas)}</span></div>` : ''}
-      ${r.patente ? `<div class="detail-row"><span class="detail-row__label">Patente</span><span class="detail-row__value">${escHtml(r.patente)}</span></div>` : ''}
-      ${r.marcaModelo ? `<div class="detail-row"><span class="detail-row__label">Vehículo</span><span class="detail-row__value">${escHtml(r.marcaModelo)}</span></div>` : ''}
-      ${r.transmision ? `<div class="detail-row"><span class="detail-row__label">Transmisión</span><span class="detail-row__value">${escHtml(r.transmision)}</span></div>` : ''}
-      ${r.seguro ? `<div class="detail-row"><span class="detail-row__label">Seguro</span><span class="detail-row__value">${escHtml(r.seguro)}</span></div>` : ''}
+      ${stops.length ? detailRow(stops.length === 1 ? 'Parada adicional' : 'Paradas adicionales', stops.join(' | '), 'block') : ''}
+      ${detailRow('Personas', r.personas)}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section__title">Vehículo</div>
+      ${detailRow('Marca y modelo', r.marcaModelo)}
+      ${detailRow('Patente', plateLabel(r.patente))}
+      ${detailRow('Transmisión', transmissionLabel(r.transmision))}
+      ${detailRow('Seguro', r.seguro)}
     </div>
 
     <div class="detail-section">
       <div class="detail-section__title">Cliente</div>
-      <div class="detail-row"><span class="detail-row__label">Email</span><span class="detail-row__value">${escHtml(r.email || '—')}</span></div>
-      <div class="detail-row"><span class="detail-row__label">Teléfono</span><span class="detail-row__value">${escHtml(r.telefono || '—')}</span></div>
-      ${r.telefono2 ? `<div class="detail-row"><span class="detail-row__label">Teléfono 2</span><span class="detail-row__value">${escHtml(r.telefono2)}</span></div>` : ''}
+      ${detailRow('Nombre', r.nombre)}
+      ${detailRow('Teléfono', r.telefono)}
+      ${r.telefono2 ? detailRow('Teléfono 2', r.telefono2) : ''}
+      ${detailRow('Email', r.email)}
     </div>
 
     <div class="detail-section">
       <div class="detail-section__title">Precio</div>
-      ${r.cotizacion?.base != null ? `<div class="detail-row"><span class="detail-row__label">Base</span><span class="detail-row__value">${fmt(r.cotizacion.base)}</span></div>` : ''}
+      ${basePrice != null ? `<div class="detail-row"><span class="detail-row__label">Base</span><span class="detail-row__value">${fmt(basePrice)}</span></div>` : ''}
       ${r.cotizacion?.costoParadas != null && r.cotizacion.costoParadas > 0 ? `<div class="detail-row"><span class="detail-row__label">Paradas</span><span class="detail-row__value">+ ${fmt(r.cotizacion.costoParadas)}</span></div>` : ''}
       ${r.cotizacion?.descuento != null && r.cotizacion.descuento > 0 ? `<div class="detail-row"><span class="detail-row__label">Descuento</span><span class="detail-row__value">− ${fmt(r.cotizacion.descuento)}</span></div>` : ''}
       ${precioAuto != null ? `<div class="detail-row"><span class="detail-row__label">Total cotizado</span><span class="detail-row__value detail-row__value--gold">${fmt(precioAuto)}</span></div>` : ''}
@@ -1739,60 +1925,15 @@ function renderDetail(r) {
     if (!driver.telefono) { alert(`El chofer ${driver.nombre} no tiene teléfono registrado`); return; }
     const phone = formatWspPhone(driver.telefono);
     if (!phone) { alert('Número de teléfono inválido'); return; }
-    const msg = buildWspMsg(driver, r);
-    const wspUrl = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(msg)}&type=phone_number&app_absent=0`;
-    window.open(wspUrl, '_blank');
+    openWhatsApp(phone, r.id, (latest) => buildDriverMessage(driver, latest));
   });
 
   el('action-wsp-client')?.addEventListener('click', () => {
     if (!r.telefono) { alert('El cliente no tiene teléfono registrado'); return; }
     const phone = formatWspPhone(r.telefono);
     if (!phone) { alert('Número de teléfono inválido'); return; }
-    const msg = buildWspClientMsg(r);
-    const wspUrl = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(msg)}&type=phone_number&app_absent=0`;
-    window.open(wspUrl, '_blank');
+    openWhatsApp(phone, r.id, buildClientMessage);
   });
-}
-
-function buildWspClientMsg(r) {
-  const precioAuto   = r.cotizacion?.total ?? r.cotizacion?.precio ?? null;
-  const precioManual = r.precioManual != null ? Number(r.precioManual) : null;
-  const precioFinal  = precioManual ?? precioAuto;
-  const dist         = r.cotizacion?.distanciaKm;
-  const precioBase   = r.cotizacion?.precioBase;
-  const firstName    = (r.nombre || 'cliente').split(' ')[0];
-  const stops        = (r.paradaAdicional || '').split('|').map(s => s.trim()).filter(Boolean);
-
-  const l = [
-    `Hola ${firstName}! ¿Cómo estás?`,
-    `Te habla Joaquín de TeLlevo.🚗😇`,
-    ``,
-    `Te comparto los datos del viaje que registraste:`,
-    ``,
-    `🤝 Alianza: ${r.codigoDescuento || 'Sin alianza'}`,
-    `📅 Fecha: ${r.fecha || '—'} a las ${r.hora || '—'}`,
-    `📞 Teléfono: ${r.telefono || '—'}`,
-    `📧 Correo: ${r.email || '—'}`,
-    `🏛 Centro de eventos: ${r.origen || '—'}`,
-    `🏠 Destino final: ${r.destino || '—'}`,
-    `👥 Nº personas: ${r.personas || '—'}`,
-    `🛑 Nº paradas: ${r.paradas || '0'}`,
-  ];
-  stops.forEach((s, i) => l.push(`   📍 Parada ${i + 1}: ${s}`));
-  if (r.marcaModelo) l.push(`🚘 Auto: ${r.marcaModelo}`);
-  if (r.patente)     l.push(`🔖 Patente: ${r.patente}`);
-  if (r.transmision) l.push(`⚙️ Transmisión: ${r.transmision}`);
-  if (r.seguro)      l.push(`🛡 Seguro: ${r.seguro}`);
-  if (dist || precioBase || precioFinal) {
-    l.push(``);
-    l.push(`── COTIZACIÓN ──────────────`);
-    if (dist)        l.push(`📏 Distancia: ${dist} km`);
-    if (precioBase)  l.push(`💵 Precio base: ${fmt(precioBase)}`);
-    if (precioFinal) l.push(`💰 TOTAL ESTIMADO: ${fmt(precioFinal)}`);
-  }
-  l.push(``);
-  l.push(`¿Deseas confirmar y realizar el pago para asegurar tu chofer de reemplazo? 🙌`);
-  return l.join('\n');
 }
 
 // ── Edit form ──────────────────────────────────────────────────────────────
@@ -1800,13 +1941,35 @@ el('detail-edit-btn').addEventListener('click', () => {
   if (selectedId && reservations[selectedId]) renderEditForm(reservations[selectedId]);
 });
 
+// Valores tal como se muestran en el formulario. Comparar contra ellos permite guardar
+// solo lo que el usuario cambió, sin pisar ediciones hechas desde otro dispositivo.
+const editableFields = (r) => {
+  const stops = tripStops(r);
+  return {
+    nombre:          String(r.nombre ?? '').trim(),
+    telefono:        String(r.telefono ?? '').trim(),
+    telefono2:       String(r.telefono2 ?? '').trim(),
+    email:           String(r.email ?? '').trim(),
+    fecha:           toISODate(r.fecha),
+    hora:            hasTime(r.hora) ? timeKey(r.hora) : '',
+    origen:          String(r.origen ?? '').trim(),
+    destino:         String(r.destino ?? '').trim(),
+    paradaAdicional: stops.join(' | '),
+    paradas:         String(stops.length),
+    personas:        String(r.personas ?? '').trim(),
+    marcaModelo:     String(r.marcaModelo ?? '').trim(),
+    patente:         plateLabel(r.patente),
+    transmision:     transmissionLabel(r.transmision),
+    seguro:          String(r.seguro ?? '').trim(),
+    codigoDescuento: String(r.codigoDescuento ?? '').trim().toUpperCase(),
+  };
+};
+
 function renderEditForm(r) {
   isEditing = true;
   const body = el('detail-body');
-
-  // Parse existing stops from paradaAdicional ("addr1 | addr2 | ...")
-  const existingStops = (r.paradaAdicional || '')
-    .split('|').map(s => s.trim()).filter(Boolean);
+  const original = editableFields(r);
+  const existingStops = tripStops(r);
 
   body.innerHTML = `
     <div class="edit-form">
@@ -1818,10 +1981,10 @@ function renderEditForm(r) {
         <input id="ef-telefono2" type="tel" value="${escHtml(r.telefono2)}"></div>
       <div class="edit-field"><label>Email</label>
         <input id="ef-email" type="email" value="${escHtml(r.email)}"></div>
-      <div class="edit-field"><label>Fecha (dd/mm/aaaa)</label>
-        <input id="ef-fecha" value="${escHtml(r.fecha)}"></div>
-      <div class="edit-field"><label>Hora</label>
-        <input id="ef-hora" value="${escHtml(r.hora)}"></div>
+      <div class="edit-field"><label>Fecha del servicio</label>
+        <input id="ef-fecha" type="date" value="${escHtml(original.fecha)}"></div>
+      <div class="edit-field"><label>Hora del servicio</label>
+        <input id="ef-hora" type="time" value="${escHtml(original.hora)}"></div>
       <div class="edit-field"><label>Origen (Centro de eventos)</label>
         <textarea id="ef-origen">${escHtml(r.origen)}</textarea></div>
       <div class="edit-field"><label>Destino</label>
@@ -1832,16 +1995,16 @@ function renderEditForm(r) {
         <button type="button" class="btn-secondary" id="ef-add-stop" style="margin-top:6px;width:100%">+ Añadir parada</button>
       </div>
       <div class="edit-field"><label>Nº personas</label>
-        <input id="ef-personas" type="number" min="1" value="${escHtml(r.personas)}"></div>
+        <input id="ef-personas" type="text" inputmode="numeric" value="${escHtml(original.personas)}"></div>
       <div class="edit-field"><label>Vehículo (Marca y Modelo)</label>
         <input id="ef-marcamodelo" value="${escHtml(r.marcaModelo)}"></div>
       <div class="edit-field"><label>Patente</label>
-        <input id="ef-patente" value="${escHtml(r.patente)}"></div>
+        <input id="ef-patente" value="${escHtml(original.patente)}" style="text-transform:uppercase"></div>
       <div class="edit-field"><label>Transmisión</label>
         <select id="ef-transmision">
           <option value="">No especifica</option>
-          <option value="Automático" ${r.transmision === 'Automático' ? 'selected' : ''}>Automático</option>
-          <option value="Manual" ${r.transmision === 'Manual' ? 'selected' : ''}>Manual</option>
+          <option value="Automático" ${original.transmision === 'Automático' ? 'selected' : ''}>Automático</option>
+          <option value="Mecánico" ${original.transmision === 'Mecánico' ? 'selected' : ''}>Mecánico</option>
         </select></div>
       <div class="edit-field"><label>Seguro</label>
         <select id="ef-seguro">
@@ -1907,13 +2070,29 @@ function renderEditForm(r) {
       paradas:         String(stops.length),
       personas:        el('ef-personas').value.trim(),
       marcaModelo:     el('ef-marcamodelo').value.trim(),
-      patente:         el('ef-patente').value.trim(),
+      patente:         plateLabel(el('ef-patente').value),
       transmision:     el('ef-transmision').value,
       seguro:          el('ef-seguro').value,
       codigoDescuento: el('ef-alianza').value.trim().toUpperCase(),
     };
-    isEditing = false;
-    await dbUpdate('reservations', r.id, fields);
+    const problem = !fields.nombre || !fields.telefono ? 'Nombre y teléfono son obligatorios.'
+      : !fields.fecha || !fields.hora ? 'Indica la fecha y la hora del servicio.'
+      : '';
+    const restoreButton = () => { btn.disabled = false; btn.textContent = 'Guardar cambios'; };
+    if (problem) { toast(`⚠ ${problem}`, 'error'); restoreButton(); return; }
+
+    const changes = Object.fromEntries(Object.entries(fields).filter(([key, value]) => value !== original[key]));
+    const closeForm = () => { isEditing = false; renderDetail(reservations[r.id] || r); };
+    if (!Object.keys(changes).length) { toast('Sin cambios que guardar'); closeForm(); return; }
+
+    try {
+      await dbUpdate('reservations', r.id, changes);
+    } catch { restoreButton(); return; }
+    closeForm();
+    const saved = reservations[r.id] || r;
+    toast('fecha' in changes || 'hora' in changes
+      ? `✓ Nuevo horario: ${fmtDate(saved.fecha, saved.hora)}. Mensajes y lista del día ya lo usan.`
+      : '✓ Cambios guardados', 'success');
   });
 }
 
@@ -1989,13 +2168,10 @@ function renderServiceStop(label, modifier, address) {
 }
 
 // ── Hora estimada de llegada ───────────────────────────────────────────────
-const NO_STOP_PLACEHOLDER = 'sin parada adicional';
 const etaResults = new Map();
 let etaQueue = Promise.resolve();
 
-const serviceStops = (r) => (r.paradaAdicional || '').split('|')
-  .map(stop => stop.trim())
-  .filter(stop => stop && stop.toLowerCase() !== NO_STOP_PLACEHOLDER);
+const serviceStops = tripStops;
 
 // El resultado solo vale mientras no cambie ningún dato que afecte la ruta.
 const etaKey = (r) => [r.origen, serviceStops(r).join('|'), r.destino, toISODate(r.fecha), timeKey(r.hora)].join('~');
@@ -2092,6 +2268,8 @@ const renderServiceCard = (r) => `
     <div class="service-card__time">${escHtml(serviceTimeLabel(r.hora))}</div>
     <div class="service-card__body">
       <p class="service-card__driver">${escHtml(r.driverName || UNASSIGNED_DRIVER)}</p>
+      <p class="service-card__client">👤 ${escHtml(r.nombre || MISSING_LABEL)} · 📞 ${escHtml(r.telefono || MISSING_LABEL)}</p>
+      <p class="service-card__client${vehicleSummary(r) ? '' : ' service-card__client--missing'}">🚘 ${escHtml(vehicleSummary(r) || 'Vehículo por confirmar')}</p>
       <dl class="service-card__route">
         ${renderServiceStop('Inicio', 'origin', r.origen)}
         ${renderServiceStop('Destino', 'destination', r.destino)}
@@ -2104,6 +2282,9 @@ const toPdfService = (r) => ({
   time: serviceTimeLabel(r.hora),
   driver: r.driverName || UNASSIGNED_DRIVER,
   isUnassigned: !r.driverName,
+  client: r.nombre || MISSING_LABEL,
+  phone: r.telefono || MISSING_LABEL,
+  vehicle: vehicleSummary(r) || 'Vehículo por confirmar',
   origin: parseAddress(r.origen),
   destination: parseAddress(r.destino),
   missingLabel: MISSING_COMUNA,
@@ -2201,7 +2382,7 @@ function readManualTrip() {
     paradas:         String(stops.length),
     personas:        value('mt-personas'),
     marcaModelo:     value('mt-marcamodelo'),
-    patente:         value('mt-patente'),
+    patente:         plateLabel(value('mt-patente')),
     transmision:     value('mt-transmision'),
     seguro:          value('mt-seguro'),
     codigoDescuento: value('mt-alianza').toUpperCase(),

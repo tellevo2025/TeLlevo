@@ -33,11 +33,12 @@ const ADDRESS = { size: 10, lineHeight: 14 };
 const DETAIL_SIZE = 8.5;
 
 const COLUMNS = [
-  { key: 'time', title: 'Hora', width: 56 },
-  { key: 'driver', title: 'Chofer', width: 128 },
-  { key: 'origin', title: 'Inicio', width: 243 },
-  { key: 'destination', title: 'Destino', width: 243 },
-  { key: 'arrival', title: 'Llegada aprox.', width: 124 },
+  { key: 'time', title: 'Hora', width: 50 },
+  { key: 'driver', title: 'Chofer', width: 100 },
+  { key: 'client', title: 'Cliente y vehículo', width: 150 },
+  { key: 'origin', title: 'Inicio', width: 195 },
+  { key: 'destination', title: 'Destino', width: 195 },
+  { key: 'arrival', title: 'Llegada aprox.', width: 104 },
 ];
 
 const REGULAR = 'regular';
@@ -236,6 +237,11 @@ function layoutRow(page, service, y, height, isAlternate) {
     } else if (column.key === 'driver') {
       const color = service.isUnassigned ? COLORS.unassigned : COLORS.text;
       cellHeights.push(layoutWrapped(page, service.driver, cellX, top, width, 11, BOLD, color, 14));
+    } else if (column.key === 'client') {
+      let clientHeight = layoutWrapped(page, service.client, cellX, top, width, ADDRESS.size, BOLD, COLORS.text, ADDRESS.lineHeight);
+      clientHeight += layoutWrapped(page, service.phone, cellX, top + clientHeight, width, DETAIL_SIZE, REGULAR, COLORS.text, 11);
+      clientHeight += layoutWrapped(page, service.vehicle, cellX, top + clientHeight, width, DETAIL_SIZE, REGULAR, COLORS.secondary, 11);
+      cellHeights.push(clientHeight);
     } else if (column.key === 'origin') {
       cellHeights.push(layoutPlace(page, service.origin, COLORS.originChip, missingLabel, cellX, top, width));
     } else if (column.key === 'destination') {

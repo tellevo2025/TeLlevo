@@ -39,6 +39,10 @@ const RATE_WINDOW_MS = 60 * 60 * 1000;
 const RATE_MAX       = 5;
 const normalizeCode  = (c) => (c || '').toUpperCase().replace(/\s+/g, '');
 
+// La landing envía este texto cuando no hay paradas; guardarlo haría que el panel lo cuente como una.
+const NO_STOP_PLACEHOLDER = 'sin parada adicional';
+const normalizeStops = (stops) => (stops.trim().toLowerCase() === NO_STOP_PLACEHOLDER ? '' : stops.trim());
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
@@ -91,8 +95,8 @@ module.exports = async function handler(req, res) {
         origen:          params.get('centroEvento')     || '',
         destino:         params.get('destino')          || '',
         paradas:         params.get('paradas')          || '0',
-        paradaAdicional: params.get('paradaAdicional')  || '',
-        patente:         params.get('patente')          || '',
+        paradaAdicional: normalizeStops(params.get('paradaAdicional') || ''),
+        patente:         (params.get('patente') || '').trim().toUpperCase(),
         marcaModelo:     params.get('marcaModelo')      || '',
         transmision:     params.get('transmision')      || '',
         seguro:          params.get('seguro')           || '',
