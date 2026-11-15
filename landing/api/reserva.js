@@ -1,7 +1,8 @@
 /*
   api/reserva.js — Vercel Serverless Function
   1. Guarda la reserva en Firestore (para el panel admin)
-  2. Reenvía al GAS para emails + Google Calendar (flujo original)
+  2. Reenvía al GAS para emails + Google Calendar, con el ID de la reserva
+     para que el panel pueda actualizar después el mismo evento y la misma fila
 */
 const admin = require('firebase-admin');
 
@@ -75,9 +76,11 @@ module.exports = async function handler(req, res) {
   const quoteId = cotizacion?.quoteId || null;
 
   // ── 1. Guardar en Firestore ──────────────────────────────────────────────
+  let reservationRef = null;
   if (db) {
     try {
-      await db.collection('reservations').add({
+      reservationRef = db.collection('reservations').doc();
+      await reservationRef.set({
         createdAt:    admin.firestore.FieldValue.serverTimestamp(),
         updatedAt:    admin.firestore.FieldValue.serverTimestamp(),
         status:       'pending',
@@ -123,12 +126,30 @@ module.exports = async function handler(req, res) {
       if (cotizacion?.precioBase != null) gasParams.set('precioBase',  String(cotizacion.precioBase));
       if (cotizacion?.descuento  != null) gasParams.set('descuento',   String(cotizacion.descuento));
       if (discountPct > 0)                gasParams.set('descuentoPct', String(discountPct));
+      if (rawCode)                        gasParams.set('alianza', rawCode);
+      if (reservationRef)                 gasParams.set('reservaId', reservationRef.id);
 
-      await fetch(GAS_URL, {
+      const gasText = await fetch(GAS_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body:    gasParams.toString(),
-      });
+      }).then(r => r.text()).then(t => t.trim());
+
+      // Cupo por hora agotado (solo si el Apps Script tiene un límite configurado):
+      // la reserva no debe quedar en el panel si no quedó en la hoja ni en el calendario.
+      if (gasText.startsWith('⛔')) {
+        if (reservationRef) await reservationRef.delete();
+        return res.status(200).setHeader('Content-Type', 'text/plain').send('⛔');
+      }
+      if (reservationRef && gasText.startsWith('✅')) {
+        await reservationRef.update({
+          calendarSync: {
+            fecha:  params.get('fechaViaje') || '',
+            hora:   params.get('horaViaje')  || '',
+            nombre: params.get('nombre')     || '',
+          },
+        });
+      }
     } catch (e) { console.error('GAS forward error:', e.message); }
   }
 

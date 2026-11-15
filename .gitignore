@@ -12,3 +12,6 @@ landing/node_modules/
 Thumbs.db
 
 .vercel
+
+# Apps Script: contiene correos e IDs y el repositorio es público
+apps-script/

@@ -1092,6 +1092,7 @@ async function dbUpdate(coll, docId, fields) {
       renderReservations(); updateBadges();
       if (selectedId && reservations[selectedId] && !isEditing) renderDetail(reservations[selectedId]);
     }
+    if (coll === 'reservations' && Object.keys(fields).some(key => EXTERNAL_FIELDS.has(key))) queueExternalSync(docId);
     if (coll === 'drivers') { await _loadDrivers(); renderDrivers(); }
     else syncChanges();
   } catch (e) {
@@ -1110,6 +1111,41 @@ async function dbDel(coll, docId) {
   await _ensureFreshToken();
   await _fsDel(coll, docId, window._fbToken);
   await _restRefresh();
+}
+
+// ── Hoja de cálculo y Google Calendar ──────────────────────────────────────
+// Los cambios que afectan al evento o a la fila se envían al servidor, que lee la
+// reserva vigente desde Firestore y actualiza ambos mediante el Apps Script.
+const EXTERNAL_FIELDS = new Set([
+  'fecha', 'hora', 'nombre', 'telefono', 'telefono2', 'email', 'origen', 'destino', 'paradas',
+  'paradaAdicional', 'personas', 'marcaModelo', 'patente', 'transmision', 'seguro',
+  'codigoDescuento', 'status', 'driverName', 'precioManual',
+]);
+const EXTERNAL_SYNC_DELAY_MS = 1500;
+const externalSyncTimers = new Map();
+
+async function syncExternal(id) {
+  try {
+    await _ensureFreshToken();
+    const res = await fetch('/api/reserva-sync', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${window._fbToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) throw new Error(`Sync ${res.status}`);
+  } catch (e) {
+    console.error('External sync error:', e);
+    toast('⚠ El cambio se guardó, pero no se pudo actualizar el calendario ni la hoja.', 'error');
+  }
+}
+
+// Varios cambios seguidos sobre la misma reserva se envían una sola vez.
+function queueExternalSync(id) {
+  clearTimeout(externalSyncTimers.get(id));
+  externalSyncTimers.set(id, setTimeout(() => {
+    externalSyncTimers.delete(id);
+    syncExternal(id);
+  }, EXTERNAL_SYNC_DELAY_MS));
 }
 
 // ── Sincronización entre dispositivos ──────────────────────────────────────
@@ -2423,7 +2459,7 @@ el('manual-trip-form').addEventListener('submit', async (e) => {
   submit.textContent = 'Guardando…';
   try {
     await _ensureFreshToken();
-    await _fsCreateReservation(trip, window._fbToken);
+    queueExternalSync(await _fsCreateReservation(trip, window._fbToken));
     el('manual-trip-form').reset();
     await _restRefresh();
     showManualTrip(trip.status);
