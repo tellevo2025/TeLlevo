@@ -7,7 +7,8 @@
 */
 
 const PLACE_ID = 'ChIJmaX7hBxiDgARkS2rsDLSgQI';
-const API_KEY  = process.env.GOOGLE_PLACES_KEY || process.env.GOOGLE_MAPS_KEY || '';
+// Algunas terminales anteponen una marca BOM invisible al guardar la variable; Google la rechaza.
+const API_KEY  = (process.env.GOOGLE_PLACES_KEY || process.env.GOOGLE_MAPS_KEY || '').replace(/^﻿/, '').trim();
 const FIELDS   = 'rating,userRatingCount,reviews,googleMapsUri';
 const TIMEOUT_MS = 6000;
 const MAX_TEXT_LENGTH = 420;
