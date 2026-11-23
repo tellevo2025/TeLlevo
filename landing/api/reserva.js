@@ -26,13 +26,11 @@ const db = admin.apps.length ? admin.firestore() : null;
 const DISCOUNT_CODES = {
   'CASAPARQUELORETO':        10,
   'DIARIOPARAUNANOVIA':      10,
-  'IBANDRA&CRISTOBAL':       15,
   'MIMATRIMONIO':            30,
   'MATRIMONIOSPORMANCAVADA': 15,
   'MATRIFRAN&FABRI':         10,
-  'MATRIMACA&JOACO':         15,
-  'MATRIV&V':                10,
   'SLIER':                   10,
+  'GERMAINE&CHRISTOPHER':    10,
 };
 
 const ipCounts       = new Map();
