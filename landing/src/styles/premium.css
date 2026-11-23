@@ -514,3 +514,237 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 
 .ticket__brand { display: inline-flex; align-items: center; gap: var(--space-2); }
 .ticket__car { width: 44px; height: auto; color: var(--color-gold); }
+
+/* ==========================================
+   9. STATEMENT DE MARCA
+========================================== */
+.statement {
+  position: relative;
+  overflow: hidden;
+  background: var(--gradient-hero);
+  border-bottom: 1px solid var(--color-primary-mid);
+}
+.statement__container {
+  max-width: 1100px; margin: 0 auto;
+  padding: var(--space-8) var(--space-3) var(--space-7);
+  text-align: center;
+}
+.statement__title {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;
+  gap: 0 .3em;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6.5vw, 4.25rem);
+  font-weight: 700; line-height: 1.12;
+  color: var(--color-white);
+}
+.statement__brand { color: var(--color-gold); text-shadow: var(--glow-gold-sm); }
+/* Las frases se apilan en la misma celda: el ancho lo fija la más larga y no hay saltos. */
+.statement__words { display: inline-grid; text-align: left; }
+.statement__word {
+  grid-area: 1 / 1;
+  justify-self: start;
+  position: relative;
+  opacity: 0;
+  transform: translateY(.45em);
+  transition: opacity .5s var(--ease-out-expo), transform .6s var(--ease-out-expo);
+}
+.statement__word::after {
+  content: '';
+  position: absolute; left: 0; bottom: .02em;
+  width: 100%; height: .07em;
+  background: var(--gradient-gold);
+  border-radius: var(--radius-full);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .7s var(--ease-out-expo) .2s;
+}
+.statement__word--active { opacity: 1; transform: none; }
+.statement__word--active::after { transform: scaleX(1); }
+.statement__word--leaving { opacity: 0; transform: translateY(-.45em); }
+.statement__sub {
+  max-width: 620px; margin: var(--space-4) auto 0;
+  font-size: clamp(1rem, 2vw, 1.15rem); line-height: 1.7;
+  color: var(--color-text-muted);
+}
+.statement__road {
+  position: relative;
+  max-width: 560px; height: 40px;
+  margin: var(--space-6) auto 0;
+}
+.statement__road::before {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--gold-a45) 0 22px, transparent 22px 40px);
+}
+.statement__car {
+  position: absolute; left: 0; bottom: 3px;
+  width: 92px; height: auto;
+  color: var(--color-gold);
+  filter: drop-shadow(0 0 6px var(--gold-a45));
+  animation: statementDrive 9s ease-in-out infinite;
+}
+@keyframes statementDrive {
+  0%   { transform: translateX(0); }
+  48%  { transform: translateX(var(--road-travel, 0px)); }
+  50%  { transform: translateX(var(--road-travel, 0px)) scaleX(-1); }
+  98%  { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0); }
+}
+
+/* ==========================================
+   10. CÓMO FUNCIONA — progreso con auto
+========================================== */
+.steps { position: relative; }
+.steps__progress { display: none; }
+.step { transition: border-color var(--transition-base), box-shadow var(--transition-base); }
+.step--lit {
+  border-color: var(--gold-a45);
+  box-shadow: var(--glow-gold-sm);
+}
+.step--lit .step__icon { filter: drop-shadow(0 0 6px rgba(201, 168, 76, .8)); }
+@media (min-width: 1024px) {
+  .steps::after { display: none; }
+  .steps__progress {
+    display: block;
+    position: absolute; top: 26px; left: 12.5%; right: 12.5%;
+    height: 2px;
+    background: var(--color-primary-mid);
+    pointer-events: none;
+  }
+  .steps__progress-fill {
+    position: absolute; inset: 0;
+    background: var(--gradient-gold);
+    box-shadow: var(--glow-gold-sm);
+    transform: scaleX(var(--steps-progress, 0)); transform-origin: left;
+  }
+  .steps__progress-car {
+    position: absolute; top: -21px; left: 0;
+    width: 64px; height: auto;
+    margin-left: -32px;
+    color: var(--color-gold-bright);
+    filter: drop-shadow(0 0 6px var(--gold-a45));
+    transform: translateX(calc(var(--steps-progress, 0) * var(--steps-width, 0px)));
+  }
+}
+
+/* ==========================================
+   11. SERVICIOS — etiquetas y movimiento
+========================================== */
+.service-card__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.service-card__tags li {
+  padding: 2px 10px;
+  border: 1px solid var(--gold-a25); border-radius: var(--radius-full);
+  font-size: .68rem; font-weight: 600; letter-spacing: .04em;
+  color: var(--color-gold-pale);
+  background: var(--gold-a06);
+}
+.service-card--alt .service-card__tags li {
+  border-color: rgba(37, 211, 102, .25);
+  color: #B9F5CF;
+  background: rgba(37, 211, 102, .06);
+}
+.service-card:hover .service-card__icon svg { animation: iconNudge .6s var(--ease-out-expo); }
+@keyframes iconNudge {
+  0%   { transform: translateX(0); }
+  40%  { transform: translateX(5px) rotate(-3deg); }
+  100% { transform: none; }
+}
+
+/* ==========================================
+   12. RESEÑAS DE GOOGLE
+========================================== */
+.google-logo { width: 18px; height: 18px; flex-shrink: 0; }
+.google-stars { color: #FBBC04; letter-spacing: 1px; }
+
+.hero__google {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 0 auto var(--space-4);
+  padding: 6px 14px;
+  border: 1px solid var(--gold-a25); border-radius: var(--radius-full);
+  background: rgba(6, 12, 24, .55);
+  font-size: .82rem; color: var(--color-text-light);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.hero__google:hover { border-color: var(--color-gold); box-shadow: var(--glow-gold-sm); }
+.hero__google-stars { color: #FBBC04; }
+.hero__google strong { color: var(--color-white); }
+
+.google-reviews { margin-bottom: var(--space-7); }
+.google-reviews__summary {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+.google-reviews__brand {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.google-reviews__score { display: flex; align-items: center; gap: var(--space-2); }
+.google-reviews__rating {
+  font-family: var(--font-display);
+  font-size: 2.5rem; line-height: 1;
+  color: var(--color-white);
+}
+.google-reviews__score .google-stars { font-size: 1.2rem; }
+.google-reviews__count { font-size: .9rem; color: var(--color-text-muted); }
+.google-reviews__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); }
+
+/* Carril horizontal con scroll-snap: se recorre con el dedo, la rueda o el teclado. */
+.google-reviews__track {
+  display: grid; grid-auto-flow: column; grid-auto-columns: min(86%, 340px);
+  gap: var(--space-3);
+  padding: 4px 4px var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-mid) transparent;
+}
+.google-reviews[data-state="unavailable"] .google-reviews__track,
+.google-reviews[data-state="empty"] .google-reviews__track { display: none; }
+@media (min-width: 1024px) {
+  .google-reviews__track {
+    grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); grid-auto-columns: auto;
+    overflow: visible;
+  }
+}
+.google-review {
+  display: flex; flex-direction: column; gap: var(--space-3);
+  min-height: 200px;
+  padding: var(--space-4);
+  scroll-snap-align: start;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-mid); border-radius: var(--radius-lg);
+  animation: fadeUp .5s var(--ease-out-expo) both;
+  transition: border-color var(--transition-base), transform var(--transition-base);
+}
+.google-review:hover { border-color: var(--gold-a45); transform: translateY(-3px); }
+.google-review--skeleton {
+  background: linear-gradient(110deg, var(--color-primary-light) 30%, var(--color-primary-mid) 50%, var(--color-primary-light) 70%);
+  background-size: 200% 100%;
+  animation: shimmerGold 1.6s linear infinite;
+}
+.google-review__head { display: flex; align-items: center; gap: var(--space-2); }
+.google-review__avatar {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.google-review__avatar--initial {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-primary-mid);
+  font-weight: 700; color: var(--color-gold);
+}
+.google-review__head > div { display: flex; flex-direction: column; min-width: 0; }
+.google-review__name { font-weight: 600; color: var(--color-white); overflow-wrap: anywhere; }
+a.google-review__name:hover { color: var(--color-gold-bright); }
+.google-review__when { font-size: .78rem; color: var(--color-text-muted); }
+.google-review__text { flex: 1; font-size: .92rem; line-height: 1.65; color: var(--color-text-light); }
+.google-review__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.google-review__link { font-size: .8rem; font-weight: 600; color: var(--color-gold); }
+.google-review__link:hover { color: var(--color-gold-bright); }
+
+@media (prefers-reduced-motion: reduce) {
+  .statement__car { animation: none; }
+  .statement__word { transition: none; }
+}

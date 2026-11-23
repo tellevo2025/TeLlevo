@@ -159,3 +159,79 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountUp();
   initSpotlight();
 });
+
+// ─── STATEMENT DE MARCA ───────────────────────────────────────────────────────
+const STATEMENT_INTERVAL_MS = 2800;
+
+/** Alterna las frases de "TeLlevo …" solo mientras la sección está en pantalla. */
+const initStatement = () => {
+  const container = document.querySelector('[data-statement-words]');
+  const road = document.querySelector('.statement__road');
+  const car = road?.querySelector('.statement__car');
+  if (road && car) {
+    const setTravel = () => road.style.setProperty('--road-travel', `${road.clientWidth - car.clientWidth}px`);
+    setTravel();
+    window.addEventListener('resize', setTravel, { passive: true });
+  }
+  if (!container) return;
+  const words = [...container.querySelectorAll('.statement__word')];
+  if (words.length < 2 || prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+
+  let index = 0;
+  let timer = null;
+  const advance = () => {
+    const current = words[index];
+    index = (index + 1) % words.length;
+    current.classList.remove('statement__word--active');
+    current.classList.add('statement__word--leaving');
+    words[index].classList.remove('statement__word--leaving');
+    words[index].classList.add('statement__word--active');
+  };
+
+  new IntersectionObserver(([entry]) => {
+    clearInterval(timer);
+    if (entry.isIntersecting) timer = setInterval(advance, STATEMENT_INTERVAL_MS);
+  }, { threshold: 0.4 }).observe(container);
+};
+
+// ─── CÓMO FUNCIONA: PROGRESO ──────────────────────────────────────────────────
+/** El auto avanza por la línea a medida que la sección cruza la pantalla y enciende cada paso. */
+const initStepsProgress = () => {
+  const list = document.querySelector('[data-steps]');
+  const track = list?.querySelector('.steps__progress');
+  if (!list || !track) return;
+  const steps = [...list.querySelectorAll('.step')];
+
+  if (prefersReducedMotion()) {
+    list.style.setProperty('--steps-progress', '1');
+    list.style.setProperty('--steps-width', `${track.offsetWidth}px`);
+    steps.forEach(step => step.classList.add('step--lit'));
+    return;
+  }
+
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const rect = list.getBoundingClientRect();
+    const viewport = window.innerHeight;
+    const progress = Math.min(1, Math.max(0, (viewport * 0.85 - rect.top) / (viewport * 0.6)));
+    list.style.setProperty('--steps-progress', progress.toFixed(3));
+    list.style.setProperty('--steps-width', `${track.offsetWidth}px`);
+    const lastIndex = Math.max(1, steps.length - 1);
+    steps.forEach((step, i) => step.classList.toggle('step--lit', progress > 0 && progress >= i / lastIndex - 0.001));
+  };
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  initStatement();
+  initStepsProgress();
+});
