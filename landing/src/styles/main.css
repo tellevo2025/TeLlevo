@@ -1242,7 +1242,6 @@ body.light-mode .codigo-feedback--invalid { color: #64748B; }
   position: absolute; inset: 0;
   background: linear-gradient(120deg, transparent 20%, rgba(201,168,76,.12) 50%, transparent 80%);
   background-size: 200% auto;
-  animation: shimmerGold 3s linear infinite;
   pointer-events: none;
 }
 .service-card--wedding-hero:hover {

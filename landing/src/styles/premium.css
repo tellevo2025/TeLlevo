@@ -1373,3 +1373,66 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .hero__orb, .hero__visual, .hero-stage__car, .hero-stage__chauffeur, .hero-stage__star,
   .hero-stage__lit, .hero-stage__bulb, .hero-stage__chip, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
 }
+
+/* ==========================================
+   17. CELULAR Y RENDIMIENTO
+========================================== */
+/* Las animaciones de una sección se pausan mientras no está en pantalla (effects.js). */
+.is-offscreen *,
+.is-offscreen *::before,
+.is-offscreen *::after { animation-play-state: paused !important; }
+
+/* Efectos costosos fuera: desenfoque de los orbes y vidrio esmerilado en elementos que se mueven. */
+.hero__orb { filter: none; }
+.hero-stage__chip { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(8, 19, 41, .92); }
+
+/* Hero: ninguna columna puede crecer más que la pantalla. */
+.hero__content { min-width: 0; }
+@media (max-width: 1023px) {
+  .hero__container { grid-template-columns: minmax(0, 1fr); }
+  .hero__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hero__stat { min-width: 0; padding: 0 var(--space-2); }
+  .hero__stat-label { text-align: center; }
+}
+@media (min-width: 1024px) {
+  .hero__container { grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); }
+}
+
+/* Chofer suelto junto al botón de "Cómo funciona" y en reseñas. */
+.steps-section__cta { align-items: center; }
+.steps-section__chauffeur { width: 32px; height: 68px; }
+.google-reviews__chauffeur { width: 30px; height: 64px; }
+
+/* Cotizador: el auto, sin cápsula. */
+.section-emblem--car {
+  width: 150px; height: auto;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+.section-emblem--car .section-emblem__car { width: 150px; height: auto; }
+.section-emblem--chauffeur .section-emblem__chauffeur { width: 46px; height: 53px; margin-top: 14px; }
+
+/* La tarjeta de matrimonio ya no lleva la franja de brillo: se veía como un panel descuadrado. */
+.service-card--wedding-hero::before { content: none; }
+
+/* Footer: enlaces y botón alineados. */
+.footer__nav-link--btn { padding: 10px 0; font-size: .9375rem; line-height: inherit; }
+
+@media (max-width: 767px) {
+  .navbar--scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(10, 22, 40, .98); }
+  .hero__container { gap: var(--space-5); padding: var(--space-5) var(--space-3) var(--space-6); }
+  .hero__eyebrow { font-size: .64rem; letter-spacing: .1em; padding: 6px 12px; }
+  .hero__title { font-size: clamp(2.4rem, 11vw, 3rem); }
+  .hero__subtitle { font-size: .98rem; }
+  .hero__actions { flex-direction: column; align-items: stretch; gap: var(--space-2); margin-bottom: var(--space-5); }
+  .hero__actions .btn { width: 100%; justify-content: center; }
+  .hero__stat-number { font-size: 1.3rem; }
+  .hero__stat-label { font-size: .6rem; letter-spacing: .06em; }
+  .hero-stage__chip { font-size: .68rem; padding: 7px 11px; }
+  .hero-stage__chip--bottom { display: none; }
+
+  /* Menos elementos animados a la vez: ventanas y estrellas quedan fijas, sin flotar. */
+  .hero__orb, .hero-stage__lit, .hero-stage__star, .hero-stage__chip, .hero-stage__bulb { animation: none; }
+
+  /* Viñetas de servicios a todo el ancho de la tarjeta. */
+  .service-card--sm .service-card__art { height: auto; aspect-ratio: 180 / 72; max-height: 130px; }
+}

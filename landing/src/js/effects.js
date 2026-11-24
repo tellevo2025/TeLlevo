@@ -197,6 +197,20 @@ const initStepsProgress = () => {
   update();
 };
 
+// ─── ANIMACIONES SOLO EN PANTALLA ─────────────────────────────────────────────
+/**
+ * Pausa las animaciones de cada sección mientras no se ve. En celular esto evita que
+ * decenas de escenas sigan dibujándose fuera de la vista y bajen los cuadros por segundo.
+ */
+const initOffscreenPause = () => {
+  if (!('IntersectionObserver' in window)) return;
+  const scopes = document.querySelectorAll('.hero, main > section, .footer, .booking-loading');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(({ target, isIntersecting }) => target.classList.toggle('is-offscreen', !isIntersecting));
+  }, { rootMargin: '120px 0px' });
+  scopes.forEach(scope => observer.observe(scope));
+};
+
 // ─── HERO: PROFUNDIDAD CON EL MOUSE ───────────────────────────────────────────
 /** La escena del hero se inclina y sus capas se desplazan según la posición del puntero. */
 const initHeroParallax = () => {
@@ -240,6 +254,7 @@ const initCotizadorCar = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  initOffscreenPause();
   initHeroParallax();
   initCotizadorCar();
   initStepsProgress();
