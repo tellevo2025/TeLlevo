@@ -1199,136 +1199,46 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 .hero__stat-number { font-size: clamp(1.35rem, 3vw, 1.7rem); font-variant-numeric: tabular-nums; }
 .hero__stat-label { font-size: .7rem; letter-spacing: .1em; }
 
-/* Escena: sin recuadro, se funde con el fondo del hero por todos sus bordes.
-   Ciclo de 16 s: el auto llega frenando con el chofer al volante (0–24 %), el chofer
-   baja por el lado de la calle y se le ve tras la carrocería (27–31 %), camina al
-   frente del auto y saluda (31–50 %), vuelve y se sube (51–61 %), el auto acelera y
-   sale (66–84 %); la calle queda vacía un momento antes del siguiente viaje. */
+/* Escena: un sedán de lujo avanza de noche por la ciudad. La cámara lo acompaña, así
+   que el auto queda al centro y es la ciudad la que pasa: faroles, luces desenfocadas,
+   estelas de otros autos y el reflejo de cada farol recorriendo la carrocería.
+   Sin recuadro: la escena usa el fondo del hero y se desvanece por todos sus bordes. */
 .hero__visual { position: relative; animation: stageIn 1.4s var(--ease-out-expo) .35s both; }
 .hero-stage {
   position: relative;
   margin: 0 calc(-1 * var(--space-3));
   -webkit-mask-image:
-    linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 16%, #000 80%, transparent 100%);
+    linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
   -webkit-mask-composite: source-in;
           mask-image:
-    linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 16%, #000 80%, transparent 100%);
+    linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
           mask-composite: intersect;
 }
-.hero-stage__svg { display: block; width: 100%; height: auto; overflow: visible; }
-.hero-stage__layer {
-  transform: translate(calc(var(--px, 0) * var(--d, 0) * 1px), calc(var(--py, 0) * var(--d, 0) * .5px));
-  transition: transform .8s var(--ease-out-expo);
-}
-.hero-stage__layer--stars { --d: -3; }
-.hero-stage__layer--moon  { --d: -6; }
-.hero-stage__layer--far   { --d: -9; }
-.hero-stage__layer--near  { --d: -14; }
-.hero-stage__star { animation: starTwinkle 3.4s ease-in-out infinite; }
-.hero-stage__star:nth-child(3n)   { animation-delay: -1.2s; }
-.hero-stage__star:nth-child(3n+1) { animation-delay: -2.3s; }
-.hero-stage__lit { animation: windowFlicker 8s steps(1) infinite; }
-.hero-stage__lit:nth-child(2n) { animation-delay: -3s; }
-.hero-stage__lit:nth-child(3n) { animation-delay: -5.5s; }
-.hero-stage__bulb { filter: drop-shadow(0 0 7px #FFF3C4); animation: bulbHum 5s ease-in-out infinite; }
-.hero-stage__lane { stroke: var(--gold-a25); stroke-width: 1.4; stroke-dasharray: 24 20; }
+.hero-stage__svg { display: block; width: 100%; height: auto; overflow: hidden; }
 
-.hero-stage__car { animation: heroCar 16s infinite; }
-.hero-stage__body { transform-box: fill-box; transform-origin: 25% 100%; animation: heroPitch 16s infinite; }
-.hero-stage__headpool { animation: heroBeam 16s infinite; }
-.hero-stage__brake { opacity: 0; animation: heroBrake 16s infinite; }
-.hero-stage__chauffeur {
-  opacity: 0;
-  transform: translate(300px, 70px);
-  animation: heroChauffeur 16s linear infinite, heroGait 16s linear infinite, heroArm 16s ease-in-out infinite;
-}
+/* Velocidad de crucero: la calle avanza 54 unidades por segundo. Faroles, líneas,
+   reflejo y ruedas usan esa misma velocidad para que todo se mueva en sincronía. */
+.hero-scene__skyline     { animation: sceneScroll 64s linear infinite; }
+.hero-scene__bokeh--far  { animation: sceneScroll 26s linear infinite; }
+.hero-scene__bokeh--near { animation: sceneScroll 8s linear infinite; }
+.hero-scene__lamps       { animation: lampScroll 4.8s linear infinite; }
+.hero-scene__lane        { animation: laneScroll .74s linear infinite; }
+.hero-scene__trail       { animation: oncoming 7s cubic-bezier(.4, 0, .9, 1) infinite; }
+.hero-car__sweep         { animation: carSweep 4.8s linear infinite; }
+.hero-car__wheel         { animation: wheelSpin 2.5s linear infinite; }
+.hero-car__beam          { animation: beamBreath 6s ease-in-out infinite; }
 
-@keyframes heroCar {
-  0%      { transform: translateX(-480px); --tl-driver: 1; --tl-beam: 1; --tl-wheel: 0deg; animation-timing-function: cubic-bezier(.15, .65, .3, 1); }
-  22%     { transform: translateX(0); --tl-wheel: 1080deg; }
-  27%     { --tl-driver: 1; --tl-beam: 0; }
-  29%     { --tl-driver: 0; }
-  59%     { --tl-driver: 0; }
-  61%     { --tl-driver: 1; --tl-beam: 0; }
-  63%     { --tl-beam: 1; }
-  66%     { transform: translateX(0); --tl-wheel: 1080deg; animation-timing-function: cubic-bezier(.55, 0, .85, .45); }
-  84%     { transform: translateX(480px); --tl-wheel: 2160deg; }
-  84.01%  { transform: translateX(-480px); --tl-wheel: 2160deg; }
-  100%    { transform: translateX(-480px); --tl-driver: 1; --tl-beam: 1; --tl-wheel: 2160deg; }
-}
-/* Al frenar el auto cabecea hacia adelante; al acelerar levanta la trompa. */
-@keyframes heroPitch {
-  0%, 20%   { transform: none; }
-  22.5%     { transform: rotate(.9deg); }
-  25%       { transform: rotate(-.3deg); }
-  27%, 66%  { transform: none; }
-  69%       { transform: rotate(-1.1deg); }
-  76%, 100% { transform: none; }
-}
-@keyframes heroBrake {
-  0%, 15%   { opacity: 0; }
-  19%, 25%  { opacity: 1; }
-  29%, 100% { opacity: 0; }
-}
-@keyframes heroBeam {
-  0%, 22%   { opacity: 1; }
-  27%, 61%  { opacity: 0; }
-  63%, 100% { opacity: 1; }
-}
-@keyframes heroChauffeur {
-  0%, 26%   { transform: translate(300px, 70px) scaleX(1); opacity: 0; }
-  27%       { transform: translate(300px, 70px) scaleX(1); opacity: 1; }
-  31%       { transform: translate(300px, 0) scaleX(1); opacity: 1; }
-  40%       { transform: translate(442px, 0) scaleX(1); }
-  41%, 50%  { transform: translate(442px, 0) scaleX(-1); }
-  58%       { transform: translate(300px, 0) scaleX(-1); opacity: 1; }
-  61%       { transform: translate(300px, 70px) scaleX(-1); opacity: 1; }
-  62%, 100% { transform: translate(300px, 70px) scaleX(-1); opacity: 0; }
-}
-@keyframes heroGait {
-  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-  31% { --tl-leg: -22deg; --tl-arm-back: -16deg; --tl-bob: 0px; }
-  32% { --tl-bob: -0.9px; }
-  33% { --tl-leg: 22deg; --tl-arm-back: 16deg; --tl-bob: 0px; }
-  34% { --tl-bob: -0.9px; }
-  35% { --tl-leg: -22deg; --tl-arm-back: -16deg; --tl-bob: 0px; }
-  36% { --tl-bob: -0.9px; }
-  37% { --tl-leg: 22deg; --tl-arm-back: 16deg; --tl-bob: 0px; }
-  38% { --tl-bob: -0.9px; }
-  39% { --tl-leg: -22deg; --tl-arm-back: -16deg; --tl-bob: 0px; }
-  40% { --tl-bob: -0.9px; }
-  40% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-  51% { --tl-leg: -22deg; --tl-arm-back: -16deg; --tl-bob: 0px; }
-  52% { --tl-bob: -0.9px; }
-  53% { --tl-leg: 22deg; --tl-arm-back: 16deg; --tl-bob: 0px; }
-  54% { --tl-bob: -0.9px; }
-  55% { --tl-leg: -22deg; --tl-arm-back: -16deg; --tl-bob: 0px; }
-  56% { --tl-bob: -0.9px; }
-  57% { --tl-leg: 22deg; --tl-arm-back: 16deg; --tl-bob: 0px; }
-  58% { --tl-bob: -0.9px; }
-  58% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-  100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-}
-@keyframes heroArm {
-  0% { --tl-arm: 0deg; --tl-cap: 0; }
-  31% { --tl-arm: 16deg; --tl-cap: 0; }
-  33% { --tl-arm: -16deg; --tl-cap: 0; }
-  35% { --tl-arm: 16deg; --tl-cap: 0; }
-  37% { --tl-arm: -16deg; --tl-cap: 0; }
-  39% { --tl-arm: 16deg; --tl-cap: 0; }
-  40% { --tl-arm: 0deg; --tl-cap: 0; }
-  42% { --tl-arm: 0deg; --tl-cap: 0; }
-  44.5% { --tl-arm: -165deg; --tl-cap: 1; }
-  47.5% { --tl-arm: -165deg; --tl-cap: 1; }
-  50% { --tl-arm: 0deg; --tl-cap: 0; }
-  51% { --tl-arm: 16deg; --tl-cap: 0; }
-  53% { --tl-arm: -16deg; --tl-cap: 0; }
-  55% { --tl-arm: 16deg; --tl-cap: 0; }
-  57% { --tl-arm: -16deg; --tl-cap: 0; }
-  58% { --tl-arm: 0deg; --tl-cap: 0; }
-  100% { --tl-arm: 0deg; --tl-cap: 0; }
+@keyframes sceneScroll { to { transform: translateX(-520px); } }
+@keyframes lampScroll  { to { transform: translateX(-260px); } }
+@keyframes laneScroll  { to { transform: translateX(-40px); } }
+@keyframes carSweep    { from { transform: translateX(170px); } to { transform: translateX(-30px); } }
+@keyframes wheelSpin   { to { transform: rotate(360deg); } }
+@keyframes beamBreath  { 0%, 100% { opacity: 1; } 50% { opacity: .82; } }
+@keyframes oncoming {
+  0%        { transform: translateX(600px); }
+  32%, 100% { transform: translateX(-140px); }
 }
 
 .hero__scroll {
@@ -1364,7 +1274,7 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 }
 @media (max-width: 379px) {
   .hero__stat { padding: 0 var(--space-3); }
-
+}
 
 @keyframes wordUp      { to { transform: none; } }
 @keyframes goldShimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
@@ -1379,9 +1289,8 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @media (prefers-reduced-motion: reduce) {
   .hero__word { transform: none; animation: none; }
   .hero__word--gold { animation: none; }
-  .hero__orb, .hero__visual, .hero-stage__car, .hero-stage__body, .hero-stage__brake, .hero-stage__headpool,
-  .hero-stage__chauffeur, .hero-stage__star,
-  .hero-stage__lit, .hero-stage__bulb, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
+  .hero__orb, .hero__visual, .hero-scene__skyline, .hero-scene__bokeh, .hero-scene__lamps,
+  .hero-scene__lane, .hero-scene__trail, .hero-car__sweep, .hero-car__wheel, .hero-car__beam, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
 }
 
 /* ==========================================
@@ -1439,9 +1348,24 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .hero__stat-label { font-size: .6rem; letter-spacing: .06em; }
 
   /* Menos elementos animados a la vez: ventanas y estrellas quedan fijas, sin flotar. */
-  .hero__orb, .hero-stage__lit, .hero-stage__star, .hero-stage__bulb { animation: none; }
-  .hero-stage__reflection { display: none; }
+  .hero__orb { animation: none; }
+  .hero-scene__reflection { display: none; }
 
   /* Viñetas de servicios a todo el ancho de la tarjeta. */
   .service-card--sm .service-card__art { height: auto; aspect-ratio: 180 / 72; max-height: 130px; }
+}
+
+/* ==========================================
+   18. HERO EN CELULAR — todo en una pantalla
+========================================== */
+@media (max-width: 767px) {
+  .hero { align-items: flex-start; min-height: 100svh; }
+  .hero__container { gap: 0; padding: var(--space-3) var(--space-3) var(--space-2); }
+  .hero__eyebrow { margin-bottom: 14px; }
+  .hero__title { margin-bottom: 12px; font-size: clamp(2.1rem, 10vw, 2.7rem); line-height: 1.06; }
+  .hero__subtitle { margin-bottom: 18px; font-size: .95rem; line-height: 1.6; }
+  .hero__actions { margin-bottom: 18px; }
+  .hero__actions .btn { padding: 14px 24px; }
+  .hero__stats { margin-bottom: 4px; }
+  .hero__visual { margin-top: 0; }
 }
