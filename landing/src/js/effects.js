@@ -160,40 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSpotlight();
 });
 
-// ─── STATEMENT DE MARCA ───────────────────────────────────────────────────────
-const STATEMENT_INTERVAL_MS = 2800;
-
-/** Alterna las frases de "TeLlevo …" solo mientras la sección está en pantalla. */
-const initStatement = () => {
-  const container = document.querySelector('[data-statement-words]');
-  const road = document.querySelector('.statement__road');
-  const car = road?.querySelector('.statement__car');
-  if (road && car) {
-    const setTravel = () => road.style.setProperty('--road-travel', `${road.clientWidth - car.clientWidth}px`);
-    setTravel();
-    window.addEventListener('resize', setTravel, { passive: true });
-  }
-  if (!container) return;
-  const words = [...container.querySelectorAll('.statement__word')];
-  if (words.length < 2 || prefersReducedMotion() || !('IntersectionObserver' in window)) return;
-
-  let index = 0;
-  let timer = null;
-  const advance = () => {
-    const current = words[index];
-    index = (index + 1) % words.length;
-    current.classList.remove('statement__word--active');
-    current.classList.add('statement__word--leaving');
-    words[index].classList.remove('statement__word--leaving');
-    words[index].classList.add('statement__word--active');
-  };
-
-  new IntersectionObserver(([entry]) => {
-    clearInterval(timer);
-    if (entry.isIntersecting) timer = setInterval(advance, STATEMENT_INTERVAL_MS);
-  }, { threshold: 0.4 }).observe(container);
-};
-
 // ─── CÓMO FUNCIONA: PROGRESO ──────────────────────────────────────────────────
 /** El auto avanza por la línea a medida que la sección cruza la pantalla y enciende cada paso. */
 const initStepsProgress = () => {
@@ -232,6 +198,5 @@ const initStepsProgress = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  initStatement();
   initStepsProgress();
 });
