@@ -1269,10 +1269,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroRotator();
 
   initFAQ();
-
-  // Retira el globo del hero del layout al terminar su animación
-  const bubble = document.getElementById('hero-bubble');
-  if (bubble) {
-    bubble.addEventListener('animationend', () => { bubble.hidden = true; }, { once: true });
-  }
 });

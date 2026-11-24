@@ -197,6 +197,24 @@ const initStepsProgress = () => {
   update();
 };
 
+// ─── COTIZADOR: EL AUTO ACELERA AL CALCULAR ───────────────────────────────────
+const COT_DRIVE_MS = 1800;
+
+const initCotizadorCar = () => {
+  const emblem = document.querySelector('[data-cot-car]');
+  const button = document.getElementById('cot-calc-btn');
+  if (!emblem || !button) return;
+  let timer = null;
+  button.addEventListener('click', () => {
+    clearTimeout(timer);
+    emblem.classList.remove('is-driving');
+    void emblem.offsetWidth;
+    emblem.classList.add('is-driving');
+    timer = setTimeout(() => emblem.classList.remove('is-driving'), COT_DRIVE_MS);
+  });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  initCotizadorCar();
   initStepsProgress();
 });

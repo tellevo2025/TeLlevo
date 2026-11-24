@@ -43,6 +43,143 @@
       <circle class="sedan__tyre" cx="48" cy="49" r="9"/>
       <circle class="sedan__tyre" cx="152" cy="49" r="9"/>
     </symbol>
+    <defs>
+      <linearGradient id="tl-body" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2E5899"/>
+        <stop offset=".46" stop-color="#1B3768"/>
+        <stop offset=".54" stop-color="#132850"/>
+        <stop offset="1" stop-color="#091530"/>
+      </linearGradient>
+      <linearGradient id="tl-glass" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5B80B8"/>
+        <stop offset="1" stop-color="#0B1A33"/>
+      </linearGradient>
+      <linearGradient id="tl-suit" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#22385F"/>
+        <stop offset="1" stop-color="#0E1830"/>
+      </linearGradient>
+      <linearGradient id="tl-gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#F5DFA0"/>
+        <stop offset=".45" stop-color="#F0C040"/>
+        <stop offset="1" stop-color="#9C7A28"/>
+      </linearGradient>
+      <linearGradient id="tl-beam" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#F5DFA0" stop-opacity=".6"/>
+        <stop offset="1" stop-color="#F5DFA0" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- El auto del cliente: chofer adelante, cliente atrás. Partes controladas con --tl-* -->
+    <symbol id="tl-car" viewBox="0 0 160 60" style="overflow:visible">
+      <ellipse cx="81" cy="57.6" rx="74" ry="2.6" fill="#000" opacity=".45"/>
+      <path class="tl-car__beam" d="M154.6 32.4 L224 20 L224 48 L154.6 36.4 Z" fill="url(#tl-beam)"/>
+      <path d="M8 42 C6 36 9 32 17 31 L36 28.5 C47 18 59 12 78 11 L98 11 C112 11 122 17 132 25.5 L144 27.5 C151 28.6 155 32 155 38 L155 43 C155 45.5 153.5 46.5 151 46.5 L139 46.5 C138 39.5 132.5 34.5 125 34.5 C117.5 34.5 112 39.5 111 46.5 L51 46.5 C50 39.5 44.5 34.5 37 34.5 C29.5 34.5 24 39.5 23 46.5 L12 46.5 C9.5 46.5 8 45 8 42 Z" fill="url(#tl-body)" stroke="#C9A84C" stroke-width="1" stroke-linejoin="round"/>
+      <path d="M51 46.5 L52.4 43.4 H109.8 L111 46.5 Z" fill="#050B18" opacity=".55"/>
+      <path d="M14 35.6 C45 33.4 115 33.4 152 34.6" stroke="#fff" stroke-width="1.1" opacity=".16" fill="none"/>
+      <path d="M47 28 C54 19.5 63 15 77 14.6 L84 14.6 L84 28 Z" fill="url(#tl-glass)"/>
+      <path d="M89 14.6 L98 14.6 C108.5 15 117 19.5 125 27.6 L89 28 Z" fill="url(#tl-glass)"/>
+      <g class="tl-car__passenger">
+        <path d="M62 28 C62.5 24.8 65.5 24 69 24 C72.5 24 75.5 24.8 76 28 Z" fill="#F5DFA0"/>
+        <circle cx="69" cy="21.3" r="3.5" fill="#DDA77A"/>
+        <path d="M65.5 20.9 C65.4 17.5 67.4 16.4 69.4 16.4 C71.6 16.4 73.1 17.9 72.9 20.3 C71 18.8 68 18.8 65.5 20.9 Z" fill="#3B2A1E"/>
+      </g>
+      <g class="tl-car__driver">
+        <path d="M100 28 C100.5 24.8 103.5 24 107 24 C110.5 24 113.5 24.8 114 28 Z" fill="#12213D"/>
+        <circle cx="107" cy="21.3" r="3.5" fill="#DDA77A"/>
+        <path d="M103.3 19.3 C103.1 15.8 105.2 14.9 107.4 14.9 C110 14.9 111.6 16.2 111.2 19.3 Z" fill="#0B1426"/>
+        <rect x="103.3" y="18.1" width="7.9" height="1.2" fill="#C9A84C"/>
+        <path d="M109 19.3 H114.2 C114.2 20.3 113.4 20.6 112.6 20.6 H109 Z" fill="#0B1426"/>
+        <path d="M116.6 28 L119.4 22.6" stroke="#0B1426" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="117.8" cy="24.2" r="1.4" fill="#F1EEE6"/>
+      </g>
+      <path d="M63 27.6 L73 15.6 L76.4 15.4 L66.4 27.6 Z" fill="#fff" opacity=".12"/>
+      <path d="M103.6 27.6 L111.6 16.6 L114 17.4 L106.4 27.6 Z" fill="#fff" opacity=".12"/>
+      <rect x="84" y="14.6" width="5" height="13.6" fill="#0B1830"/>
+      <path d="M47 28 C54 19.5 63 15 77 14.6 L98 14.6 C108.5 15 117 19.5 125 27.6" fill="none" stroke="#F5DFA0" stroke-width=".8" opacity=".75"/>
+      <path d="M42 29.8 H131" stroke="#F0C040" stroke-width=".9" opacity=".85"/>
+      <path d="M87 30.4 V45.5 M50 30.6 C49 35.5 49 40 50 45" stroke="#04070E" stroke-width=".75" opacity=".55" fill="none"/>
+      <rect x="72" y="32.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
+      <rect x="102" y="32.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
+      <path d="M121.4 26.8 L127 25.8 C128.6 25.6 129.5 26.8 129 28 L128 29.8 L121.8 29.2 Z" fill="#13294F" stroke="#C9A84C" stroke-width=".6"/>
+      <path d="M147.6 30.6 C151.6 31 154.2 32.8 154.8 35.4 L148 35.4 Z" fill="#FFF6D6"/>
+      <path d="M8.4 33.4 L13.6 32.8 L13.6 37.6 L8.2 37.8 Z" fill="#E25C5C"/>
+      <path d="M148.5 40.8 H155 M8.6 40.8 H17" stroke="#C9A84C" stroke-width=".9" stroke-linecap="round"/>
+      <g class="tl-car__ribbon">
+        <path d="M131.6 27.4 C135 30.6 141 30.4 146.6 29.2" stroke="#F5F1E8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M128.4 24.8 L131.6 27.4 L128.4 30 Z M134.8 24.8 L131.6 27.4 L134.8 30 Z" fill="#F5F1E8"/>
+        <circle cx="131.6" cy="27.4" r="1.1" fill="#F0C040"/>
+      </g>
+      <path d="M23 46.5 C24 39.5 29.5 34.5 37 34.5 C44.5 34.5 50 39.5 51 46.5 M111 46.5 C112 39.5 117.5 34.5 125 34.5 C132.5 34.5 138 39.5 139 46.5" stroke="#050B18" stroke-width="1.6" opacity=".7" fill="none"/>
+      <g transform="translate(37 46.5)"><g class="tl-car__wheel">
+          <circle r="10.6" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
+          <circle r="7.2" fill="url(#tl-gold)"/>
+          <g fill="#0A1628">
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(72)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(144)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(216)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(288)"/>
+          </g>
+          <circle r="2.1" fill="#0A1628"/>
+          <circle r=".8" fill="#F0C040"/>
+      </g></g>
+      <g transform="translate(125 46.5)"><g class="tl-car__wheel">
+          <circle r="10.6" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
+          <circle r="7.2" fill="url(#tl-gold)"/>
+          <g fill="#0A1628">
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(72)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(144)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(216)"/>
+            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(288)"/>
+          </g>
+          <circle r="2.1" fill="#0A1628"/>
+          <circle r=".8" fill="#F0C040"/>
+      </g></g>
+    </symbol>
+    <!-- El chofer TeLlevo, de cuerpo entero (pies en y=0). Poses con --tl-* -->
+    <symbol id="tl-chauffeur" viewBox="-16 -66 32 68" style="overflow:visible">
+      <ellipse cx="1" cy=".8" rx="9" ry="1.8" fill="#000" opacity=".4"/>
+      <g class="tl-ch__body">
+        <g class="tl-ch__limb tl-ch__arm-back">
+          <rect x="-2.3" y="-41" width="4.6" height="17" rx="2.3" fill="#0E1830"/>
+          <circle cx="0" cy="-23.6" r="2.4" fill="#F1EEE6"/>
+        </g>
+        <g class="tl-ch__limb tl-ch__leg-back">
+          <rect x="-2.6" y="-25" width="5.2" height="22.6" rx="2.4" fill="#0B1426"/>
+          <path d="M-3 -3 H4.2 C6.4 -3 7.6 -1.8 7.6 0 H-3 Z" fill="#05080F"/>
+        </g>
+        <g class="tl-ch__limb tl-ch__leg-front">
+          <rect x="-2.6" y="-25" width="5.2" height="22.6" rx="2.4" fill="#122040"/>
+          <path d="M-3 -3 H4.2 C6.4 -3 7.6 -1.8 7.6 0 H-3 Z" fill="#05080F"/>
+        </g>
+        <path d="M-6.6 -24 L-7.4 -40.5 C-7.4 -45.5 -3.8 -47.5 0 -47.5 C3.8 -47.5 7.4 -45.5 7.4 -40.5 L6.8 -24 C4 -22.6 -4 -22.6 -6.6 -24 Z" fill="url(#tl-suit)"/>
+        <path d="M-2.4 -47.3 L0.2 -40.4 L2.6 -47.3 Z" fill="#F1EEE6"/>
+        <path d="M-0.9 -46.6 H1.1 L1.6 -39.6 L0.1 -37.8 L-1.4 -39.6 Z" fill="#C9A84C"/>
+        <circle cx="2.8" cy="-35.4" r=".8" fill="#F0C040"/>
+        <circle cx="2.8" cy="-30.4" r=".8" fill="#F0C040"/>
+        <path d="M-5.2 -36 H-1.8" stroke="#C9A84C" stroke-width=".7" stroke-linecap="round"/>
+        <rect x="-1.6" y="-49.6" width="3.4" height="2.8" fill="#C98F63"/>
+        <circle cx=".6" cy="-52.6" r="4.6" fill="#DDA77A"/>
+        <circle cx="-1.9" cy="-52.4" r="1" fill="#C98F63"/>
+        <path d="M4.9 -53.2 L6.7 -51.6 L4.9 -51 Z" fill="#C98F63"/>
+        <circle cx="3.2" cy="-53.7" r=".55" fill="#1A1A1A"/>
+        <path d="M2.6 -50.4 Q3.8 -49.6 4.8 -50.4" stroke="#7A4A2A" stroke-width=".55" fill="none" stroke-linecap="round"/>
+        <g class="tl-ch__cap">
+          <path d="M-4.6 -55.2 C-5 -60.4 -1.8 -61.8 1.2 -61.8 C4.6 -61.8 6.8 -60.2 6.2 -55.2 Z" fill="#0B1426"/>
+          <rect x="-4.6" y="-56.8" width="10.8" height="1.6" fill="#C9A84C"/>
+          <circle cx="4.6" cy="-58.8" r="1" fill="#F0C040"/>
+          <path d="M2.2 -55.2 H9.6 C9.6 -53.9 8.7 -53.4 7.6 -53.4 H2.2 Z" fill="#05080F"/>
+        </g>
+        <g class="tl-ch__limb tl-ch__arm-front">
+          <rect x="-2.3" y="-41" width="4.6" height="17" rx="2.3" fill="#18294D"/>
+          <circle cx="0" cy="-23.6" r="2.4" fill="#F1EEE6"/>
+          <g class="tl-ch__key">
+            <circle cx="0" cy="-20.2" r="1.7" fill="none" stroke="#F0C040" stroke-width="1"/>
+            <path d="M0 -18.6 V-13.6 M0 -15 H1.6 M0 -16.6 H1.3" stroke="#F0C040" stroke-width="1" stroke-linecap="round"/>
+          </g>
+        </g>
+      </g>
+    </symbol>
     <symbol id="icon-chauffeur" viewBox="0 0 48 48">
       <path class="line-icon" d="M13 15 C13 9 18 6 24 6 C30 6 35 9 35 15 Z"/>
       <path class="line-icon" d="M11 15 H37 V18.5 H11 Z"/>
@@ -196,10 +333,6 @@
         <p class="hero__subtitle">
           Celebra sin límites. Nosotros manejamos tu auto y te llevamos sano y salvo a casa.
         </p>
-        <p class="hero__quote-bubble" id="hero-bubble" aria-live="polite">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Reserva en línea y recibe tu cotización automáticamente
-        </p>
         <div class="hero__actions">
           <a href="#reserva" class="btn btn--primary btn--lg hero__cta">Reservar mi chofer</a>
           <a href="#cotizar" class="btn btn--secondary btn--lg">
@@ -210,35 +343,8 @@
         <div class="hero-route">
           <div class="hero-scene" aria-hidden="true">
             <svg class="hero-scene__svg" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="hs-body" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#2B5290"/>
-                  <stop offset=".55" stop-color="#13294F"/>
-                  <stop offset="1" stop-color="#0A1830"/>
-                </linearGradient>
-                <linearGradient id="hs-glass" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#4A6FA8"/>
-                  <stop offset="1" stop-color="#0B1A33"/>
-                </linearGradient>
-                <linearGradient id="hs-suit" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#1F3358"/>
-                  <stop offset="1" stop-color="#0E1830"/>
-                </linearGradient>
-                <linearGradient id="hs-gold" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#F0C040"/>
-                  <stop offset="1" stop-color="#A8862F"/>
-                </linearGradient>
-                <linearGradient id="hs-beam" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#F5DFA0" stop-opacity=".55"/>
-                  <stop offset="1" stop-color="#F5DFA0" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-
-              <!-- Calle -->
               <rect class="hero-scene__street" x="0" y="104" width="400" height="7" rx="2"/>
               <line class="hero-scene__lane" x1="6" y1="107.5" x2="394" y2="107.5"/>
-
-              <!-- Salón del evento, con luces -->
               <g class="hero-scene__venue">
                 <path class="hero-scene__roof" d="M1 67 L29 48 L57 67 Z"/>
                 <rect class="hero-scene__wall" x="6" y="66" width="46" height="38" rx="1.5"/>
@@ -248,8 +354,6 @@
                   <circle cx="31" cy="74" r="1.3"/><circle cx="38" cy="73" r="1.3"/><circle cx="45" cy="71" r="1.3"/>
                 </g>
               </g>
-
-              <!-- Tu casa: la ventana se enciende cuando llegas -->
               <g class="hero-scene__home">
                 <rect class="hero-scene__chimney" x="382" y="58" width="6" height="12"/>
                 <path class="hero-scene__roof" d="M341 79 L370 58 L399 79 Z"/>
@@ -258,98 +362,8 @@
                 <rect class="hero-scene__window" x="377" y="84" width="11" height="9" rx="1"/>
                 <rect class="hero-scene__window-light" x="377" y="84" width="11" height="9" rx="1"/>
               </g>
-
-              <!-- El auto del cliente -->
-              <g class="hero-scene__car">
-                <g transform="translate(52 50)">
-                  <ellipse cx="78" cy="55" rx="72" ry="3.2" fill="#000" opacity=".45"/>
-                  <path class="hero-scene__beam" d="M149 30 L212 20 L212 44 L149 34 Z" fill="url(#hs-beam)"/>
-                  <path d="M6 40 C4 34 8 30 16 29 L38 26 C48 15 60 9 78 8 L96 8 C110 8 120 14 130 23 L140 25 C147 26 150 30 150 36 L150 40 C150 43 148 44 145 44 L132 44 A12 12 0 0 0 108 44 L46 44 A12 12 0 0 0 22 44 L10 44 C7 44 6 42 6 40 Z" fill="url(#hs-body)" stroke="#C9A84C" stroke-width="1.1" stroke-linejoin="round"/>
-                  <path d="M45 26 C52.5 17.5 62 13 75 12.6 L81 12.6 L81 26 Z" fill="url(#hs-glass)"/>
-                  <path d="M86 12.6 L95 12.6 C105.5 13 114 17.5 122 25.6 L86 26 Z" fill="url(#hs-glass)"/>
-                  <!-- Cliente, atrás y tranquilo -->
-                  <path d="M59 26 C59.5 22.8 62.5 22 66 22 C69.5 22 72.5 22.8 73 26 Z" fill="#F5DFA0"/>
-                  <circle cx="66" cy="19.4" r="3.5" fill="#DDA77A"/>
-                  <path d="M62.5 19 C62.4 15.6 64.4 14.5 66.4 14.5 C68.6 14.5 70.1 16 69.9 18.4 C68 16.9 65 16.9 62.5 19 Z" fill="#3B2A1E"/>
-                  <!-- Chofer al volante (aparece al subirse) -->
-                  <g class="hero-scene__driver">
-                    <path d="M97 26 C97.5 22.8 100.5 22 104 22 C107.5 22 110.5 22.8 111 26 Z" fill="#12213D"/>
-                    <circle cx="104" cy="19.4" r="3.5" fill="#DDA77A"/>
-                    <path d="M100.3 17.4 C100.1 13.9 102.2 13 104.4 13 C107 13 108.6 14.3 108.2 17.4 Z" fill="#0B1426"/>
-                    <rect x="100.3" y="16.2" width="7.9" height="1.2" fill="#C9A84C"/>
-                    <path d="M106 17.4 H111.2 C111.2 18.4 110.4 18.7 109.6 18.7 H106 Z" fill="#0B1426"/>
-                    <path d="M113.4 26 L116.4 20.6" stroke="#0B1426" stroke-width="1.6" stroke-linecap="round"/>
-                    <circle cx="114.6" cy="22.4" r="1.4" fill="#F1EEE6"/>
-                  </g>
-                  <path d="M60 25.6 L70 13.6 L73.4 13.4 L63.4 25.6 Z" fill="#fff" opacity=".12"/>
-                  <path d="M100.6 25.6 L108.6 14.6 L111 15.4 L103.4 25.6 Z" fill="#fff" opacity=".12"/>
-                  <rect x="81" y="12.6" width="5" height="13.6" fill="#0D1F3C"/>
-                  <path d="M45 26 C52.5 17.5 62 13 75 12.6 L95 12.6 C105.5 13 114 17.5 122 25.6" fill="none" stroke="#C9A84C" stroke-width=".8" opacity=".8"/>
-                  <path d="M40 27.2 H128" stroke="#F0C040" stroke-width=".9" opacity=".85"/>
-                  <path d="M84 27.8 V42.5 M47 28 C46 33 46 38 47 42.5" stroke="#05080F" stroke-width=".8" opacity=".5" fill="none"/>
-                  <path d="M14 33.5 C40 31.5 110 31.5 146 32.5" stroke="#fff" stroke-width="1.3" opacity=".12" fill="none"/>
-                  <rect x="70" y="30.4" width="6.4" height="1.5" rx=".75" fill="#C9A84C"/>
-                  <rect x="99" y="30.4" width="6.4" height="1.5" rx=".75" fill="#C9A84C"/>
-                  <path d="M143.4 28.6 C147 28.9 149 30.4 149.4 32.6 L144 32.6 Z" fill="#FFF3C4"/>
-                  <path d="M6.6 31 L11 30.6 L11 34.6 L6.4 34.8 Z" fill="#E25C5C"/>
-                  <path d="M140 40.6 H149 M7 40.6 H16" stroke="#C9A84C" stroke-width=".9" stroke-linecap="round"/>
-                  <g transform="translate(34 44)"><g class="hero-scene__wheel">
-                    <circle r="10" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
-                    <circle r="6.2" fill="url(#hs-gold)"/>
-                    <path d="M0 -5.6 V5.6 M-5.6 0 H5.6 M-4 -4 L4 4 M-4 4 L4 -4" stroke="#0A1628" stroke-width="1.1"/>
-                    <circle r="1.9" fill="#0A1628"/>
-                  </g></g>
-                  <g transform="translate(120 44)"><g class="hero-scene__wheel">
-                    <circle r="10" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
-                    <circle r="6.2" fill="url(#hs-gold)"/>
-                    <path d="M0 -5.6 V5.6 M-5.6 0 H5.6 M-4 -4 L4 4 M-4 4 L4 -4" stroke="#0A1628" stroke-width="1.1"/>
-                    <circle r="1.9" fill="#0A1628"/>
-                  </g></g>
-                </g>
-              </g>
-
-              <!-- El chofer TeLlevo: sale del salón, saluda y se sube -->
-              <g class="hero-scene__walker">
-                <g transform="translate(0 104)">
-                  <ellipse cx="1" cy=".6" rx="9" ry="1.8" fill="#000" opacity=".4"/>
-                  <g class="hero-scene__person">
-                    <g class="hero-scene__limb hero-scene__arm--back">
-                      <rect x="-2.3" y="-41" width="4.6" height="17" rx="2.3" fill="#0E1830"/>
-                      <circle cx="0" cy="-23.6" r="2.4" fill="#F1EEE6"/>
-                    </g>
-                    <g class="hero-scene__limb hero-scene__leg--back">
-                      <rect x="-2.6" y="-25" width="5.2" height="22.6" rx="2.4" fill="#0B1426"/>
-                      <path d="M-3 -3 H4.2 C6.4 -3 7.6 -1.8 7.6 0 H-3 Z" fill="#05080F"/>
-                    </g>
-                    <g class="hero-scene__limb hero-scene__leg--front">
-                      <rect x="-2.6" y="-25" width="5.2" height="22.6" rx="2.4" fill="#122040"/>
-                      <path d="M-3 -3 H4.2 C6.4 -3 7.6 -1.8 7.6 0 H-3 Z" fill="#05080F"/>
-                    </g>
-                    <path d="M-6.6 -24 L-7.4 -40.5 C-7.4 -45.5 -3.8 -47.5 0 -47.5 C3.8 -47.5 7.4 -45.5 7.4 -40.5 L6.8 -24 C4 -22.6 -4 -22.6 -6.6 -24 Z" fill="url(#hs-suit)"/>
-                    <path d="M-2.4 -47.3 L0.2 -40.4 L2.6 -47.3 Z" fill="#F1EEE6"/>
-                    <path d="M-0.9 -46.6 H1.1 L1.6 -39.6 L0.1 -37.8 L-1.4 -39.6 Z" fill="#C9A84C"/>
-                    <circle cx="2.8" cy="-35.4" r=".8" fill="#F0C040"/>
-                    <circle cx="2.8" cy="-30.4" r=".8" fill="#F0C040"/>
-                    <path d="M-5.2 -36 H-1.8" stroke="#C9A84C" stroke-width=".7" stroke-linecap="round"/>
-                    <rect x="-1.6" y="-49.6" width="3.4" height="2.8" fill="#C98F63"/>
-                    <circle cx=".6" cy="-52.6" r="4.6" fill="#DDA77A"/>
-                    <circle cx="-1.9" cy="-52.4" r="1" fill="#C98F63"/>
-                    <path d="M4.9 -53.2 L6.7 -51.6 L4.9 -51 Z" fill="#C98F63"/>
-                    <circle cx="3.2" cy="-53.7" r=".55" fill="#1A1A1A"/>
-                    <path d="M2.6 -50.4 Q3.8 -49.6 4.8 -50.4" stroke="#7A4A2A" stroke-width=".55" fill="none" stroke-linecap="round"/>
-                    <g class="hero-scene__cap">
-                      <path d="M-4.6 -55.2 C-5 -60.4 -1.8 -61.8 1.2 -61.8 C4.6 -61.8 6.8 -60.2 6.2 -55.2 Z" fill="#0B1426"/>
-                      <rect x="-4.6" y="-56.8" width="10.8" height="1.6" fill="#C9A84C"/>
-                      <circle cx="4.6" cy="-58.8" r="1" fill="#F0C040"/>
-                      <path d="M2.2 -55.2 H9.6 C9.6 -53.9 8.7 -53.4 7.6 -53.4 H2.2 Z" fill="#05080F"/>
-                    </g>
-                    <g class="hero-scene__limb hero-scene__arm--front">
-                      <rect x="-2.3" y="-41" width="4.6" height="17" rx="2.3" fill="#18294D"/>
-                      <circle cx="0" cy="-23.6" r="2.4" fill="#F1EEE6"/>
-                    </g>
-                  </g>
-                </g>
-              </g>
+              <g class="hero-scene__car"><use href="#tl-car" x="44" y="46" width="160" height="60"/></g>
+              <g class="hero-scene__walker"><use href="#tl-chauffeur" x="-16" y="38" width="32" height="68"/></g>
             </svg>
             <div class="hero-scene__labels">
               <span>Tu evento</span>
@@ -433,7 +447,7 @@
         <ol class="steps" role="list" data-steps>
           <li class="steps__progress" aria-hidden="true">
             <span class="steps__progress-fill"></span>
-            <svg class="steps__progress-car" viewBox="0 0 200 64"><use href="#icon-sedan"/></svg>
+            <svg class="tl-art steps__progress-car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
           </li>
           <li data-spotlight class="step reveal reveal--d1">
             <span class="step__num" aria-hidden="true">1</span>
@@ -496,6 +510,7 @@
         </ol>
 
         <div class="steps-section__cta">
+          <svg class="tl-art steps-section__chauffeur" viewBox="-16 -66 32 68"><use href="#tl-chauffeur"/></svg>
           <a href="#reserva" class="btn btn--primary btn--lg">Reservar ahora</a>
         </div>
       </div>
@@ -515,12 +530,11 @@
         <div class="services__grid">
 
           <a href="#reserva" data-spotlight class="service-card service-card--sm reveal reveal--d1" aria-label="Chofer de reemplazo — Ir al formulario de reserva">
-            <div class="service-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
-                <rect x="3" y="13" width="26" height="12" rx="3" stroke="currentColor" stroke-width="2"/>
-                <path d="M6 13 L8 7 H24 L26 13" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <circle cx="9" cy="25" r="2" fill="currentColor"/>
-                <circle cx="23" cy="25" r="2" fill="currentColor"/>
+            <div class="service-card__art" aria-hidden="true">
+              <svg class="tl-art service-art service-art--replacement" viewBox="0 0 180 72">
+                <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
+                <g class="service-art__car"><use href="#tl-car" x="2" y="22" width="128" height="48"/></g>
+                <g class="service-art__chauffeur"><use href="#tl-chauffeur" x="136" y="10" width="30" height="63.75"/></g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -532,11 +546,14 @@
           </a>
 
           <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" data-spotlight class="service-card service-card--sm service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
-            <div class="service-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
-                <circle cx="11" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
-                <circle cx="21" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
-                <path d="M3 27 C3 22 7 19 11 19 H21 C25 19 29 22 29 27" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <div class="service-card__art" aria-hidden="true">
+              <svg class="tl-art service-art service-art--team" viewBox="0 0 180 72">
+                <path class="service-art__bunting" d="M18 12 Q90 30 162 12"/>
+                <g class="service-art__flags"><path d="M40 17 l5 9 l5 -7 Z"/><path d="M70 22 l5 9 l5 -8 Z"/><path d="M100 22 l5 9 l5 -8 Z"/><path d="M130 17 l5 9 l5 -7 Z"/></g>
+                <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
+                <g class="service-art__chauffeur service-art__chauffeur--1"><use href="#tl-chauffeur" x="42" y="10" width="30" height="63.75"/></g>
+                <g class="service-art__chauffeur service-art__chauffeur--2"><use href="#tl-chauffeur" x="75" y="10" width="30" height="63.75"/></g>
+                <g class="service-art__chauffeur service-art__chauffeur--3"><use href="#tl-chauffeur" x="108" y="10" width="30" height="63.75"/></g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -548,12 +565,11 @@
           </a>
 
           <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20quisiera%20cotizar%20el%20servicio%20de%20Valet%20Parking.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" data-spotlight class="service-card service-card--sm service-card--alt reveal reveal--d3" aria-label="Valet Parking — Contactar por WhatsApp">
-            <div class="service-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
-                <rect x="2" y="10" width="28" height="14" rx="3" stroke="currentColor" stroke-width="2"/>
-                <path d="M6 10 L9 4 H23 L26 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <circle cx="9" cy="24" r="2.5" fill="currentColor"/>
-                <circle cx="23" cy="24" r="2.5" fill="currentColor"/>
+            <div class="service-card__art" aria-hidden="true">
+              <svg class="tl-art service-art service-art--valet" viewBox="0 0 180 72">
+                <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
+                <g class="service-art__car"><use href="#tl-car" x="2" y="22" width="128" height="48"/></g>
+                <g class="service-art__chauffeur service-art__chauffeur--key"><use href="#tl-chauffeur" x="136" y="10" width="30" height="63.75"/></g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -576,6 +592,18 @@
         <!-- Card matrimonio: grande y animada -->
         <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20caso%20pronto%20y%20quiero%20conocer%20los%20beneficios%20que%20tienen%20para%20matrimonios.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" class="service-card service-card--wedding-hero reveal reveal--d1" aria-label="Servicio para matrimonios — Contactar por WhatsApp">
           <div class="service-card--wedding-hero__inner">
+            <div class="wedding-art" aria-hidden="true">
+              <svg class="tl-art wedding-art__svg" viewBox="0 0 300 84">
+                <line class="service-art__ground" x1="4" y1="78.5" x2="296" y2="78.5"/>
+                <g class="wedding-art__hearts">
+                  <g transform="translate(96 30)"><path class="wedding-art__heart" d="M0 0 C-2 -2.4 -5 -1 -5 1.4 C-5 4 -2 5.6 0 7.4 C2 5.6 5 4 5 1.4 C5 -1 2 -2.4 0 0 Z"/></g>
+                  <g transform="translate(120 20)"><path class="wedding-art__heart" d="M0 0 C-2 -2.4 -5 -1 -5 1.4 C-5 4 -2 5.6 0 7.4 C2 5.6 5 4 5 1.4 C5 -1 2 -2.4 0 0 Z"/></g>
+                  <g transform="translate(146 28)"><path class="wedding-art__heart" d="M0 0 C-2 -2.4 -5 -1 -5 1.4 C-5 4 -2 5.6 0 7.4 C2 5.6 5 4 5 1.4 C5 -1 2 -2.4 0 0 Z"/></g>
+                </g>
+                <g class="wedding-art__car"><use href="#tl-car" x="40" y="20" width="160" height="60"/></g>
+                <g class="wedding-art__chauffeur"><use href="#tl-chauffeur" x="216" y="12" width="32" height="68"/></g>
+              </svg>
+            </div>
             <div class="wedding-hero__badge">💍 Servicio especial</div>
             <h3 class="wedding-hero__title">¿Te casas?</h3>
             <p class="wedding-hero__text">Contáctanos y descubre los beneficios exclusivos que tenemos para tu matrimonio. Coordinamos choferes, Valet Parking y transporte grupal para que tú y tus invitados disfruten sin preocupaciones.</p>
@@ -597,7 +625,7 @@
     <section class="testimonials" id="testimonios" aria-labelledby="testimonials-title">
       <div class="testimonials__container">
         <div class="road-divider reveal" aria-hidden="true">
-          <svg class="road-divider__car" viewBox="0 0 200 64"><use href="#icon-sedan"/></svg>
+          <svg class="tl-art road-divider__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
         </div>
 
         <header class="testimonials__header">
@@ -609,6 +637,7 @@
         <!-- Reseñas de Google (pobladas por reviews.js desde /api/google-reviews) -->
         <div class="google-reviews" id="google-reviews" data-state="loading">
           <div class="google-reviews__summary">
+            <svg class="tl-art google-reviews__chauffeur" viewBox="-16 -66 32 68"><use href="#tl-chauffeur"/></svg>
             <div class="google-reviews__brand">
               <svg class="google-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 38.2 44 33 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
               <span>Reseñas en Google</span>
@@ -642,8 +671,8 @@
     <section class="cotizador" id="cotizar" aria-labelledby="cotizador-title">
       <div class="cotizador__container">
         <header class="cotizador__header">
-          <span class="section-emblem section-emblem--sedan" aria-hidden="true">
-            <svg viewBox="0 0 200 64"><use href="#icon-sedan"/></svg>
+          <span class="section-emblem section-emblem--car" aria-hidden="true" data-cot-car>
+            <svg class="tl-art section-emblem__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
           </span>
           <p class="section-eyebrow">Cotización instantánea</p>
           <h2 class="section-title" id="cotizador-title">¿Cuánto cuesta tu viaje?</h2>
@@ -734,8 +763,8 @@
         </div>
 
         <header class="booking__header">
-          <span class="section-emblem" aria-hidden="true">
-            <svg viewBox="0 0 48 48"><use href="#icon-chauffeur"/></svg>
+          <span class="section-emblem section-emblem--chauffeur" aria-hidden="true">
+            <svg class="tl-art section-emblem__chauffeur" viewBox="-13 -64 26 30"><use href="#tl-chauffeur"/></svg>
           </span>
           <p class="section-eyebrow">Reservas</p>
           <h2 class="section-title" id="booking-title">Reserva tu chofer ahora</h2>
@@ -1037,40 +1066,7 @@
             <span class="journey__light journey__light--1"></span>
             <span class="journey__light journey__light--2"></span>
             <span class="journey__light journey__light--3"></span>
-            <svg class="journey__car" viewBox="0 0 270 64" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="journey-beam" x1="0" x2="1" y1="0" y2="0">
-                  <stop class="journey__beam-stop" offset="0" stop-opacity=".5"/>
-                  <stop class="journey__beam-stop" offset="1" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path class="journey__beam" d="M191 38 L268 22 L268 60 L191 43 Z" fill="url(#journey-beam)"/>
-              <path class="journey__body" d="M8 44 C8 38 12 34 20 33 L46 30 C58 19 72 13 92 13 L114 13 C130 13 142 20 154 29 L178 33 C188 34.5 192 38 192 43 L192 46 Q192 49 189 49 L164 49 A12 12 0 0 0 140 49 L60 49 A12 12 0 0 0 36 49 L11 49 Q8 49 8 46 Z"/>
-              <path class="journey__glass" d="M56 29 C66 21 76 17.5 92 17 L100 17 L100 29 Z"/>
-              <path class="journey__glass" d="M105 17 L114 17 C126 17.5 136 22 146 29 L105 29 Z"/>
-              <g class="journey__passenger">
-                <circle cx="86" cy="23.6" r="3.4"/>
-                <path d="M79.5 29 Q80 26.2 86 26.2 Q92 26.2 92.5 29 Z"/>
-              </g>
-              <g class="journey__driver">
-                <circle cx="119" cy="24" r="3.4"/>
-                <path d="M112.5 29 Q113 26.6 119 26.6 Q125 26.6 125.5 29 Z"/>
-                <g class="journey__cap">
-                  <path d="M114.6 21.2 Q114.8 17.9 119 17.9 Q123.2 17.9 123.4 21.2 Z"/>
-                  <path d="M114 21.2 H126.4 Q126.4 22.4 125 22.4 H114 Z"/>
-                </g>
-              </g>
-              <g class="journey__wheel">
-                <circle class="journey__tyre" cx="48" cy="49" r="9"/>
-                <path class="journey__spokes" d="M48 42v14M41 49h14"/>
-              </g>
-              <g class="journey__wheel">
-                <circle class="journey__tyre" cx="152" cy="49" r="9"/>
-                <path class="journey__spokes" d="M152 42v14M145 49h14"/>
-              </g>
-              <circle class="journey__headlight" cx="189" cy="40" r="2.5"/>
-              <rect class="journey__taillight" x="8.5" y="37" width="3" height="5" rx="1"/>
-            </svg>
+            <svg class="tl-art journey__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
             <span class="journey__road"></span>
           </div>
           <p class="booking-loading__text" id="booking-loading-text">Recibiendo tu solicitud…</p>
@@ -1088,6 +1084,7 @@
               <circle class="success-seal__ring" cx="40" cy="40" r="36" pathLength="1" transform="rotate(-90 40 40)"/>
               <path class="success-seal__check" d="M25 41 L36 52 L56 30" pathLength="1"/>
             </svg>
+            <svg class="tl-art success-seal__chauffeur" viewBox="-16 -66 32 68"><use href="#tl-chauffeur"/></svg>
             <span class="success-seal__spark"></span>
             <span class="success-seal__spark"></span>
             <span class="success-seal__spark"></span>
@@ -1187,7 +1184,7 @@
     <section class="faq" id="faq" aria-labelledby="faq-title">
       <div class="faq__container">
         <div class="road-divider reveal" aria-hidden="true">
-          <svg class="road-divider__car" viewBox="0 0 200 64"><use href="#icon-sedan"/></svg>
+          <svg class="tl-art road-divider__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
         </div>
 
         <header class="faq__header">
@@ -1308,6 +1305,9 @@
      FOOTER
   ========================================== -->
   <footer class="footer" role="contentinfo">
+    <div class="footer-road" aria-hidden="true">
+      <svg class="tl-art footer-road__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
+    </div>
     <div class="footer__container">
       <div class="footer__brand">
         <a href="#" class="footer__logo-link" aria-label="TeLlevo — Inicio">

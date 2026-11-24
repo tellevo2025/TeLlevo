@@ -222,31 +222,15 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 @keyframes lightPass { to { transform: translateX(-520px); } }
 
 .journey__car {
-  position: absolute; left: 50%; bottom: 16px;
-  width: 250px; height: auto;
-  margin-left: -110px;
-  animation: carBob .9s ease-in-out infinite;
+  position: absolute; left: 50%; bottom: 14px;
+  width: 230px; height: auto;
+  margin-left: -100px;
+  --tl-beam: 1;
+  animation: carBob .9s ease-in-out infinite, tlDrive .6s linear infinite;
 }
 @keyframes carBob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-1.5px); }
-}
-.journey__body  { fill: var(--color-primary-light); stroke: var(--color-gold); stroke-width: 1.5; stroke-linejoin: round; }
-.journey__glass { fill: var(--gold-a12); stroke: var(--color-gold); stroke-width: 1; stroke-linejoin: round; }
-.journey__tyre  { fill: var(--color-primary); stroke: var(--color-gold); stroke-width: 1.5; }
-.journey__spokes { fill: none; stroke: var(--color-gold); stroke-width: 1; }
-.journey__wheel {
-  transform-box: fill-box; transform-origin: center;
-  animation: wheelSpin .55s linear infinite;
-}
-@keyframes wheelSpin { to { transform: rotate(360deg); } }
-.journey__headlight { fill: var(--color-gold-bright); filter: drop-shadow(0 0 4px var(--color-gold-bright)); }
-.journey__taillight { fill: var(--color-danger); }
-.journey__beam-stop { stop-color: var(--color-gold-pale); }
-.journey__beam { animation: beamFlicker 2.4s ease-in-out infinite; }
-@keyframes beamFlicker {
-  0%, 100% { opacity: .9; }
-  50%      { opacity: .6; }
 }
 .journey__road {
   position: absolute; left: 0; bottom: 12px;
@@ -618,30 +602,14 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   inherits: true;
   initial-value: 0;
 }
-.sedan__driver,
-.journey__driver { fill: var(--sedan-driver, currentColor); }
-.sedan__passenger,
-.journey__passenger { fill: var(--sedan-passenger, currentColor); opacity: .5; }
-.journey__driver { fill: var(--color-gold-bright); }
-.journey__passenger { fill: var(--color-gold-pale); }
-/* La gorra se levanta como saludo: el valor llega desde el auto que la contiene. */
-.sedan__cap,
-.journey__cap {
+.sedan__driver { fill: var(--sedan-driver, currentColor); }
+.sedan__passenger { fill: var(--sedan-passenger, currentColor); opacity: .5; }
+.sedan__cap {
   transform-box: fill-box;
   transform-origin: 30% 100%;
   transform: translateY(calc(var(--cap-lift) * -3px)) rotate(calc(var(--cap-lift) * -14deg));
 }
-@keyframes capTipLoop {
-  0%, 70%, 100% { --cap-lift: 0; }
-  80%, 88%      { --cap-lift: 1; }
-}
-.journey__car { animation: carBob .9s ease-in-out infinite, capTipLoop 2.6s ease-in-out infinite; }
 
-.road-divider { height: 46px; }
-.road-divider__car { width: 110px; margin-left: -55px; }
-@media (min-width: 1024px) {
-  .steps__progress-car { top: -28px; width: 84px; margin-left: -42px; }
-}
 /* ==========================================
    14. AJUSTES CELULAR Y ESCRITORIO
 ========================================== */
@@ -696,22 +664,63 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .journey__car { animation: none; }
 }
 
 /* Tablet: tres tarjetas de servicio no caben a lo ancho; van en filas con el ícono a la izquierda. */
 @media (min-width: 640px) and (max-width: 1023px) {
   .services__grid { grid-template-columns: 1fr; }
   .service-card--sm { flex-direction: row; align-items: flex-start; gap: var(--space-4); }
-  .service-card--sm .service-card__icon { flex-shrink: 0; width: 48px; height: 48px; }
   .service-card--sm .service-card__text { display: block; overflow: visible; -webkit-line-clamp: unset; }
 }
 
 /* ==========================================
-   15. HERO — el chofer sale del salón, saluda, se sube y te lleva a casa
-   Ciclo de 12 s: camina (4–34 %), levanta la gorra (36–46 %), sube al auto
-   (47–52 %), maneja hasta tu casa (54–86 %) y se enciende la luz (86–95 %).
+   15. SISTEMA DE ILUSTRACIÓN TELLEVO
+   Un solo auto (#tl-car) y un solo chofer (#tl-chauffeur) para toda la landing.
+   Cada copia se anima por separado con propiedades --tl-* que hereda de su <use>.
 ========================================== */
+@property --tl-driver    { syntax: '<number>'; inherits: true; initial-value: 1; }
+@property --tl-passenger { syntax: '<number>'; inherits: true; initial-value: 1; }
+@property --tl-beam      { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --tl-ribbon    { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --tl-key       { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --tl-cap       { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --tl-arm       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --tl-arm-back  { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --tl-leg       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --tl-wheel     { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --tl-bob       { syntax: '<length>'; inherits: true; initial-value: 0px; }
+
+.tl-art { display: block; overflow: visible; }
+.tl-car__driver    { opacity: var(--tl-driver); }
+.tl-car__passenger { opacity: var(--tl-passenger); }
+.tl-car__beam      { opacity: var(--tl-beam); transition: opacity .4s ease; }
+.tl-car__ribbon    { opacity: var(--tl-ribbon); }
+/* Cada rueda está dibujada alrededor de (0,0) dentro de un grupo trasladado a su eje. */
+.tl-car__wheel     { transform-box: view-box; transform-origin: 0 0; transform: rotate(var(--tl-wheel)); }
+.tl-ch__body       { transform: translateY(var(--tl-bob)); }
+.tl-ch__limb       { transform-box: fill-box; transform-origin: 50% 7%; }
+.tl-ch__arm-front  { transform: rotate(var(--tl-arm)); }
+.tl-ch__arm-back   { transform: rotate(var(--tl-arm-back)); }
+.tl-ch__leg-front  { transform: rotate(var(--tl-leg)); }
+.tl-ch__leg-back   { transform: rotate(calc(var(--tl-leg) * -1)); }
+.tl-ch__key        { opacity: var(--tl-key); }
+.tl-ch__cap {
+  transform-box: fill-box; transform-origin: 20% 100%;
+  transform: translateY(calc(var(--tl-cap) * -2.6px)) rotate(calc(var(--tl-cap) * -14deg));
+}
+
+/* Movimientos reutilizables */
+@keyframes tlDrive   { from { --tl-wheel: 0deg; } to { --tl-wheel: 360deg; } }
+@keyframes tlCapTip {
+  0%, 58%, 100% { --tl-arm: 0deg; --tl-cap: 0; }
+  68%, 82%      { --tl-arm: -165deg; --tl-cap: 1; }
+}
+@keyframes tlKeyOffer {
+  0%, 100% { --tl-arm: -62deg; }
+  50%      { --tl-arm: -78deg; }
+}
+
+/* ── Hero: el chofer sale del salón, saluda, se sube y te lleva a casa (12 s) ── */
 .hero-scene { width: 100%; }
 .hero-scene__svg { display: block; width: 100%; height: auto; overflow: visible; }
 .hero-scene__street { fill: var(--color-primary-light); }
@@ -736,21 +745,12 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
   color: var(--color-text-muted);
 }
-
-.hero-scene__car { animation: sceneCar 12s ease-in-out infinite; }
-.hero-scene__driver { opacity: 0; animation: sceneDriver 12s ease-in-out infinite; }
-.hero-scene__beam { opacity: 0; animation: sceneBeam 12s ease-in-out infinite; }
-.hero-scene__wheel { transform-box: fill-box; transform-origin: center; animation: sceneWheel 12s ease-in-out infinite; }
-
+.hero-scene__car { --tl-driver: 0; animation: sceneCar 12s ease-in-out infinite; }
 /* Sin animación, el chofer espera junto a la puerta del conductor. */
-.hero-scene__walker { transform: translateX(150px); animation: sceneWalk 12s linear infinite; }
-.hero-scene__person { animation: sceneBob 12s linear infinite; }
-.hero-scene__limb { transform-box: fill-box; transform-origin: 50% 7%; }
-.hero-scene__leg--back { animation: sceneLegBack 12s linear infinite; }
-.hero-scene__leg--front { animation: sceneLegFront 12s linear infinite; }
-.hero-scene__arm--back { animation: sceneArmBack 12s linear infinite; }
-.hero-scene__arm--front { animation: sceneArmFront 12s ease-in-out infinite; }
-.hero-scene__cap { transform-box: fill-box; transform-origin: 20% 100%; animation: sceneCap 12s ease-in-out infinite; }
+.hero-scene__walker {
+  transform: translateX(150px);
+  animation: sceneWalk 12s linear infinite, sceneGait 12s linear infinite, sceneArm 12s ease-in-out infinite;
+}
 
 @keyframes sceneWalk {
   0%        { transform: translateX(29px); opacity: 0; }
@@ -759,123 +759,61 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   47%       { transform: translateX(150px); opacity: 1; }
   52%, 100% { transform: translateX(146px); opacity: 0; }
 }
-@keyframes sceneBob {
-  0% { transform: translateY(0); }
-  4% { transform: translateY(0); }
-  5.25% { transform: translateY(-0.9px); }
-  6.5% { transform: translateY(0); }
-  7.75% { transform: translateY(-0.9px); }
-  9% { transform: translateY(0); }
-  10.25% { transform: translateY(-0.9px); }
-  11.5% { transform: translateY(0); }
-  12.75% { transform: translateY(-0.9px); }
-  14% { transform: translateY(0); }
-  15.25% { transform: translateY(-0.9px); }
-  16.5% { transform: translateY(0); }
-  17.75% { transform: translateY(-0.9px); }
-  19% { transform: translateY(0); }
-  20.25% { transform: translateY(-0.9px); }
-  21.5% { transform: translateY(0); }
-  22.75% { transform: translateY(-0.9px); }
-  24% { transform: translateY(0); }
-  25.25% { transform: translateY(-0.9px); }
-  26.5% { transform: translateY(0); }
-  27.75% { transform: translateY(-0.9px); }
-  29% { transform: translateY(0); }
-  30.25% { transform: translateY(-0.9px); }
-  31.5% { transform: translateY(0); }
-  32.75% { transform: translateY(-0.9px); }
-  34%, 100% { transform: translateY(0); }
+@keyframes sceneGait {
+  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  4% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  5.25% { --tl-bob: -0.9px; }
+  6.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  7.75% { --tl-bob: -0.9px; }
+  9% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  10.25% { --tl-bob: -0.9px; }
+  11.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  12.75% { --tl-bob: -0.9px; }
+  14% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  15.25% { --tl-bob: -0.9px; }
+  16.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  17.75% { --tl-bob: -0.9px; }
+  19% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  20.25% { --tl-bob: -0.9px; }
+  21.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  22.75% { --tl-bob: -0.9px; }
+  24% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  25.25% { --tl-bob: -0.9px; }
+  26.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  27.75% { --tl-bob: -0.9px; }
+  29% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  30.25% { --tl-bob: -0.9px; }
+  31.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  32.75% { --tl-bob: -0.9px; }
+  34%, 100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
 }
-@keyframes sceneLegBack {
-  0% { transform: rotate(0deg); }
-  4% { transform: rotate(22deg); }
-  6.5% { transform: rotate(-22deg); }
-  9% { transform: rotate(22deg); }
-  11.5% { transform: rotate(-22deg); }
-  14% { transform: rotate(22deg); }
-  16.5% { transform: rotate(-22deg); }
-  19% { transform: rotate(22deg); }
-  21.5% { transform: rotate(-22deg); }
-  24% { transform: rotate(22deg); }
-  26.5% { transform: rotate(-22deg); }
-  29% { transform: rotate(22deg); }
-  31.5% { transform: rotate(-22deg); }
-  34%, 100% { transform: rotate(0deg); }
-}
-@keyframes sceneLegFront {
-  0% { transform: rotate(0deg); }
-  4% { transform: rotate(-22deg); }
-  6.5% { transform: rotate(22deg); }
-  9% { transform: rotate(-22deg); }
-  11.5% { transform: rotate(22deg); }
-  14% { transform: rotate(-22deg); }
-  16.5% { transform: rotate(22deg); }
-  19% { transform: rotate(-22deg); }
-  21.5% { transform: rotate(22deg); }
-  24% { transform: rotate(-22deg); }
-  26.5% { transform: rotate(22deg); }
-  29% { transform: rotate(-22deg); }
-  31.5% { transform: rotate(22deg); }
-  34%, 100% { transform: rotate(0deg); }
-}
-@keyframes sceneArmBack {
-  0% { transform: rotate(0deg); }
-  4% { transform: rotate(-18deg); }
-  6.5% { transform: rotate(18deg); }
-  9% { transform: rotate(-18deg); }
-  11.5% { transform: rotate(18deg); }
-  14% { transform: rotate(-18deg); }
-  16.5% { transform: rotate(18deg); }
-  19% { transform: rotate(-18deg); }
-  21.5% { transform: rotate(18deg); }
-  24% { transform: rotate(-18deg); }
-  26.5% { transform: rotate(18deg); }
-  29% { transform: rotate(-18deg); }
-  31.5% { transform: rotate(18deg); }
-  34%, 100% { transform: rotate(0deg); }
-}
-@keyframes sceneArmFront {
-  0% { transform: rotate(0deg); }
-  4% { transform: rotate(18deg); }
-  6.5% { transform: rotate(-18deg); }
-  9% { transform: rotate(18deg); }
-  11.5% { transform: rotate(-18deg); }
-  14% { transform: rotate(18deg); }
-  16.5% { transform: rotate(-18deg); }
-  19% { transform: rotate(18deg); }
-  21.5% { transform: rotate(-18deg); }
-  24% { transform: rotate(18deg); }
-  26.5% { transform: rotate(-18deg); }
-  29% { transform: rotate(18deg); }
-  31.5% { transform: rotate(-18deg); }
-  34%, 36% { transform: rotate(0deg); }
-  40%, 44% { transform: rotate(-165deg); }
-  48%, 100% { transform: rotate(0deg); }
-}
-@keyframes sceneCap {
-  0%, 37%, 46%, 100% { transform: none; }
-  41%, 44%           { transform: translateY(-2.6px) rotate(-14deg); }
-}
-@keyframes sceneDriver {
-  0%, 49%   { opacity: 0; }
-  53%, 96%  { opacity: 1; }
-  100%      { opacity: 0; }
-}
-@keyframes sceneBeam {
-  0%, 51%   { opacity: 0; }
-  55%, 92%  { opacity: 1; }
-  96%, 100% { opacity: 0; }
+@keyframes sceneArm {
+  0% { --tl-arm: 0deg; --tl-cap: 0; }
+  4% { --tl-arm: 18deg; }
+  6.5% { --tl-arm: -18deg; }
+  9% { --tl-arm: 18deg; }
+  11.5% { --tl-arm: -18deg; }
+  14% { --tl-arm: 18deg; }
+  16.5% { --tl-arm: -18deg; }
+  19% { --tl-arm: 18deg; }
+  21.5% { --tl-arm: -18deg; }
+  24% { --tl-arm: 18deg; }
+  26.5% { --tl-arm: -18deg; }
+  29% { --tl-arm: 18deg; }
+  31.5% { --tl-arm: -18deg; }
+  34%, 36% { --tl-arm: 0deg; --tl-cap: 0; }
+  40%, 44% { --tl-arm: -165deg; --tl-cap: 1; }
+  48%, 100% { --tl-arm: 0deg; --tl-cap: 0; }
 }
 @keyframes sceneCar {
-  0%        { transform: translateX(0); opacity: 0; }
-  4%, 54%   { transform: translateX(0); opacity: 1; }
-  86%, 93%  { transform: translateX(136px); opacity: 1; }
-  98%, 100% { transform: translateX(136px); opacity: 0; }
-}
-@keyframes sceneWheel {
-  0%, 54%    { transform: rotate(0deg); }
-  86%, 100%  { transform: rotate(900deg); }
+  0%        { transform: translateX(0); opacity: 0; --tl-driver: 0; --tl-beam: 0; --tl-wheel: 0deg; }
+  4%        { transform: translateX(0); opacity: 1; }
+  49%       { --tl-driver: 0; --tl-beam: 0; }
+  53%       { --tl-driver: 1; }
+  54%       { transform: translateX(0); --tl-beam: 1; --tl-wheel: 0deg; }
+  86%       { transform: translateX(124px); --tl-wheel: 900deg; }
+  93%       { transform: translateX(124px); opacity: 1; --tl-driver: 1; --tl-beam: 1; --tl-wheel: 900deg; }
+  98%, 100% { transform: translateX(124px); opacity: 0; --tl-driver: 1; --tl-beam: 0; --tl-wheel: 900deg; }
 }
 @keyframes sceneLight {
   0%, 85%   { opacity: 0; }
@@ -887,10 +825,124 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   50%      { opacity: .35; }
 }
 
+/* ── Cómo funciona: auto ilustrado en la línea y chofer junto al botón ── */
+@media (min-width: 1024px) {
+  .steps__progress-car {
+    top: -30px; width: 96px; margin-left: -48px;
+    --tl-beam: 1;
+    animation: tlDrive .9s linear infinite;
+    filter: none;
+  }
+}
+.steps-section__cta { display: flex; align-items: flex-end; justify-content: center; gap: var(--space-3); }
+.steps-section__chauffeur { width: 34px; height: 72px; animation: tlCapTip 4.5s ease-in-out infinite; }
+
+/* ── Servicios: viñetas ilustradas ── */
+.service-card__art { height: 76px; margin-bottom: var(--space-1); }
+.service-art { width: 100%; height: 100%; }
+.service-art__ground { stroke: var(--gold-a25); stroke-width: 1.2; stroke-dasharray: 6 5; }
+.service-art__bunting { fill: none; stroke: var(--gold-a45); stroke-width: 1; }
+.service-art__flags path { fill: var(--color-gold); opacity: .85; }
+.service-art__flags path:nth-child(even) { fill: var(--color-gold-pale); }
+.service-art__chauffeur { animation: tlCapTip 5s ease-in-out infinite; }
+.service-art__chauffeur--2 { animation-delay: .35s; }
+.service-art__chauffeur--3 { animation-delay: .7s; }
+.service-art__chauffeur--key { --tl-key: 1; animation: tlKeyOffer 2.4s ease-in-out infinite; }
+.service-art__car { transition: transform .5s var(--ease-out-expo); }
+.service-card:hover .service-art__car,
+.service-card:focus-visible .service-art__car { --tl-beam: 1; transform: translateX(4px); animation: tlDrive .7s linear infinite; }
+.service-card:hover .service-art__chauffeur { animation-duration: 1.6s; }
+.service-card--alt .service-art__ground { stroke: rgba(37, 211, 102, .3); }
+/* Celular: la viñeta va arriba, más baja. Tablet: a la izquierda de la tarjeta en fila. */
+@media (max-width: 639px) {
+  .service-card--sm { flex-direction: column; }
+  .service-card--sm .service-card__art { flex: none; width: 100%; height: 64px; margin: 0; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .service-card--sm .service-card__art { flex: 0 0 150px; height: 60px; margin: 0; }
+}
+
+/* ── Matrimonios: auto de novios que llega con corazones ── */
+.wedding-art { width: min(100%, 360px); }
+.wedding-art__svg { width: 100%; height: auto; }
+.wedding-art__car { --tl-ribbon: 1; }
+.wedding-art__chauffeur { animation: tlCapTip 4s ease-in-out infinite; }
+.wedding-art__heart { fill: var(--color-gold-bright); opacity: 0; transform-box: fill-box; transform-origin: center; }
+.service-card--wedding-hero.is-visible .wedding-art__car {
+  animation: weddingArrive 2.4s var(--ease-out-expo) both, tlDrive .6s linear 4;
+}
+.service-card--wedding-hero.is-visible .wedding-art__heart { animation: heartFloat 3.2s ease-in-out 1.6s infinite; }
+.service-card--wedding-hero.is-visible .wedding-art__hearts g:nth-child(2) .wedding-art__heart { animation-delay: 2.2s; }
+.service-card--wedding-hero.is-visible .wedding-art__hearts g:nth-child(3) .wedding-art__heart { animation-delay: 2.8s; }
+@keyframes weddingArrive {
+  from { transform: translateX(-120px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes heartFloat {
+  0%   { opacity: 0; transform: translateY(6px) scale(.6); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-16px) scale(1.1); }
+}
+
+/* ── Separadores, cotizador, reservas, reseñas y footer ── */
+.road-divider { height: 54px; }
+.road-divider__car { width: 128px; margin-left: -64px; --tl-beam: 1; }
+.road-divider.is-visible .road-divider__car { animation: tlDrive .6s linear 3; }
+
+.section-emblem--car { width: 96px; border-radius: var(--radius-full); }
+.section-emblem__car { width: 76px; height: auto; }
+.section-emblem--car.is-driving .section-emblem__car {
+  --tl-beam: 1;
+  animation: tlDrive .45s linear 4, emblemRev 1.8s var(--ease-out-expo);
+}
+@keyframes emblemRev {
+  0%, 100% { transform: none; }
+  20%      { transform: translateX(-3px); }
+  60%      { transform: translateX(5px); }
+}
+.section-emblem--chauffeur { overflow: hidden; }
+.section-emblem__chauffeur { width: 42px; height: 48px; margin-top: 10px; animation: tlCapTip 4s ease-in-out infinite; }
+
+.success-seal__chauffeur {
+  position: absolute; left: calc(100% + 10px); bottom: -4px;
+  width: 36px; height: 76px;
+  animation: tlCapTip 3s ease-in-out 1s infinite;
+}
+
+.google-reviews__chauffeur { width: 38px; height: 80px; animation: tlCapTip 4.5s ease-in-out infinite; }
+
+.footer-road {
+  position: relative;
+  height: 52px;
+  overflow: hidden;
+  container-type: inline-size;
+  border-bottom: 1px solid var(--color-primary-mid);
+}
+.footer-road::before {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 8px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--gold-a45) 0 18px, transparent 18px 34px);
+}
+.footer-road__car {
+  position: absolute; left: 0; bottom: 9px;
+  width: 110px; height: auto;
+  --tl-beam: 1;
+  animation: footerDrive 16s linear infinite, tlDrive .7s linear infinite;
+}
+@keyframes footerDrive {
+  from { transform: translateX(-140px); }
+  to   { transform: translateX(calc(100cqw + 20px)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-scene__car, .hero-scene__driver, .hero-scene__beam, .hero-scene__wheel,
-  .hero-scene__walker, .hero-scene__person, .hero-scene__limb, .hero-scene__cap,
-  .hero-scene__window-light, .hero-scene__bulbs circle { animation: none; }
+  .hero-scene__car, .hero-scene__walker, .hero-scene__window-light, .hero-scene__bulbs circle,
+  .steps__progress-car, .steps-section__chauffeur, .service-art__chauffeur, .service-art__car,
+  .wedding-art__car, .wedding-art__chauffeur, .wedding-art__heart, .road-divider__car,
+  .section-emblem__car, .section-emblem__chauffeur, .success-seal__chauffeur,
+  .google-reviews__chauffeur, .footer-road__car, .journey__car { animation: none !important; }
+  .hero-scene__car, .wedding-art__car { opacity: 1; }
+  .footer-road__car { transform: translateX(24px); }
 }
 
 /* La escena no debe empujar las estadísticas fuera de la primera pantalla. */
