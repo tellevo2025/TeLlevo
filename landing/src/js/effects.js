@@ -197,6 +197,31 @@ const initStepsProgress = () => {
   update();
 };
 
+// ─── HERO: PROFUNDIDAD CON EL MOUSE ───────────────────────────────────────────
+/** La escena del hero se inclina y sus capas se desplazan según la posición del puntero. */
+const initHeroParallax = () => {
+  const stage = document.querySelector('[data-parallax]');
+  const hero = stage?.closest('.hero');
+  if (!hero || prefersReducedMotion() || !window.matchMedia('(hover: hover)').matches) return;
+
+  let frame = 0;
+  let point = { x: 0, y: 0 };
+  const apply = () => {
+    frame = 0;
+    stage.style.setProperty('--px', point.x.toFixed(3));
+    stage.style.setProperty('--py', point.y.toFixed(3));
+  };
+  hero.addEventListener('pointermove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    point = { x: ((e.clientX - rect.left) / rect.width - 0.5) * 2, y: ((e.clientY - rect.top) / rect.height - 0.5) * 2 };
+    frame ||= requestAnimationFrame(apply);
+  }, { passive: true });
+  hero.addEventListener('pointerleave', () => {
+    point = { x: 0, y: 0 };
+    frame ||= requestAnimationFrame(apply);
+  });
+};
+
 // ─── COTIZADOR: EL AUTO ACELERA AL CALCULAR ───────────────────────────────────
 const COT_DRIVE_MS = 1800;
 
@@ -215,6 +240,7 @@ const initCotizadorCar = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  initHeroParallax();
   initCotizadorCar();
   initStepsProgress();
 });

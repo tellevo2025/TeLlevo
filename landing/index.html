@@ -45,13 +45,18 @@
     </symbol>
     <defs>
       <linearGradient id="tl-body" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#2E5899"/>
-        <stop offset=".46" stop-color="#1B3768"/>
-        <stop offset=".54" stop-color="#132850"/>
-        <stop offset="1" stop-color="#091530"/>
+        <stop offset="0" stop-color="#3563A8"/>
+        <stop offset=".42" stop-color="#1D3B70"/>
+        <stop offset=".58" stop-color="#132850"/>
+        <stop offset="1" stop-color="#081430"/>
+      </linearGradient>
+      <linearGradient id="tl-pearl" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FFFFFF"/>
+        <stop offset=".5" stop-color="#EEE8DC"/>
+        <stop offset="1" stop-color="#B9B09E"/>
       </linearGradient>
       <linearGradient id="tl-glass" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#5B80B8"/>
+        <stop offset="0" stop-color="#6286BE"/>
         <stop offset="1" stop-color="#0B1A33"/>
       </linearGradient>
       <linearGradient id="tl-suit" x1="0" y1="0" x2="0" y2="1">
@@ -68,72 +73,101 @@
         <stop offset="1" stop-color="#F5DFA0" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <!-- El auto del cliente: chofer adelante, cliente atrás. Partes controladas con --tl-* -->
+    <!-- Sedán de lujo del cliente: chofer adelante, cliente atrás.
+         Con --tl-wedding se viste de carroza de novios (pintura perla, cintas, flores y corona). -->
     <symbol id="tl-car" viewBox="0 0 160 60" style="overflow:visible">
-      <ellipse cx="81" cy="57.6" rx="74" ry="2.6" fill="#000" opacity=".45"/>
-      <path class="tl-car__beam" d="M154.6 32.4 L224 20 L224 48 L154.6 36.4 Z" fill="url(#tl-beam)"/>
-      <path d="M8 42 C6 36 9 32 17 31 L36 28.5 C47 18 59 12 78 11 L98 11 C112 11 122 17 132 25.5 L144 27.5 C151 28.6 155 32 155 38 L155 43 C155 45.5 153.5 46.5 151 46.5 L139 46.5 C138 39.5 132.5 34.5 125 34.5 C117.5 34.5 112 39.5 111 46.5 L51 46.5 C50 39.5 44.5 34.5 37 34.5 C29.5 34.5 24 39.5 23 46.5 L12 46.5 C9.5 46.5 8 45 8 42 Z" fill="url(#tl-body)" stroke="#C9A84C" stroke-width="1" stroke-linejoin="round"/>
-      <path d="M51 46.5 L52.4 43.4 H109.8 L111 46.5 Z" fill="#050B18" opacity=".55"/>
-      <path d="M14 35.6 C45 33.4 115 33.4 152 34.6" stroke="#fff" stroke-width="1.1" opacity=".16" fill="none"/>
-      <path d="M47 28 C54 19.5 63 15 77 14.6 L84 14.6 L84 28 Z" fill="url(#tl-glass)"/>
-      <path d="M89 14.6 L98 14.6 C108.5 15 117 19.5 125 27.6 L89 28 Z" fill="url(#tl-glass)"/>
+      <ellipse cx="80" cy="57.8" rx="74" ry="2.6" fill="#000" opacity=".45"/>
+      <path class="tl-car__beam" d="M154.4 32.4 L226 19 L226 48 L154.4 37 Z" fill="url(#tl-beam)"/>
+      <g class="tl-car__cans">
+        <path d="M6 43 L-8 53 M7 44 L-1 55" stroke="#F7F3EA" stroke-width=".6" fill="none"/>
+        <rect x="-11.6" y="51.6" width="4.4" height="5.6" rx=".8" fill="#C9C2B3" stroke="#8A8272" stroke-width=".4"/>
+        <rect x="-4.4" y="53.2" width="4.4" height="4.6" rx=".8" fill="#C9C2B3" stroke="#8A8272" stroke-width=".4"/>
+      </g>
+      <path class="tl-car__body" d="M10 45 C7 44.5 5.5 42 5.6 38.5 L6.2 33.5 C6.6 30.6 8.6 29.2 12 28.8 L34 27.6 C42 26.8 47 24 54 18.6 C60 14 67 11.6 78 11.2 L96 11.2 C104 11.4 109 13.6 115 18.2 C119 21.4 122 24.4 125.5 27 L144 28.6 C150 29.2 153.6 31 154.4 34.4 L154.8 39.2 C154.9 42.6 153.4 44.6 150.4 45 L136.8 45.4 C135.8 38.2 130.4 33.6 122.5 33.6 C114.6 33.6 109.2 38.2 108.2 45.4 L50.6 45.4 C49.6 38.2 44.2 33.6 36.3 33.6 C28.4 33.6 23 38.2 22 45.4 L14 45.4 C12.2 45.4 11 45.2 10 45 Z" fill="url(#tl-body)" stroke="#C9A84C" stroke-width="1" stroke-linejoin="round"/>
+      <path d="M50.6 45.4 L51.8 42.4 H107 L108.2 45.4 Z" fill="#050B18" opacity=".5"/>
+      <path d="M12 34 C45 32.4 115 32.4 152 33.6" stroke="#fff" stroke-width="1.1" opacity=".18" fill="none"/>
+      <path d="M50.5 27.4 C55.5 21.4 62 15.6 72 14.4 L83.6 14.2 L83.6 27.4 Z" fill="url(#tl-glass)"/>
+      <path d="M88.6 14.2 L96.4 14.2 C103 14.4 108 16.6 112.4 20.4 L117.4 26.6 L88.6 27.4 Z" fill="url(#tl-glass)"/>
       <g class="tl-car__passenger">
-        <path d="M62 28 C62.5 24.8 65.5 24 69 24 C72.5 24 75.5 24.8 76 28 Z" fill="#F5DFA0"/>
-        <circle cx="69" cy="21.3" r="3.5" fill="#DDA77A"/>
-        <path d="M65.5 20.9 C65.4 17.5 67.4 16.4 69.4 16.4 C71.6 16.4 73.1 17.9 72.9 20.3 C71 18.8 68 18.8 65.5 20.9 Z" fill="#3B2A1E"/>
+        <path d="M63 27.4 C63.5 24.2 66.5 23.4 70 23.4 C73.5 23.4 76.5 24.2 77 27.4 Z" fill="#F5DFA0"/>
+        <circle cx="70" cy="20.6" r="3.5" fill="#DDA77A"/>
+        <path d="M66.5 20.2 C66.4 16.8 68.4 15.7 70.4 15.7 C72.6 15.7 74.1 17.2 73.9 19.6 C72 18.1 69 18.1 66.5 20.2 Z" fill="#3B2A1E"/>
+      </g>
+      <g class="tl-car__couple">
+        <path d="M57.4 27.4 C57.8 24.4 60.4 23.6 63.4 23.6 C66.4 23.6 69 24.4 69.4 27.4 Z" fill="#141C2E"/>
+        <path d="M62.6 23.8 L63.4 26 L64.2 23.8 Z" fill="#F7F3EA"/>
+        <circle cx="63.4" cy="20.8" r="3.3" fill="#DDA77A"/>
+        <path d="M60.2 20.2 C60.2 17.2 61.8 16.2 63.6 16.2 C65.6 16.2 66.8 17.4 66.6 19.4 C65 18.4 62.2 18.4 60.2 20.2 Z" fill="#2A1D14"/>
+        <path d="M71 18 C69.6 22 70 26 72 27.4 L82.6 27.4 C83 22.6 81.6 18.6 79.4 17 Z" fill="#F7F3EA" opacity=".92"/>
+        <path d="M72.4 27.4 C72.8 24.4 74.8 23.6 77 23.6 C79.2 23.6 81.2 24.4 81.6 27.4 Z" fill="#F7F3EA"/>
+        <circle cx="77" cy="20.8" r="3.2" fill="#E3B48C"/>
+        <path d="M73.8 20.4 C73.6 17.4 75.2 16.4 77 16.4 C79 16.4 80.4 17.6 80.2 19.8 C78.8 18.6 75.8 18.6 73.8 20.4 Z" fill="#5A3A22"/>
+        <path d="M74.6 16.8 L75.6 15.2 L77 16.4 L78.4 15.2 L79.4 16.8 Z" fill="#F0C040"/>
       </g>
       <g class="tl-car__driver">
-        <path d="M100 28 C100.5 24.8 103.5 24 107 24 C110.5 24 113.5 24.8 114 28 Z" fill="#12213D"/>
-        <circle cx="107" cy="21.3" r="3.5" fill="#DDA77A"/>
-        <path d="M103.3 19.3 C103.1 15.8 105.2 14.9 107.4 14.9 C110 14.9 111.6 16.2 111.2 19.3 Z" fill="#0B1426"/>
-        <rect x="103.3" y="18.1" width="7.9" height="1.2" fill="#C9A84C"/>
-        <path d="M109 19.3 H114.2 C114.2 20.3 113.4 20.6 112.6 20.6 H109 Z" fill="#0B1426"/>
-        <path d="M116.6 28 L119.4 22.6" stroke="#0B1426" stroke-width="1.6" stroke-linecap="round"/>
-        <circle cx="117.8" cy="24.2" r="1.4" fill="#F1EEE6"/>
+        <path d="M93 27.4 C93.5 24.2 96.5 23.4 100 23.4 C103.5 23.4 106.5 24.2 107 27.4 Z" fill="#12213D"/>
+        <circle cx="100" cy="20.6" r="3.5" fill="#DDA77A"/>
+        <path d="M96.3 18.6 C96.1 15.1 98.2 14.2 100.4 14.2 C103 14.2 104.6 15.5 104.2 18.6 Z" fill="#0B1426"/>
+        <rect x="96.3" y="17.4" width="7.9" height="1.2" fill="#C9A84C"/>
+        <path d="M102 18.6 H107.2 C107.2 19.6 106.4 19.9 105.6 19.9 H102 Z" fill="#0B1426"/>
+        <path d="M109.6 27.4 L112.4 22" stroke="#0B1426" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="110.8" cy="23.6" r="1.4" fill="#F1EEE6"/>
       </g>
-      <path d="M63 27.6 L73 15.6 L76.4 15.4 L66.4 27.6 Z" fill="#fff" opacity=".12"/>
-      <path d="M103.6 27.6 L111.6 16.6 L114 17.4 L106.4 27.6 Z" fill="#fff" opacity=".12"/>
-      <rect x="84" y="14.6" width="5" height="13.6" fill="#0B1830"/>
-      <path d="M47 28 C54 19.5 63 15 77 14.6 L98 14.6 C108.5 15 117 19.5 125 27.6" fill="none" stroke="#F5DFA0" stroke-width=".8" opacity=".75"/>
-      <path d="M42 29.8 H131" stroke="#F0C040" stroke-width=".9" opacity=".85"/>
-      <path d="M87 30.4 V45.5 M50 30.6 C49 35.5 49 40 50 45" stroke="#04070E" stroke-width=".75" opacity=".55" fill="none"/>
-      <rect x="72" y="32.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
-      <rect x="102" y="32.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
-      <path d="M121.4 26.8 L127 25.8 C128.6 25.6 129.5 26.8 129 28 L128 29.8 L121.8 29.2 Z" fill="#13294F" stroke="#C9A84C" stroke-width=".6"/>
-      <path d="M147.6 30.6 C151.6 31 154.2 32.8 154.8 35.4 L148 35.4 Z" fill="#FFF6D6"/>
-      <path d="M8.4 33.4 L13.6 32.8 L13.6 37.6 L8.2 37.8 Z" fill="#E25C5C"/>
-      <path d="M148.5 40.8 H155 M8.6 40.8 H17" stroke="#C9A84C" stroke-width=".9" stroke-linecap="round"/>
-      <g class="tl-car__ribbon">
-        <path d="M131.6 27.4 C135 30.6 141 30.4 146.6 29.2" stroke="#F5F1E8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <path d="M128.4 24.8 L131.6 27.4 L128.4 30 Z M134.8 24.8 L131.6 27.4 L134.8 30 Z" fill="#F5F1E8"/>
-        <circle cx="131.6" cy="27.4" r="1.1" fill="#F0C040"/>
+      <path d="M64 27 L74 15.2 L77.4 15 L67.4 27 Z" fill="#fff" opacity=".12"/>
+      <path d="M97 27 L105 16 L107.4 16.8 L99.8 27 Z" fill="#fff" opacity=".12"/>
+      <rect x="83.6" y="14.2" width="5" height="13.2" fill="#0B1830"/>
+      <path d="M50.5 27.4 C55.5 21.4 62 15.6 72 14.4 L96.4 14.2 C103 14.4 108 16.6 112.4 20.4 L117.4 26.6" fill="none" stroke="#F5DFA0" stroke-width=".8" opacity=".8"/>
+      <path d="M40 29.4 H126" stroke="#F0C040" stroke-width=".9" opacity=".85"/>
+      <path d="M86.1 29.6 V45 M50.4 29.6 C49.6 34 49.6 38.5 50.6 42 M118.4 29.4 C117.8 34.6 118.2 40 119 43" stroke="#04070E" stroke-width=".7" opacity=".5" fill="none"/>
+      <rect x="70" y="31.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
+      <rect x="100" y="31.6" width="7" height="1.5" rx=".75" fill="#C9A84C"/>
+      <path d="M114.6 25.4 L120.2 24.4 C121.8 24.2 122.7 25.4 122.2 26.6 L121.2 28.4 L115 27.8 Z" fill="#13294F" stroke="#C9A84C" stroke-width=".6"/>
+      <path d="M146.4 30.2 C150.6 30.6 153.4 32.2 154.2 34.8 L147.2 34.8 Z" fill="#FFF6D6"/>
+      <path d="M140.6 35.8 H153.8" stroke="#F0C040" stroke-width=".8" stroke-linecap="round"/>
+      <path d="M151.8 37.6 V42" stroke="#C9A84C" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M5.9 32.6 L12.4 31.8 L12.6 36.4 L5.8 36.8 Z" fill="#E25C5C"/>
+      <path d="M145 42.4 H154 M6.4 41 H16.4" stroke="#C9A84C" stroke-width=".9" stroke-linecap="round"/>
+      <g class="tl-car__wedding">
+        <path d="M78.6 10.6 L77.4 6.2 L80.4 8.2 L82.6 4.8 L84.8 8.2 L87.8 6.2 L86.6 10.6 Z" fill="#F0C040" stroke="#9C7A28" stroke-width=".4"/>
+        <path d="M58 37.6 C61 34.6 65 35 66 37.8 C67 40.6 63.4 41.6 62.2 39.6 M95 37.6 C98 34.6 102 35 103 37.8 C104 40.6 100.4 41.6 99.2 39.6" stroke="#C9A84C" stroke-width=".7" fill="none" stroke-linecap="round"/>
+        <circle cx="48" cy="29.6" r="1.25" fill="#F7F3EA"/><circle cx="55" cy="29.6" r="1.25" fill="#F2B8C6"/><circle cx="62" cy="29.6" r="1.25" fill="#F7F3EA"/><circle cx="69" cy="29.6" r="1.25" fill="#F2B8C6"/><circle cx="76" cy="29.6" r="1.25" fill="#F7F3EA"/><circle cx="83" cy="29.6" r="1.25" fill="#F2B8C6"/><circle cx="90" cy="29.6" r="1.25" fill="#F7F3EA"/><circle cx="97" cy="29.6" r="1.25" fill="#F2B8C6"/><circle cx="104" cy="29.6" r="1.25" fill="#F7F3EA"/><circle cx="111" cy="29.6" r="1.25" fill="#F2B8C6"/><circle cx="118" cy="29.6" r="1.25" fill="#F7F3EA"/>
+        <path d="M120.6 26.4 C128 33 140 36.4 152.4 37.6" stroke="#F7F3EA" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M136 28.6 C131.4 24.4 128.2 28.4 131.6 31.2 Z M136 28.6 C140.6 24.4 143.8 28.4 140.4 31.2 Z" fill="#F7F3EA" stroke="#C9A84C" stroke-width=".4"/>
+        <path d="M135.4 29.4 L133.6 33.6 M136.6 29.4 L138.4 33.6" stroke="#F7F3EA" stroke-width="1.1" stroke-linecap="round"/>
+        <circle cx="136" cy="28.8" r="1.2" fill="#F0C040"/>
+        <circle cx="146" cy="28.4" r="1.7" fill="#F2B8C6"/><circle cx="148.8" cy="29.4" r="1.5" fill="#F7F3EA"/><circle cx="143.4" cy="29.2" r="1.4" fill="#F7F3EA"/>
+        <ellipse cx="150.4" cy="30.6" rx="1.4" ry=".6" fill="#6FA27A"/><ellipse cx="141.6" cy="30.2" rx="1.3" ry=".6" fill="#6FA27A"/>
+        <rect x="11" y="30.8" width="21" height="5.4" rx="1.2" fill="#F7F3EA" stroke="#C9A84C" stroke-width=".5"/>
+        <text x="21.5" y="34.6" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="3.6" fill="#9C7A28">Recién casados</text>
       </g>
-      <path d="M23 46.5 C24 39.5 29.5 34.5 37 34.5 C44.5 34.5 50 39.5 51 46.5 M111 46.5 C112 39.5 117.5 34.5 125 34.5 C132.5 34.5 138 39.5 139 46.5" stroke="#050B18" stroke-width="1.6" opacity=".7" fill="none"/>
-      <g transform="translate(37 46.5)"><g class="tl-car__wheel">
-          <circle r="10.6" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
-          <circle r="7.2" fill="url(#tl-gold)"/>
+      <path d="M22 45.4 C23 38.2 28.4 33.6 36.3 33.6 C44.2 33.6 49.6 38.2 50.6 45.4 M108.2 45.4 C109.2 38.2 114.6 33.6 122.5 33.6 C130.4 33.6 135.8 38.2 136.8 45.4" stroke="#050B18" stroke-width="1.6" opacity=".7" fill="none"/>
+      <g transform="translate(36.3 46.5)"><g class="tl-car__wheel">
+          <circle r="11.2" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
+          <circle r="8" fill="url(#tl-gold)"/>
+          <circle r="6.6" fill="none" stroke="#0A1628" stroke-width=".5" opacity=".6"/>
           <g fill="#0A1628">
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(72)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(144)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(216)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(288)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(0)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(72)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(144)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(216)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(288)"/>
           </g>
-          <circle r="2.1" fill="#0A1628"/>
-          <circle r=".8" fill="#F0C040"/>
+          <circle r="2.2" fill="#0A1628"/>
+          <circle r=".85" fill="#F0C040"/>
       </g></g>
-      <g transform="translate(125 46.5)"><g class="tl-car__wheel">
-          <circle r="10.6" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
-          <circle r="7.2" fill="url(#tl-gold)"/>
+      <g transform="translate(122.5 46.5)"><g class="tl-car__wheel">
+          <circle r="11.2" fill="#070B14" stroke="#1B3A6B" stroke-width="1"/>
+          <circle r="8" fill="url(#tl-gold)"/>
+          <circle r="6.6" fill="none" stroke="#0A1628" stroke-width=".5" opacity=".6"/>
           <g fill="#0A1628">
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(72)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(144)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(216)"/>
-            <path d="M0 -6.6 L1.6 -1.5 L-1.6 -1.5 Z" transform="rotate(288)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(0)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(72)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(144)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(216)"/>
+            <path d="M0 -7.4 L1.7 -1.7 L-1.7 -1.7 Z" transform="rotate(288)"/>
           </g>
-          <circle r="2.1" fill="#0A1628"/>
-          <circle r=".8" fill="#F0C040"/>
+          <circle r="2.2" fill="#0A1628"/>
+          <circle r=".85" fill="#F0C040"/>
       </g></g>
     </symbol>
     <!-- El chofer TeLlevo, de cuerpo entero (pies en y=0). Poses con --tl-* -->
@@ -319,82 +353,107 @@
        HERO
     ========================================== -->
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero__scene" aria-hidden="true">
-        <span class="hero__streak hero__streak--1"></span>
-        <span class="hero__streak hero__streak--2"></span>
-        <span class="hero__streak hero__streak--3"></span>
-        <span class="hero__streak hero__streak--4"></span>
+      <div class="hero__backdrop" aria-hidden="true">
+        <span class="hero__orb hero__orb--gold"></span>
+        <span class="hero__orb hero__orb--blue"></span>
+        <span class="hero__grid"></span>
       </div>
       <div class="hero__container">
-        <p class="hero__eyebrow">Choferes de Reemplazo · Chile</p>
-        <h1 class="hero__title" id="hero-title">
-          <span id="hero-rotating-text">¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em></span>
-        </h1>
-        <p class="hero__subtitle">
-          Celebra sin límites. Nosotros manejamos tu auto y te llevamos sano y salvo a casa.
-        </p>
-        <div class="hero__actions">
-          <a href="#reserva" class="btn btn--primary btn--lg hero__cta">Reservar mi chofer</a>
-          <a href="#cotizar" class="btn btn--secondary btn--lg">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            Cotizar precio
-          </a>
-        </div>
-        <div class="hero-route">
-          <div class="hero-scene" aria-hidden="true">
-            <svg class="hero-scene__svg" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
-              <rect class="hero-scene__street" x="0" y="104" width="400" height="7" rx="2"/>
-              <line class="hero-scene__lane" x1="6" y1="107.5" x2="394" y2="107.5"/>
-              <g class="hero-scene__venue">
-                <path class="hero-scene__roof" d="M1 67 L29 48 L57 67 Z"/>
-                <rect class="hero-scene__wall" x="6" y="66" width="46" height="38" rx="1.5"/>
-                <path class="hero-scene__door" d="M22 104 V90 A7 7 0 0 1 36 90 V104 Z"/>
-                <g class="hero-scene__bulbs">
-                  <circle cx="10" cy="71" r="1.3"/><circle cx="17" cy="73" r="1.3"/><circle cx="24" cy="74" r="1.3"/>
-                  <circle cx="31" cy="74" r="1.3"/><circle cx="38" cy="73" r="1.3"/><circle cx="45" cy="71" r="1.3"/>
-                </g>
-              </g>
-              <g class="hero-scene__home">
-                <rect class="hero-scene__chimney" x="382" y="58" width="6" height="12"/>
-                <path class="hero-scene__roof" d="M341 79 L370 58 L399 79 Z"/>
-                <rect class="hero-scene__wall" x="346" y="78" width="48" height="26" rx="1.5"/>
-                <rect class="hero-scene__home-door" x="360" y="89" width="11" height="15" rx="1"/>
-                <rect class="hero-scene__window" x="377" y="84" width="11" height="9" rx="1"/>
-                <rect class="hero-scene__window-light" x="377" y="84" width="11" height="9" rx="1"/>
-              </g>
-              <g class="hero-scene__car"><use href="#tl-car" x="44" y="46" width="160" height="60"/></g>
-              <g class="hero-scene__walker"><use href="#tl-chauffeur" x="-16" y="38" width="32" height="68"/></g>
-            </svg>
-            <div class="hero-scene__labels">
-              <span>Tu evento</span>
-              <span>Tu casa</span>
-            </div>
+        <div class="hero__content">
+          <p class="hero__eyebrow"><span class="hero__eyebrow-dot" aria-hidden="true"></span>Choferes de reemplazo · Santiago</p>
+          <h1 class="hero__title" id="hero-title">
+            <span class="hero__line"><span class="hero__word">Tú</span> <span class="hero__word">celebras.</span></span>
+            <span class="hero__line"><span class="hero__word hero__word--gold">Nosotros</span> <span class="hero__word hero__word--gold">te</span> <span class="hero__word hero__word--gold">llevamos.</span></span>
+          </h1>
+          <p class="hero__subtitle">Un chofer profesional llega donde estés y maneja <strong>tu propio auto</strong> de vuelta a casa. Tú solo disfruta la noche.</p>
+          <div class="hero__actions">
+            <a href="#reserva" class="btn btn--primary btn--lg hero__cta">Reservar mi chofer <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></a>
+            <a href="#cotizar" class="btn btn--secondary btn--lg hero__cta-alt">Cotizar precio</a>
           </div>
-          <p class="hero-route__tagline">
-            <svg class="hero-route__icon hero-route__icon--sedan" viewBox="0 0 200 64" aria-hidden="true"><use href="#icon-sedan"/></svg>
-            Tu vehículo
-            <span class="hero-route__plus" aria-hidden="true">+</span>
-            <svg class="hero-route__icon" viewBox="0 0 48 48" aria-hidden="true"><use href="#icon-chauffeur"/></svg>
-            Nuestro chofer
-          </p>
+          <ul class="hero__stats" role="list" aria-label="Estadísticas del servicio">
+            <li class="hero__stat">
+              <span class="hero__stat-number" data-count-to="850" data-count-prefix="+">+850</span>
+              <span class="hero__stat-label">Clientes felices</span>
+            </li>
+            <li class="hero__stat">
+              <span class="hero__stat-number" data-count-to="94.8" data-count-decimals="1" data-count-suffix="%">94.8%</span>
+              <span class="hero__stat-label">Puntualidad</span>
+            </li>
+            <li class="hero__stat">
+              <span class="hero__stat-number" data-count-to="4.87" data-count-decimals="2" data-count-suffix="★">4.87★</span>
+              <span class="hero__stat-label">Calificación</span>
+            </li>
+          </ul>
         </div>
-        <ul class="hero__stats" role="list" aria-label="Estadísticas del servicio">
-          <li class="hero__stat">
-            <span class="hero__stat-number" data-count-to="850" data-count-prefix="+">+850</span>
-            <span class="hero__stat-label">Clientes felices</span>
-          </li>
-          <li class="hero__stat-divider" aria-hidden="true"></li>
-          <li class="hero__stat">
-            <span class="hero__stat-number" data-count-to="94.8" data-count-decimals="1" data-count-suffix="%">94.8%</span>
-            <span class="hero__stat-label">Puntualidad</span>
-          </li>
-          <li class="hero__stat-divider" aria-hidden="true"></li>
-          <li class="hero__stat">
-            <span class="hero__stat-number" data-count-to="4.87" data-count-decimals="2" data-count-suffix="★">4.87★</span>
-            <span class="hero__stat-label">Calificación</span>
-          </li>
-        </ul>
+        <div class="hero__visual" aria-hidden="true">
+          <div class="hero-stage" data-parallax>
+            <svg class="hero-stage__svg" viewBox="0 0 440 320" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="hv-sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#081329"/>
+                  <stop offset=".65" stop-color="#132A52"/>
+                  <stop offset="1" stop-color="#1E3D6E"/>
+                </linearGradient>
+                <radialGradient id="hv-moon-glow">
+                  <stop offset="0" stop-color="#F5DFA0" stop-opacity=".55"/>
+                  <stop offset="1" stop-color="#F5DFA0" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="hv-cone" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#F5DFA0" stop-opacity=".42"/>
+                  <stop offset="1" stop-color="#F5DFA0" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="hv-road" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#0E2142"/>
+                  <stop offset="1" stop-color="#050B18"/>
+                </linearGradient>
+                <linearGradient id="hv-reflect" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#fff" stop-opacity=".9"/>
+                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <mask id="hv-reflect-mask" maskUnits="userSpaceOnUse" x="0" y="262" width="440" height="58">
+                  <rect x="0" y="262" width="440" height="58" fill="url(#hv-reflect)"/>
+                </mask>
+                <clipPath id="hv-clip"><rect width="440" height="320" rx="26"/></clipPath>
+              </defs>
+              <g clip-path="url(#hv-clip)">
+                <rect width="440" height="320" fill="url(#hv-sky)"/>
+                <g class="hero-stage__layer hero-stage__layer--stars" fill="#F5DFA0"><circle class="hero-stage__star" cx="211" cy="99" r="1"/><circle class="hero-stage__star" cx="217" cy="46" r="1"/><circle class="hero-stage__star" cx="221" cy="16" r="1"/><circle class="hero-stage__star" cx="389" cy="82" r="1"/><circle class="hero-stage__star" cx="220" cy="63" r="0.6"/><circle class="hero-stage__star" cx="400" cy="112" r="1"/><circle class="hero-stage__star" cx="337" cy="35" r="1.2"/><circle class="hero-stage__star" cx="380" cy="61" r="0.8"/><circle class="hero-stage__star" cx="11" cy="65" r="0.8"/><circle class="hero-stage__star" cx="224" cy="24" r="0.6"/><circle class="hero-stage__star" cx="215" cy="83" r="1"/><circle class="hero-stage__star" cx="243" cy="108" r="0.8"/><circle class="hero-stage__star" cx="74" cy="11" r="0.6"/><circle class="hero-stage__star" cx="290" cy="28" r="1.2"/><circle class="hero-stage__star" cx="53" cy="83" r="1"/><circle class="hero-stage__star" cx="385" cy="74" r="0.8"/><circle class="hero-stage__star" cx="82" cy="54" r="1"/><circle class="hero-stage__star" cx="90" cy="76" r="0.8"/><circle class="hero-stage__star" cx="42" cy="23" r="1.2"/><circle class="hero-stage__star" cx="259" cy="106" r="0.8"/><circle class="hero-stage__star" cx="162" cy="26" r="0.6"/><circle class="hero-stage__star" cx="255" cy="50" r="0.6"/><circle class="hero-stage__star" cx="319" cy="91" r="1.2"/><circle class="hero-stage__star" cx="52" cy="101" r="0.8"/><circle class="hero-stage__star" cx="335" cy="110" r="0.8"/><circle class="hero-stage__star" cx="325" cy="61" r="0.8"/></g>
+                <g class="hero-stage__layer hero-stage__layer--moon">
+                  <circle cx="368" cy="70" r="70" fill="url(#hv-moon-glow)"/>
+                  <circle cx="368" cy="70" r="21" fill="#F7E7B8"/>
+                  <circle cx="361" cy="64" r="4" fill="#E8D49A" opacity=".7"/>
+                  <circle cx="374" cy="78" r="3" fill="#E8D49A" opacity=".6"/>
+                </g>
+                <g class="hero-stage__layer hero-stage__layer--far"><g fill="#142B55"><rect x="-6" y="180" width="31" height="72" rx="1"/><rect x="26" y="146" width="35" height="106" rx="1"/><rect x="65" y="164" width="30" height="88" rx="1"/><rect x="96" y="120" width="33" height="132" rx="1"/><rect x="131" y="158" width="38" height="94" rx="1"/><rect x="173" y="176" width="38" height="76" rx="1"/><rect x="213" y="132" width="35" height="120" rx="1"/><rect x="250" y="152" width="33" height="100" rx="1"/><rect x="285" y="110" width="32" height="142" rx="1"/><rect x="320" y="166" width="35" height="86" rx="1"/><rect x="359" y="142" width="38" height="110" rx="1"/><rect x="399" y="174" width="31" height="78" rx="1"/><rect x="432" y="154" width="35" height="98" rx="1"/></g><g fill="#F5DFA0"><rect class="hero-stage__lit" x="12" y="186" width="3" height="4" rx=".5"/><rect x="-2" y="195" width="3" height="4" rx=".5"/><rect x="19" y="195" width="3" height="4" rx=".5"/><rect x="-2" y="204" width="3" height="4" rx=".5"/><rect x="12" y="204" width="3" height="4" rx=".5"/><rect x="-2" y="213" width="3" height="4" rx=".5"/><rect x="5" y="222" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="19" y="222" width="3" height="4" rx=".5"/><rect x="-2" y="231" width="3" height="4" rx=".5"/><rect x="12" y="231" width="3" height="4" rx=".5"/><rect x="37" y="152" width="3" height="4" rx=".5"/><rect x="44" y="152" width="3" height="4" rx=".5"/><rect x="30" y="179" width="3" height="4" rx=".5"/><rect x="37" y="179" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="51" y="179" width="3" height="4" rx=".5"/><rect x="30" y="188" width="3" height="4" rx=".5"/><rect x="37" y="197" width="3" height="4" rx=".5"/><rect x="51" y="197" width="3" height="4" rx=".5"/><rect x="30" y="215" width="3" height="4" rx=".5"/><rect x="30" y="233" width="3" height="4" rx=".5"/><rect x="37" y="233" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="44" y="233" width="3" height="4" rx=".5"/><rect x="30" y="242" width="3" height="4" rx=".5"/><rect x="44" y="242" width="3" height="4" rx=".5"/><rect x="90" y="179" width="3" height="4" rx=".5"/><rect x="69" y="188" width="3" height="4" rx=".5"/><rect x="76" y="197" width="3" height="4" rx=".5"/><rect x="90" y="197" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="69" y="206" width="3" height="4" rx=".5"/><rect x="90" y="215" width="3" height="4" rx=".5"/><rect x="69" y="224" width="3" height="4" rx=".5"/><rect x="76" y="224" width="3" height="4" rx=".5"/><rect x="90" y="224" width="3" height="4" rx=".5"/><rect x="76" y="233" width="3" height="4" rx=".5"/><rect x="83" y="233" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="90" y="233" width="3" height="4" rx=".5"/><rect x="83" y="242" width="3" height="4" rx=".5"/><rect x="90" y="242" width="3" height="4" rx=".5"/><rect x="114" y="135" width="3" height="4" rx=".5"/><rect x="100" y="144" width="3" height="4" rx=".5"/><rect x="107" y="144" width="3" height="4" rx=".5"/><rect x="114" y="144" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="121" y="144" width="3" height="4" rx=".5"/><rect x="107" y="153" width="3" height="4" rx=".5"/><rect x="114" y="153" width="3" height="4" rx=".5"/><rect x="121" y="153" width="3" height="4" rx=".5"/><rect x="100" y="162" width="3" height="4" rx=".5"/><rect x="114" y="162" width="3" height="4" rx=".5"/><rect x="107" y="171" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="114" y="171" width="3" height="4" rx=".5"/><rect x="107" y="180" width="3" height="4" rx=".5"/><rect x="114" y="189" width="3" height="4" rx=".5"/><rect x="121" y="189" width="3" height="4" rx=".5"/><rect x="107" y="198" width="3" height="4" rx=".5"/><rect x="121" y="198" width="3" height="4" rx=".5"/><rect x="100" y="207" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="121" y="207" width="3" height="4" rx=".5"/><rect x="107" y="216" width="3" height="4" rx=".5"/><rect x="114" y="225" width="3" height="4" rx=".5"/><rect x="100" y="234" width="3" height="4" rx=".5"/><rect x="107" y="243" width="3" height="4" rx=".5"/><rect x="135" y="164" width="3" height="4" rx=".5"/><rect x="156" y="164" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="163" y="173" width="3" height="4" rx=".5"/><rect x="142" y="191" width="3" height="4" rx=".5"/><rect x="149" y="191" width="3" height="4" rx=".5"/><rect x="156" y="200" width="3" height="4" rx=".5"/><rect x="156" y="209" width="3" height="4" rx=".5"/><rect x="142" y="218" width="3" height="4" rx=".5"/><rect x="135" y="227" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="135" y="236" width="3" height="4" rx=".5"/><rect x="142" y="236" width="3" height="4" rx=".5"/><rect x="156" y="236" width="3" height="4" rx=".5"/><rect x="177" y="191" width="3" height="4" rx=".5"/><rect x="191" y="191" width="3" height="4" rx=".5"/><rect x="177" y="200" width="3" height="4" rx=".5"/><rect x="191" y="200" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="205" y="200" width="3" height="4" rx=".5"/><rect x="184" y="209" width="3" height="4" rx=".5"/><rect x="191" y="209" width="3" height="4" rx=".5"/><rect x="198" y="218" width="3" height="4" rx=".5"/><rect x="184" y="236" width="3" height="4" rx=".5"/><rect x="191" y="236" width="3" height="4" rx=".5"/><rect x="217" y="138" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="231" y="138" width="3" height="4" rx=".5"/><rect x="231" y="156" width="3" height="4" rx=".5"/><rect x="217" y="165" width="3" height="4" rx=".5"/><rect x="224" y="165" width="3" height="4" rx=".5"/><rect x="238" y="201" width="3" height="4" rx=".5"/><rect x="238" y="210" width="3" height="4" rx=".5"/><rect x="217" y="219" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="231" y="219" width="3" height="4" rx=".5"/><rect x="238" y="219" width="3" height="4" rx=".5"/><rect x="217" y="228" width="3" height="4" rx=".5"/><rect x="217" y="237" width="3" height="4" rx=".5"/><rect x="238" y="237" width="3" height="4" rx=".5"/><rect x="254" y="158" width="3" height="4" rx=".5"/><rect x="268" y="167" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="268" y="176" width="3" height="4" rx=".5"/><rect x="275" y="176" width="3" height="4" rx=".5"/><rect x="261" y="185" width="3" height="4" rx=".5"/><rect x="254" y="194" width="3" height="4" rx=".5"/><rect x="254" y="203" width="3" height="4" rx=".5"/><rect x="254" y="212" width="3" height="4" rx=".5"/><rect x="261" y="212" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="268" y="212" width="3" height="4" rx=".5"/><rect x="254" y="221" width="3" height="4" rx=".5"/><rect x="261" y="221" width="3" height="4" rx=".5"/><rect x="261" y="230" width="3" height="4" rx=".5"/><rect x="268" y="230" width="3" height="4" rx=".5"/><rect x="268" y="239" width="3" height="4" rx=".5"/><rect x="275" y="239" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="296" y="116" width="3" height="4" rx=".5"/><rect x="303" y="116" width="3" height="4" rx=".5"/><rect x="310" y="116" width="3" height="4" rx=".5"/><rect x="289" y="125" width="3" height="4" rx=".5"/><rect x="303" y="125" width="3" height="4" rx=".5"/><rect x="310" y="125" width="3" height="4" rx=".5"/><rect x="289" y="134" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="296" y="134" width="3" height="4" rx=".5"/><rect x="303" y="143" width="3" height="4" rx=".5"/><rect x="303" y="152" width="3" height="4" rx=".5"/><rect x="310" y="152" width="3" height="4" rx=".5"/><rect x="310" y="161" width="3" height="4" rx=".5"/><rect x="303" y="170" width="3" height="4" rx=".5"/><rect x="296" y="179" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="303" y="179" width="3" height="4" rx=".5"/><rect x="303" y="188" width="3" height="4" rx=".5"/><rect x="303" y="206" width="3" height="4" rx=".5"/><rect x="310" y="206" width="3" height="4" rx=".5"/><rect x="289" y="215" width="3" height="4" rx=".5"/><rect x="296" y="215" width="3" height="4" rx=".5"/><rect x="289" y="224" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="289" y="233" width="3" height="4" rx=".5"/><rect x="289" y="242" width="3" height="4" rx=".5"/><rect x="324" y="172" width="3" height="4" rx=".5"/><rect x="331" y="172" width="3" height="4" rx=".5"/><rect x="345" y="172" width="3" height="4" rx=".5"/><rect x="331" y="181" width="3" height="4" rx=".5"/><rect x="331" y="190" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="345" y="190" width="3" height="4" rx=".5"/><rect x="331" y="199" width="3" height="4" rx=".5"/><rect x="331" y="208" width="3" height="4" rx=".5"/><rect x="345" y="208" width="3" height="4" rx=".5"/><rect x="324" y="217" width="3" height="4" rx=".5"/><rect x="331" y="217" width="3" height="4" rx=".5"/><rect x="345" y="217" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="324" y="226" width="3" height="4" rx=".5"/><rect x="331" y="226" width="3" height="4" rx=".5"/><rect x="338" y="226" width="3" height="4" rx=".5"/><rect x="377" y="148" width="3" height="4" rx=".5"/><rect x="363" y="157" width="3" height="4" rx=".5"/><rect x="370" y="166" width="3" height="4" rx=".5"/><rect x="370" y="184" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="377" y="184" width="3" height="4" rx=".5"/><rect x="384" y="184" width="3" height="4" rx=".5"/><rect x="363" y="193" width="3" height="4" rx=".5"/><rect x="377" y="202" width="3" height="4" rx=".5"/><rect x="384" y="211" width="3" height="4" rx=".5"/><rect x="363" y="220" width="3" height="4" rx=".5"/><rect x="370" y="220" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="377" y="220" width="3" height="4" rx=".5"/><rect x="391" y="220" width="3" height="4" rx=".5"/><rect x="391" y="238" width="3" height="4" rx=".5"/><rect x="403" y="180" width="3" height="4" rx=".5"/><rect x="417" y="180" width="3" height="4" rx=".5"/><rect x="403" y="189" width="3" height="4" rx=".5"/><rect x="410" y="189" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="417" y="189" width="3" height="4" rx=".5"/><rect x="417" y="198" width="3" height="4" rx=".5"/><rect x="417" y="207" width="3" height="4" rx=".5"/><rect x="403" y="216" width="3" height="4" rx=".5"/><rect x="424" y="216" width="3" height="4" rx=".5"/><rect x="403" y="234" width="3" height="4" rx=".5"/><rect x="410" y="234" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="424" y="234" width="3" height="4" rx=".5"/><rect x="410" y="243" width="3" height="4" rx=".5"/><rect x="436" y="169" width="3" height="4" rx=".5"/><rect x="457" y="169" width="3" height="4" rx=".5"/><rect x="436" y="178" width="3" height="4" rx=".5"/><rect x="457" y="178" width="3" height="4" rx=".5"/><rect x="436" y="187" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="450" y="187" width="3" height="4" rx=".5"/><rect x="436" y="196" width="3" height="4" rx=".5"/><rect x="457" y="196" width="3" height="4" rx=".5"/><rect x="457" y="205" width="3" height="4" rx=".5"/><rect x="450" y="223" width="3" height="4" rx=".5"/><rect x="457" y="223" width="3" height="4" rx=".5"/><rect x="436" y="232" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="450" y="232" width="3" height="4" rx=".5"/><rect x="436" y="241" width="3" height="4" rx=".5"/><rect x="443" y="241" width="3" height="4" rx=".5"/><rect x="457" y="241" width="3" height="4" rx=".5"/></g></g>
+                <g class="hero-stage__layer hero-stage__layer--near"><g fill="#0D1E3D"><rect x="-10" y="206" width="46" height="50" rx="1"/><rect x="39" y="188" width="41" height="68" rx="1"/><rect x="82" y="214" width="35" height="42" rx="1"/><rect x="121" y="172" width="41" height="84" rx="1"/><rect x="163" y="198" width="37" height="58" rx="1"/><rect x="202" y="210" width="48" height="46" rx="1"/><rect x="253" y="182" width="39" height="74" rx="1"/><rect x="295" y="202" width="48" height="54" rx="1"/><rect x="344" y="192" width="44" height="64" rx="1"/><rect x="389" y="216" width="44" height="40" rx="1"/><rect x="434" y="196" width="35" height="60" rx="1"/></g><g fill="#F0C040"><rect class="hero-stage__lit" x="8" y="221" width="3" height="4" rx=".5"/><rect x="1" y="230" width="3" height="4" rx=".5"/><rect x="8" y="230" width="3" height="4" rx=".5"/><rect x="22" y="230" width="3" height="4" rx=".5"/><rect x="1" y="239" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="22" y="239" width="3" height="4" rx=".5"/><rect x="57" y="194" width="3" height="4" rx=".5"/><rect x="64" y="194" width="3" height="4" rx=".5"/><rect x="71" y="194" width="3" height="4" rx=".5"/><rect x="57" y="203" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="50" y="212" width="3" height="4" rx=".5"/><rect x="57" y="212" width="3" height="4" rx=".5"/><rect x="64" y="212" width="3" height="4" rx=".5"/><rect x="43" y="221" width="3" height="4" rx=".5"/><rect x="50" y="221" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="57" y="221" width="3" height="4" rx=".5"/><rect x="50" y="239" width="3" height="4" rx=".5"/><rect x="57" y="239" width="3" height="4" rx=".5"/><rect x="71" y="239" width="3" height="4" rx=".5"/><rect x="86" y="220" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="93" y="220" width="3" height="4" rx=".5"/><rect x="107" y="229" width="3" height="4" rx=".5"/><rect x="86" y="238" width="3" height="4" rx=".5"/><rect x="93" y="247" width="3" height="4" rx=".5"/><rect x="125" y="178" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="132" y="178" width="3" height="4" rx=".5"/><rect x="139" y="178" width="3" height="4" rx=".5"/><rect x="132" y="196" width="3" height="4" rx=".5"/><rect x="146" y="196" width="3" height="4" rx=".5"/><rect x="132" y="205" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="139" y="205" width="3" height="4" rx=".5"/><rect x="146" y="205" width="3" height="4" rx=".5"/><rect x="132" y="214" width="3" height="4" rx=".5"/><rect x="139" y="214" width="3" height="4" rx=".5"/><rect x="132" y="223" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="146" y="223" width="3" height="4" rx=".5"/><rect x="153" y="223" width="3" height="4" rx=".5"/><rect x="125" y="241" width="3" height="4" rx=".5"/><rect x="132" y="241" width="3" height="4" rx=".5"/><rect x="153" y="241" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="188" y="204" width="3" height="4" rx=".5"/><rect x="174" y="213" width="3" height="4" rx=".5"/><rect x="181" y="213" width="3" height="4" rx=".5"/><rect x="174" y="222" width="3" height="4" rx=".5"/><rect x="167" y="231" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="181" y="231" width="3" height="4" rx=".5"/><rect x="195" y="231" width="3" height="4" rx=".5"/><rect x="167" y="240" width="3" height="4" rx=".5"/><rect x="181" y="240" width="3" height="4" rx=".5"/><rect x="206" y="216" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="234" y="216" width="3" height="4" rx=".5"/><rect x="206" y="225" width="3" height="4" rx=".5"/><rect x="220" y="225" width="3" height="4" rx=".5"/><rect x="227" y="225" width="3" height="4" rx=".5"/><rect x="234" y="225" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="206" y="243" width="3" height="4" rx=".5"/><rect x="227" y="243" width="3" height="4" rx=".5"/><rect x="264" y="188" width="3" height="4" rx=".5"/><rect x="271" y="188" width="3" height="4" rx=".5"/><rect x="278" y="188" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="257" y="206" width="3" height="4" rx=".5"/><rect x="271" y="206" width="3" height="4" rx=".5"/><rect x="285" y="206" width="3" height="4" rx=".5"/><rect x="264" y="224" width="3" height="4" rx=".5"/><rect x="271" y="233" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="278" y="233" width="3" height="4" rx=".5"/><rect x="285" y="233" width="3" height="4" rx=".5"/><rect x="285" y="242" width="3" height="4" rx=".5"/><rect x="299" y="208" width="3" height="4" rx=".5"/><rect x="306" y="208" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="299" y="217" width="3" height="4" rx=".5"/><rect x="306" y="217" width="3" height="4" rx=".5"/><rect x="299" y="226" width="3" height="4" rx=".5"/><rect x="327" y="226" width="3" height="4" rx=".5"/><rect x="334" y="235" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="313" y="244" width="3" height="4" rx=".5"/><rect x="320" y="244" width="3" height="4" rx=".5"/><rect x="334" y="244" width="3" height="4" rx=".5"/><rect x="348" y="198" width="3" height="4" rx=".5"/><rect x="348" y="207" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="355" y="207" width="3" height="4" rx=".5"/><rect x="362" y="207" width="3" height="4" rx=".5"/><rect x="348" y="216" width="3" height="4" rx=".5"/><rect x="355" y="225" width="3" height="4" rx=".5"/><rect x="369" y="225" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="355" y="234" width="3" height="4" rx=".5"/><rect x="362" y="234" width="3" height="4" rx=".5"/><rect x="369" y="234" width="3" height="4" rx=".5"/><rect x="376" y="234" width="3" height="4" rx=".5"/><rect x="383" y="243" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="400" y="222" width="3" height="4" rx=".5"/><rect x="407" y="222" width="3" height="4" rx=".5"/><rect x="421" y="222" width="3" height="4" rx=".5"/><rect x="407" y="231" width="3" height="4" rx=".5"/><rect x="414" y="231" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="393" y="240" width="3" height="4" rx=".5"/><rect x="400" y="240" width="3" height="4" rx=".5"/><rect x="414" y="240" width="3" height="4" rx=".5"/><rect x="459" y="202" width="3" height="4" rx=".5"/><rect x="445" y="211" width="3" height="4" rx=".5"/><rect class="hero-stage__lit" x="459" y="211" width="3" height="4" rx=".5"/><rect x="459" y="229" width="3" height="4" rx=".5"/><rect x="438" y="238" width="3" height="4" rx=".5"/><rect x="452" y="247" width="3" height="4" rx=".5"/></g></g>
+                <rect x="0" y="254" width="440" height="8" fill="#10264A"/>
+                <rect x="0" y="262" width="440" height="58" fill="url(#hv-road)"/>
+                <line x1="0" y1="262.5" x2="440" y2="262.5" stroke="#C9A84C" stroke-opacity=".35"/>
+                <line class="hero-stage__lane" x1="0" y1="294" x2="440" y2="294"/>
+                <g class="hero-stage__lamp">
+                  <path d="M47 118 L59 118 L112 262 L-6 262 Z" fill="url(#hv-cone)" class="hero-stage__cone"/>
+                  <ellipse cx="53" cy="263" rx="62" ry="6" fill="#F5DFA0" opacity=".18"/>
+                  <rect x="22" y="112" width="4" height="150" fill="#0B1830" stroke="#C9A84C" stroke-opacity=".45" stroke-width=".8"/>
+                  <path d="M24 114 Q24 104 38 104 H53" fill="none" stroke="#0B1830" stroke-width="3"/>
+                  <path d="M45 104 H61 L58 112 H48 Z" fill="#0B1830" stroke="#C9A84C" stroke-width=".8"/>
+                  <circle cx="53" cy="115" r="4" fill="#FFF3C4" class="hero-stage__bulb"/>
+                </g>
+                <g class="hero-stage__car">
+                  <g mask="url(#hv-reflect-mask)" opacity=".22"><g transform="translate(0 524) scale(1 -1)"><use href="#tl-car" x="44" y="153.25" width="300" height="112.5"/></g></g>
+                  <use href="#tl-car" x="44" y="153.25" width="300" height="112.5"/>
+                </g>
+                <g class="hero-stage__chauffeur"><use href="#tl-chauffeur" x="-30" y="138.25" width="60" height="127.5"/></g>
+              </g>
+              <rect x=".5" y=".5" width="439" height="319" rx="26" fill="none" stroke="#C9A84C" stroke-opacity=".45"/>
+            </svg>
+            <p class="hero-stage__chip hero-stage__chip--top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><polyline points="9 12 11 14 15 10"/></svg> Choferes verificados</p>
+            <p class="hero-stage__chip hero-stage__chip--bottom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg> Tu auto · Nuestro chofer · 24/7</p>
+          </div>
+        </div>
       </div>
+      <a class="hero__scroll" href="#como-funciona" aria-label="Ver cómo funciona">
+        <span class="hero__scroll-line" aria-hidden="true"></span>
+      </a>
     </section>
 
     <!-- ==========================================
@@ -533,8 +592,8 @@
             <div class="service-card__art" aria-hidden="true">
               <svg class="tl-art service-art service-art--replacement" viewBox="0 0 180 72">
                 <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
-                <g class="service-art__car"><use href="#tl-car" x="2" y="22" width="128" height="48"/></g>
-                <g class="service-art__chauffeur"><use href="#tl-chauffeur" x="136" y="10" width="30" height="63.75"/></g>
+                <g class="svc-rep__car"><use href="#tl-car" x="2" y="22.1" width="128" height="48"/></g>
+                <g class="svc-rep__chauffeur"><use href="#tl-chauffeur" x="-15" y="6.6" width="30" height="63.75"/></g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -548,12 +607,17 @@
           <a href="https://wa.me/56954873548?text=Hola%20TeLlevo%2C%20me%20interesa%20contratar%20choferes%20para%20mi%20evento.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" data-spotlight class="service-card service-card--sm service-card--alt reveal reveal--d2" aria-label="Choferes para tu evento — Contactar por WhatsApp">
             <div class="service-card__art" aria-hidden="true">
               <svg class="tl-art service-art service-art--team" viewBox="0 0 180 72">
-                <path class="service-art__bunting" d="M18 12 Q90 30 162 12"/>
-                <g class="service-art__flags"><path d="M40 17 l5 9 l5 -7 Z"/><path d="M70 22 l5 9 l5 -8 Z"/><path d="M100 22 l5 9 l5 -8 Z"/><path d="M130 17 l5 9 l5 -7 Z"/></g>
+                <path class="service-art__bunting" d="M10 10 Q90 28 170 10"/>
+                <g class="svc-team__lights">
+                  <circle cx="30" cy="15.4" r="1.6"/><circle cx="50" cy="19.2" r="1.6"/><circle cx="70" cy="21.6" r="1.6"/>
+                  <circle cx="90" cy="22.4" r="1.6"/><circle cx="110" cy="21.6" r="1.6"/><circle cx="130" cy="19.2" r="1.6"/><circle cx="150" cy="15.4" r="1.6"/>
+                </g>
                 <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
-                <g class="service-art__chauffeur service-art__chauffeur--1"><use href="#tl-chauffeur" x="42" y="10" width="30" height="63.75"/></g>
-                <g class="service-art__chauffeur service-art__chauffeur--2"><use href="#tl-chauffeur" x="75" y="10" width="30" height="63.75"/></g>
-                <g class="service-art__chauffeur service-art__chauffeur--3"><use href="#tl-chauffeur" x="108" y="10" width="30" height="63.75"/></g>
+                <g class="svc-team__row">
+                  <g transform="translate(58 0)"><g class="svc-team__member svc-team__member--1"><use href="#tl-chauffeur" x="-15" y="6.6" width="30" height="63.75"/></g></g>
+                  <g transform="translate(90 0)"><g class="svc-team__member svc-team__member--2"><use href="#tl-chauffeur" x="-15" y="6.6" width="30" height="63.75"/></g></g>
+                  <g transform="translate(122 0)"><g class="svc-team__member svc-team__member--3"><use href="#tl-chauffeur" x="-15" y="6.6" width="30" height="63.75"/></g></g>
+                </g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -568,8 +632,21 @@
             <div class="service-card__art" aria-hidden="true">
               <svg class="tl-art service-art service-art--valet" viewBox="0 0 180 72">
                 <line class="service-art__ground" x1="2" y1="68.5" x2="178" y2="68.5"/>
-                <g class="service-art__car"><use href="#tl-car" x="2" y="22" width="128" height="48"/></g>
-                <g class="service-art__chauffeur service-art__chauffeur--key"><use href="#tl-chauffeur" x="136" y="10" width="30" height="63.75"/></g>
+                <g class="svc-valet__sign">
+                  <rect x="156" y="6" width="18" height="18" rx="4"/>
+                  <text x="165" y="19.6" text-anchor="middle">P</text>
+                </g>
+                <g class="svc-valet__chauffeur"><use href="#tl-chauffeur" x="-15" y="6.6" width="30" height="63.75"/></g>
+                <g class="svc-valet__podium">
+                  <rect x="145" y="47" width="22" height="21.5" rx="1.5"/>
+                  <rect x="143" y="44" width="26" height="4" rx="1"/>
+                  <text x="156" y="59" text-anchor="middle">VALET</text>
+                </g>
+                <g class="svc-valet__car"><use href="#tl-car" x="2" y="22.1" width="128" height="48"/></g>
+                <g class="svc-valet__key-x"><g class="svc-valet__key-y">
+                  <circle cx="0" cy="0" r="2.6" fill="none" stroke="#F0C040" stroke-width="1.4"/>
+                  <path d="M2.4 0.4 H9.4 M7.4 0.4 V3 M5.4 0.4 V2.4" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round"/>
+                </g></g>
               </svg>
             </div>
             <div class="service-card__body">
@@ -595,6 +672,8 @@
             <div class="wedding-art" aria-hidden="true">
               <svg class="tl-art wedding-art__svg" viewBox="0 0 300 84">
                 <line class="service-art__ground" x1="4" y1="78.5" x2="296" y2="78.5"/>
+                <g class="wedding-art__sparks"><path class="wedding-art__spark" transform="translate(30 22)" d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1 Z"/><path class="wedding-art__spark" transform="translate(214 16)" d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1 Z"/><path class="wedding-art__spark" transform="translate(268 30)" d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1 Z"/><path class="wedding-art__spark" transform="translate(150 8)" d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1 Z"/></g>
+                <g class="wedding-art__petals"><g transform="translate(70 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F2B8C6"/></g><g transform="translate(104 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F7F3EA"/></g><g transform="translate(138 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F2B8C6"/></g><g transform="translate(172 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F7F3EA"/></g><g transform="translate(206 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F2B8C6"/></g><g transform="translate(240 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F7F3EA"/></g><g transform="translate(86 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F7F3EA"/></g><g transform="translate(190 -6)"><ellipse class="wedding-art__petal" rx="2.2" ry="1.3" fill="#F2B8C6"/></g></g>
                 <g class="wedding-art__hearts">
                   <g transform="translate(96 30)"><path class="wedding-art__heart" d="M0 0 C-2 -2.4 -5 -1 -5 1.4 C-5 4 -2 5.6 0 7.4 C2 5.6 5 4 5 1.4 C5 -1 2 -2.4 0 0 Z"/></g>
                   <g transform="translate(120 20)"><path class="wedding-art__heart" d="M0 0 C-2 -2.4 -5 -1 -5 1.4 C-5 4 -2 5.6 0 7.4 C2 5.6 5 4 5 1.4 C5 -1 2 -2.4 0 0 Z"/></g>

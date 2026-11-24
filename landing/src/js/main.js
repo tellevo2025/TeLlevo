@@ -1226,35 +1226,6 @@ const initCotizadorWidget = () => {
 // Callback invocado por el script de Google Maps una vez cargado
 window.initGoogleMaps = () => { initCotizadorWidget(); initCotizador(); };
 
-// ─── HERO TEXT ROTATOR ────────────────────────────────────────────────────────
-const initHeroRotator = () => {
-  const el = document.getElementById('hero-rotating-text');
-  if (!el) return;
-
-  const phrases = [
-    '¿Necesitas chofer de <em class="hero__title-accent">reemplazo?</em>',
-    '¿<em class="hero__title-accent">Te casas?</em> Tenemos el plan perfecto.',
-    '<em class="hero__title-accent">Valet Parking</em> para tu evento.',
-    'Celebra sin límites. <em class="hero__title-accent">Nosotros manejamos.</em>',
-  ];
-
-  let current = 0;
-
-  const rotate = () => {
-    el.classList.add('hero-rotate-out');
-    setTimeout(() => {
-      current = (current + 1) % phrases.length;
-      el.innerHTML = phrases[current];
-      el.classList.remove('hero-rotate-out');
-      el.classList.add('hero-rotate-in');
-      setTimeout(() => el.classList.remove('hero-rotate-in'), 450);
-    }, 350);
-  };
-
-  setInterval(rotate, 3500);
-};
-
-
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
@@ -1266,7 +1237,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initParadaToggle();
   initForm();
   initReveal();
-  initHeroRotator();
 
   initFAQ();
 });

@@ -72,59 +72,6 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 }
 
 /* ==========================================
-   3. HERO — escena nocturna
-========================================== */
-.hero__scene {
-  position: absolute; inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-/* Estelas de luz: autos pasando de noche */
-.hero__streak {
-  position: absolute; left: 0;
-  width: clamp(160px, 28vw, 420px); height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-gold-pale), transparent);
-  opacity: 0;
-  animation: streakPass 8s linear infinite;
-}
-.hero__streak--1 { top: 64%; animation-delay: 0s; }
-.hero__streak--2 { top: 72%; animation-delay: 2.6s; animation-duration: 6s; }
-.hero__streak--3 { top: 81%; animation-delay: 1.2s; animation-duration: 10s; }
-.hero__streak--4 { top: 89%; animation-delay: 4.4s; animation-duration: 7s; }
-@keyframes streakPass {
-  0%   { opacity: 0;   transform: translateX(-100%); }
-  12%  { opacity: .45; }
-  88%  { opacity: .45; }
-  100% { opacity: 0;   transform: translateX(100vw); }
-}
-
-/* Entrada escalonada del contenido */
-.hero__eyebrow,
-.hero__title,
-.hero__subtitle,
-.hero__actions,
-.hero-route,
-.hero__stats { animation: riseIn .9s var(--ease-out-expo) both; }
-.hero__title    { animation-delay: .1s; letter-spacing: -.01em; }
-.hero__subtitle { animation-delay: .22s; }
-.hero__actions  { animation-delay: .34s; }
-.hero-route     { animation-delay: .46s; }
-.hero__stats    { animation-delay: .58s; }
-.hero__stat-number { font-variant-numeric: tabular-nums; }
-
-/* Ruta animada: del evento a tu casa */
-.hero-route { max-width: 460px; margin: 0 auto var(--space-5); }
-.hero-route__tagline {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  font-size: .78rem; font-weight: 600; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--color-gold-pale);
-}
-.hero-route__icon { width: 20px; height: 20px; color: var(--color-gold); }
-.hero-route__icon--sedan { width: 40px; height: auto; }
-.hero-route__plus { color: var(--color-gold); font-weight: 400; }
-/* ==========================================
    4. FRANJA DE CONFIANZA
 ========================================== */
 .trust {
@@ -614,7 +561,6 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
    14. AJUSTES CELULAR Y ESCRITORIO
 ========================================== */
 /* Tamaños mínimos legibles y áreas táctiles de al menos 44px. */
-.hero__eyebrow { font-size: .72rem; }
 .service-card__tags li { font-size: .74rem; }
 .navbar__toggle { align-items: center; justify-content: center; width: 44px; height: 44px; }
 .calendar-nav { width: 40px; height: 40px; }
@@ -689,10 +635,16 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @property --tl-leg       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
 @property --tl-wheel     { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
 @property --tl-bob       { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --tl-wedding   { syntax: '<number>'; inherits: true; initial-value: 0; }
 
 .tl-art { display: block; overflow: visible; }
 .tl-car__driver    { opacity: var(--tl-driver); }
-.tl-car__passenger { opacity: var(--tl-passenger); }
+.tl-car__passenger { opacity: calc(var(--tl-passenger) * (1 - var(--tl-wedding))); }
+/* Carroza de novios: pintura perla, novios atrás, cintas, flores, corona y tarros. */
+.tl-car__body      { fill: var(--tl-paint, url(#tl-body)); }
+.tl-car__couple,
+.tl-car__wedding,
+.tl-car__cans      { opacity: var(--tl-wedding); }
 .tl-car__beam      { opacity: var(--tl-beam); transition: opacity .4s ease; }
 .tl-car__ribbon    { opacity: var(--tl-ribbon); }
 /* Cada rueda está dibujada alrededor de (0,0) dentro de un grupo trasladado a su eje. */
@@ -720,111 +672,6 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   50%      { --tl-arm: -78deg; }
 }
 
-/* ── Hero: el chofer sale del salón, saluda, se sube y te lleva a casa (12 s) ── */
-.hero-scene { width: 100%; }
-.hero-scene__svg { display: block; width: 100%; height: auto; overflow: visible; }
-.hero-scene__street { fill: var(--color-primary-light); }
-.hero-scene__lane { stroke: var(--gold-a45); stroke-width: 1; stroke-dasharray: 10 8; }
-.hero-scene__roof { fill: var(--color-primary-light); stroke: var(--gold-a45); stroke-width: 1.2; stroke-linejoin: round; }
-.hero-scene__wall { fill: var(--color-surface); stroke: var(--gold-a25); stroke-width: 1.2; }
-.hero-scene__door { fill: var(--gold-a12); stroke: var(--color-gold); stroke-width: 1; }
-.hero-scene__home-door { fill: var(--color-primary-mid); }
-.hero-scene__chimney { fill: var(--color-primary-light); stroke: var(--gold-a25); }
-.hero-scene__window { fill: var(--color-primary-mid); }
-.hero-scene__window-light {
-  fill: var(--color-gold-bright);
-  opacity: 0;
-  filter: drop-shadow(0 0 4px var(--color-gold-bright));
-  animation: sceneLight 12s ease-in-out infinite;
-}
-.hero-scene__bulbs circle { fill: var(--color-gold-bright); animation: sceneTwinkle 1.8s ease-in-out infinite; }
-.hero-scene__bulbs circle:nth-child(even) { animation-delay: .9s; }
-.hero-scene__labels {
-  display: flex; justify-content: space-between;
-  margin-top: 6px;
-  font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-.hero-scene__car { --tl-driver: 0; animation: sceneCar 12s ease-in-out infinite; }
-/* Sin animación, el chofer espera junto a la puerta del conductor. */
-.hero-scene__walker {
-  transform: translateX(150px);
-  animation: sceneWalk 12s linear infinite, sceneGait 12s linear infinite, sceneArm 12s ease-in-out infinite;
-}
-
-@keyframes sceneWalk {
-  0%        { transform: translateX(29px); opacity: 0; }
-  4%        { transform: translateX(29px); opacity: 1; }
-  34%       { transform: translateX(150px); }
-  47%       { transform: translateX(150px); opacity: 1; }
-  52%, 100% { transform: translateX(146px); opacity: 0; }
-}
-@keyframes sceneGait {
-  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-  4% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  5.25% { --tl-bob: -0.9px; }
-  6.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  7.75% { --tl-bob: -0.9px; }
-  9% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  10.25% { --tl-bob: -0.9px; }
-  11.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  12.75% { --tl-bob: -0.9px; }
-  14% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  15.25% { --tl-bob: -0.9px; }
-  16.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  17.75% { --tl-bob: -0.9px; }
-  19% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  20.25% { --tl-bob: -0.9px; }
-  21.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  22.75% { --tl-bob: -0.9px; }
-  24% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  25.25% { --tl-bob: -0.9px; }
-  26.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  27.75% { --tl-bob: -0.9px; }
-  29% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
-  30.25% { --tl-bob: -0.9px; }
-  31.5% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
-  32.75% { --tl-bob: -0.9px; }
-  34%, 100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
-}
-@keyframes sceneArm {
-  0% { --tl-arm: 0deg; --tl-cap: 0; }
-  4% { --tl-arm: 18deg; }
-  6.5% { --tl-arm: -18deg; }
-  9% { --tl-arm: 18deg; }
-  11.5% { --tl-arm: -18deg; }
-  14% { --tl-arm: 18deg; }
-  16.5% { --tl-arm: -18deg; }
-  19% { --tl-arm: 18deg; }
-  21.5% { --tl-arm: -18deg; }
-  24% { --tl-arm: 18deg; }
-  26.5% { --tl-arm: -18deg; }
-  29% { --tl-arm: 18deg; }
-  31.5% { --tl-arm: -18deg; }
-  34%, 36% { --tl-arm: 0deg; --tl-cap: 0; }
-  40%, 44% { --tl-arm: -165deg; --tl-cap: 1; }
-  48%, 100% { --tl-arm: 0deg; --tl-cap: 0; }
-}
-@keyframes sceneCar {
-  0%        { transform: translateX(0); opacity: 0; --tl-driver: 0; --tl-beam: 0; --tl-wheel: 0deg; }
-  4%        { transform: translateX(0); opacity: 1; }
-  49%       { --tl-driver: 0; --tl-beam: 0; }
-  53%       { --tl-driver: 1; }
-  54%       { transform: translateX(0); --tl-beam: 1; --tl-wheel: 0deg; }
-  86%       { transform: translateX(124px); --tl-wheel: 900deg; }
-  93%       { transform: translateX(124px); opacity: 1; --tl-driver: 1; --tl-beam: 1; --tl-wheel: 900deg; }
-  98%, 100% { transform: translateX(124px); opacity: 0; --tl-driver: 1; --tl-beam: 0; --tl-wheel: 900deg; }
-}
-@keyframes sceneLight {
-  0%, 85%   { opacity: 0; }
-  89%, 95%  { opacity: 1; }
-  100%      { opacity: 0; }
-}
-@keyframes sceneTwinkle {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: .35; }
-}
-
 /* ── Cómo funciona: auto ilustrado en la línea y chofer junto al botón ── */
 @media (min-width: 1024px) {
   .steps__progress-car {
@@ -837,23 +684,271 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 .steps-section__cta { display: flex; align-items: flex-end; justify-content: center; gap: var(--space-3); }
 .steps-section__chauffeur { width: 34px; height: 72px; animation: tlCapTip 4.5s ease-in-out infinite; }
 
-/* ── Servicios: viñetas ilustradas ── */
-.service-card__art { height: 76px; margin-bottom: var(--space-1); }
-.service-art { width: 100%; height: 100%; }
+/* ── Servicios: una escena distinta para cada uno ──
+   Chofer de reemplazo: el chofer saluda, se sube y se lleva el auto del cliente.
+   Choferes para tu evento: el equipo llega marchando, saluda en cadena y se va.
+   Valet Parking: llega el auto, el cliente lanza la llave y el valet lo estaciona. */
+.service-card__art { height: 76px; margin-bottom: var(--space-1); overflow: hidden; }
+.service-art { width: 100%; height: 100%; overflow: hidden; }
 .service-art__ground { stroke: var(--gold-a25); stroke-width: 1.2; stroke-dasharray: 6 5; }
 .service-art__bunting { fill: none; stroke: var(--gold-a45); stroke-width: 1; }
-.service-art__flags path { fill: var(--color-gold); opacity: .85; }
-.service-art__flags path:nth-child(even) { fill: var(--color-gold-pale); }
-.service-art__chauffeur { animation: tlCapTip 5s ease-in-out infinite; }
-.service-art__chauffeur--2 { animation-delay: .35s; }
-.service-art__chauffeur--3 { animation-delay: .7s; }
-.service-art__chauffeur--key { --tl-key: 1; animation: tlKeyOffer 2.4s ease-in-out infinite; }
-.service-art__car { transition: transform .5s var(--ease-out-expo); }
-.service-card:hover .service-art__car,
-.service-card:focus-visible .service-art__car { --tl-beam: 1; transform: translateX(4px); animation: tlDrive .7s linear infinite; }
-.service-card:hover .service-art__chauffeur { animation-duration: 1.6s; }
 .service-card--alt .service-art__ground { stroke: rgba(37, 211, 102, .3); }
-/* Celular: la viñeta va arriba, más baja. Tablet: a la izquierda de la tarjeta en fila. */
+
+.svc-rep__car { animation: svcRepCar 8s ease-in-out infinite; }
+.svc-rep__chauffeur {
+  transform: translateX(152px) scaleX(-1);
+  animation: svcRepChauffeur 8s linear infinite, svcRepGait 8s linear infinite, svcRepArm 8s ease-in-out infinite;
+}
+@keyframes svcRepChauffeur {
+  0%, 14%  { transform: translateX(152px) scaleX(-1); opacity: 1; }
+  28%      { transform: translateX(96px) scaleX(-1); opacity: 1; }
+  32%      { transform: translateX(92px) scaleX(-1); opacity: 0; }
+  90%      { transform: translateX(152px) scaleX(-1); opacity: 0; }
+  96%, 100% { transform: translateX(152px) scaleX(-1); opacity: 1; }
+}
+@keyframes svcRepGait {
+  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  14% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  15.5% { --tl-bob: -0.8px; }
+  17% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  18.5% { --tl-bob: -0.8px; }
+  20% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  21.5% { --tl-bob: -0.8px; }
+  23% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  24.5% { --tl-bob: -0.8px; }
+  26% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  27.5% { --tl-bob: -0.8px; }
+  28% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+}
+@keyframes svcRepArm {
+  0% { --tl-arm: 0deg; --tl-cap: 0; }
+  2% { --tl-arm: 0deg; --tl-cap: 0; }
+  5% { --tl-arm: -165deg; --tl-cap: 1; }
+  9% { --tl-arm: -165deg; --tl-cap: 1; }
+  12% { --tl-arm: 0deg; --tl-cap: 0; }
+  14% { --tl-arm: 20deg; --tl-cap: 0; }
+  17% { --tl-arm: -20deg; --tl-cap: 0; }
+  20% { --tl-arm: 20deg; --tl-cap: 0; }
+  23% { --tl-arm: -20deg; --tl-cap: 0; }
+  26% { --tl-arm: 20deg; --tl-cap: 0; }
+  28% { --tl-arm: 0deg; --tl-cap: 0; }
+  100% { --tl-arm: 0deg; --tl-cap: 0; }
+}
+@keyframes svcRepCar {
+  0%      { transform: translateX(0); --tl-driver: 0; --tl-beam: 0; --tl-wheel: 0deg; }
+  31%     { --tl-driver: 0; }
+  34%     { --tl-driver: 1; --tl-beam: 1; }
+  38%     { transform: translateX(0); --tl-wheel: 0deg; }
+  58%     { transform: translateX(200px); --tl-wheel: 900deg; }
+  58.01%  { transform: translateX(-200px); }
+  80%     { transform: translateX(0); --tl-wheel: 1800deg; }
+  84%     { --tl-beam: 1; --tl-driver: 1; }
+  88%     { --tl-beam: 0; --tl-driver: 0; }
+  100%    { transform: translateX(0); --tl-driver: 0; --tl-beam: 0; --tl-wheel: 1800deg; }
+}
+
+.svc-team__lights circle { fill: var(--color-gold-bright); animation: sceneTwinkle 1.6s ease-in-out infinite; }
+.svc-team__lights circle:nth-child(even) { animation-delay: .8s; }
+.svc-team__row { animation: svcTeamMarch 9s linear infinite; }
+.svc-team__member { animation: svcTeamGait 9s linear infinite; }
+.svc-team__member--1 { animation-name: svcTeamGait, svcTeamArm1; animation-duration: 9s; animation-iteration-count: infinite; }
+.svc-team__member--2 { animation-name: svcTeamGait, svcTeamArm2; animation-duration: 9s; animation-iteration-count: infinite; }
+.svc-team__member--3 { animation-name: svcTeamGait, svcTeamArm3; animation-duration: 9s; animation-iteration-count: infinite; }
+@keyframes svcTeamMarch {
+  0%       { transform: translateX(-150px); opacity: 0; }
+  4%       { opacity: 1; }
+  28%, 66% { transform: translateX(0); opacity: 1; }
+  92%      { transform: translateX(150px); opacity: 1; }
+  96%, 100% { transform: translateX(150px); opacity: 0; }
+}
+@keyframes svcTeamGait {
+  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  0% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  1.5% { --tl-bob: -0.8px; }
+  3% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  4.5% { --tl-bob: -0.8px; }
+  6% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  7.5% { --tl-bob: -0.8px; }
+  9% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  10.5% { --tl-bob: -0.8px; }
+  12% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  13.5% { --tl-bob: -0.8px; }
+  15% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  16.5% { --tl-bob: -0.8px; }
+  18% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  19.5% { --tl-bob: -0.8px; }
+  21% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  22.5% { --tl-bob: -0.8px; }
+  24% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  25.5% { --tl-bob: -0.8px; }
+  27% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  28.5% { --tl-bob: -0.8px; }
+  28% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  66% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  67.5% { --tl-bob: -0.8px; }
+  69% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  70.5% { --tl-bob: -0.8px; }
+  72% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  73.5% { --tl-bob: -0.8px; }
+  75% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  76.5% { --tl-bob: -0.8px; }
+  78% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  79.5% { --tl-bob: -0.8px; }
+  81% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  82.5% { --tl-bob: -0.8px; }
+  84% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  85.5% { --tl-bob: -0.8px; }
+  87% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  88.5% { --tl-bob: -0.8px; }
+  90% { --tl-leg: -24deg; --tl-arm-back: -20deg; --tl-bob: 0px; }
+  91.5% { --tl-bob: -0.8px; }
+  93% { --tl-leg: 24deg; --tl-arm-back: 20deg; --tl-bob: 0px; }
+  94.5% { --tl-bob: -0.8px; }
+  94% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+}
+@keyframes svcTeamArm1 {
+  0% { --tl-arm: 0deg; --tl-cap: 0; }
+  0% { --tl-arm: 20deg; --tl-cap: 0; }
+  3% { --tl-arm: -20deg; --tl-cap: 0; }
+  6% { --tl-arm: 20deg; --tl-cap: 0; }
+  9% { --tl-arm: -20deg; --tl-cap: 0; }
+  12% { --tl-arm: 20deg; --tl-cap: 0; }
+  15% { --tl-arm: -20deg; --tl-cap: 0; }
+  18% { --tl-arm: 20deg; --tl-cap: 0; }
+  21% { --tl-arm: -20deg; --tl-cap: 0; }
+  24% { --tl-arm: 20deg; --tl-cap: 0; }
+  27% { --tl-arm: -20deg; --tl-cap: 0; }
+  28% { --tl-arm: 0deg; --tl-cap: 0; }
+  31% { --tl-arm: 0deg; --tl-cap: 0; }
+  34% { --tl-arm: -165deg; --tl-cap: 1; }
+  40% { --tl-arm: -165deg; --tl-cap: 1; }
+  43% { --tl-arm: 0deg; --tl-cap: 0; }
+  66% { --tl-arm: 20deg; --tl-cap: 0; }
+  69% { --tl-arm: -20deg; --tl-cap: 0; }
+  72% { --tl-arm: 20deg; --tl-cap: 0; }
+  75% { --tl-arm: -20deg; --tl-cap: 0; }
+  78% { --tl-arm: 20deg; --tl-cap: 0; }
+  81% { --tl-arm: -20deg; --tl-cap: 0; }
+  84% { --tl-arm: 20deg; --tl-cap: 0; }
+  87% { --tl-arm: -20deg; --tl-cap: 0; }
+  90% { --tl-arm: 20deg; --tl-cap: 0; }
+  93% { --tl-arm: -20deg; --tl-cap: 0; }
+  94% { --tl-arm: 0deg; --tl-cap: 0; }
+  100% { --tl-arm: 0deg; --tl-cap: 0; }
+}
+@keyframes svcTeamArm2 {
+  0% { --tl-arm: 0deg; --tl-cap: 0; }
+  0% { --tl-arm: 20deg; --tl-cap: 0; }
+  3% { --tl-arm: -20deg; --tl-cap: 0; }
+  6% { --tl-arm: 20deg; --tl-cap: 0; }
+  9% { --tl-arm: -20deg; --tl-cap: 0; }
+  12% { --tl-arm: 20deg; --tl-cap: 0; }
+  15% { --tl-arm: -20deg; --tl-cap: 0; }
+  18% { --tl-arm: 20deg; --tl-cap: 0; }
+  21% { --tl-arm: -20deg; --tl-cap: 0; }
+  24% { --tl-arm: 20deg; --tl-cap: 0; }
+  27% { --tl-arm: -20deg; --tl-cap: 0; }
+  28% { --tl-arm: 0deg; --tl-cap: 0; }
+  38% { --tl-arm: 0deg; --tl-cap: 0; }
+  41% { --tl-arm: -165deg; --tl-cap: 1; }
+  47% { --tl-arm: -165deg; --tl-cap: 1; }
+  50% { --tl-arm: 0deg; --tl-cap: 0; }
+  66% { --tl-arm: 20deg; --tl-cap: 0; }
+  69% { --tl-arm: -20deg; --tl-cap: 0; }
+  72% { --tl-arm: 20deg; --tl-cap: 0; }
+  75% { --tl-arm: -20deg; --tl-cap: 0; }
+  78% { --tl-arm: 20deg; --tl-cap: 0; }
+  81% { --tl-arm: -20deg; --tl-cap: 0; }
+  84% { --tl-arm: 20deg; --tl-cap: 0; }
+  87% { --tl-arm: -20deg; --tl-cap: 0; }
+  90% { --tl-arm: 20deg; --tl-cap: 0; }
+  93% { --tl-arm: -20deg; --tl-cap: 0; }
+  94% { --tl-arm: 0deg; --tl-cap: 0; }
+  100% { --tl-arm: 0deg; --tl-cap: 0; }
+}
+@keyframes svcTeamArm3 {
+  0% { --tl-arm: 0deg; --tl-cap: 0; }
+  0% { --tl-arm: 20deg; --tl-cap: 0; }
+  3% { --tl-arm: -20deg; --tl-cap: 0; }
+  6% { --tl-arm: 20deg; --tl-cap: 0; }
+  9% { --tl-arm: -20deg; --tl-cap: 0; }
+  12% { --tl-arm: 20deg; --tl-cap: 0; }
+  15% { --tl-arm: -20deg; --tl-cap: 0; }
+  18% { --tl-arm: 20deg; --tl-cap: 0; }
+  21% { --tl-arm: -20deg; --tl-cap: 0; }
+  24% { --tl-arm: 20deg; --tl-cap: 0; }
+  27% { --tl-arm: -20deg; --tl-cap: 0; }
+  28% { --tl-arm: 0deg; --tl-cap: 0; }
+  45% { --tl-arm: 0deg; --tl-cap: 0; }
+  48% { --tl-arm: -165deg; --tl-cap: 1; }
+  54% { --tl-arm: -165deg; --tl-cap: 1; }
+  57% { --tl-arm: 0deg; --tl-cap: 0; }
+  66% { --tl-arm: 20deg; --tl-cap: 0; }
+  69% { --tl-arm: -20deg; --tl-cap: 0; }
+  72% { --tl-arm: 20deg; --tl-cap: 0; }
+  75% { --tl-arm: -20deg; --tl-cap: 0; }
+  78% { --tl-arm: 20deg; --tl-cap: 0; }
+  81% { --tl-arm: -20deg; --tl-cap: 0; }
+  84% { --tl-arm: 20deg; --tl-cap: 0; }
+  87% { --tl-arm: -20deg; --tl-cap: 0; }
+  90% { --tl-arm: 20deg; --tl-cap: 0; }
+  93% { --tl-arm: -20deg; --tl-cap: 0; }
+  94% { --tl-arm: 0deg; --tl-cap: 0; }
+  100% { --tl-arm: 0deg; --tl-cap: 0; }
+}
+
+.svc-valet__sign rect { fill: #1B3A6B; stroke: var(--color-gold); stroke-width: 1; animation: valetSign 8s ease-in-out infinite; }
+.svc-valet__sign text { font: 700 12px var(--font-body); fill: var(--color-gold-bright); }
+.svc-valet__podium rect { fill: var(--color-primary-light); stroke: var(--color-gold); stroke-width: .8; }
+.svc-valet__podium text { font: 700 4.6px var(--font-body); letter-spacing: .08em; fill: var(--color-gold); }
+.svc-valet__car { animation: svcValetCar 8s ease-in-out infinite; }
+.svc-valet__chauffeur {
+  transform: translateX(158px) scaleX(-1);
+  animation: svcValetChauffeur 8s ease-in-out infinite, svcValetArm 8s ease-in-out infinite;
+}
+.svc-valet__key-x { opacity: 0; animation: svcValetKeyX 8s linear infinite; }
+.svc-valet__key-y { animation: svcValetKeyY 8s linear infinite; }
+@keyframes svcValetCar {
+  0%      { transform: translateX(-200px); --tl-driver: 0; --tl-beam: 1; --tl-wheel: 0deg; }
+  26%     { transform: translateX(0); --tl-wheel: 720deg; }
+  30%     { --tl-beam: 0; }
+  50%     { --tl-driver: 0; }
+  54%     { transform: translateX(0); --tl-driver: 1; --tl-beam: 1; --tl-wheel: 720deg; }
+  78%     { transform: translateX(200px); --tl-wheel: 1440deg; }
+  100%    { transform: translateX(200px); --tl-driver: 1; --tl-beam: 1; --tl-wheel: 1440deg; }
+}
+@keyframes svcValetKeyX {
+  0%, 31%  { transform: translateX(84px); opacity: 0; }
+  32%      { opacity: 1; }
+  42%      { transform: translateX(146px); opacity: 1; }
+  43%, 100% { transform: translateX(146px); opacity: 0; }
+}
+@keyframes svcValetKeyY {
+  0%, 32%  { transform: translateY(32px); }
+  37%      { transform: translateY(10px); }
+  42%, 100% { transform: translateY(38px); }
+}
+@keyframes svcValetChauffeur {
+  0%, 48%  { transform: translateX(158px) scaleX(-1); opacity: 1; }
+  53%      { transform: translateX(150px) scaleX(-1); opacity: 0; }
+  86%      { transform: translateX(158px) scaleX(-1); opacity: 0; }
+  92%, 100% { transform: translateX(158px) scaleX(-1); opacity: 1; }
+}
+@keyframes svcValetArm {
+  0%, 38%  { --tl-arm: 0deg; --tl-key: 0; --tl-cap: 0; }
+  42%      { --tl-arm: -75deg; --tl-key: 1; }
+  48%      { --tl-arm: -95deg; --tl-key: 1; }
+  52%, 92% { --tl-arm: 0deg; --tl-key: 0; }
+  95%      { --tl-arm: -165deg; --tl-cap: 1; }
+  100%     { --tl-arm: 0deg; --tl-cap: 0; }
+}
+@keyframes valetSign {
+  0%, 60%, 84%, 100% { filter: none; }
+  70%, 76%           { filter: drop-shadow(0 0 6px #F0C040); }
+}
+
 @media (max-width: 639px) {
   .service-card--sm { flex-direction: column; }
   .service-card--sm .service-card__art { flex: none; width: 100%; height: 64px; margin: 0; }
@@ -862,26 +957,55 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .service-card--sm .service-card__art { flex: 0 0 150px; height: 60px; margin: 0; }
 }
 
-/* ── Matrimonios: auto de novios que llega con corazones ── */
-.wedding-art { width: min(100%, 360px); }
+/* ── Matrimonios: carroza de novios ── */
+.wedding-art { width: min(100%, 380px); }
 .wedding-art__svg { width: 100%; height: auto; }
-.wedding-art__car { --tl-ribbon: 1; }
+.wedding-art__car { --tl-wedding: 1; --tl-paint: url(#tl-pearl); }
 .wedding-art__chauffeur { animation: tlCapTip 4s ease-in-out infinite; }
 .wedding-art__heart { fill: var(--color-gold-bright); opacity: 0; transform-box: fill-box; transform-origin: center; }
+.wedding-art__petal { opacity: 0; }
+.wedding-art__spark { fill: var(--color-gold-bright); opacity: 0; transform-box: fill-box; transform-origin: center; }
 .service-card--wedding-hero.is-visible .wedding-art__car {
-  animation: weddingArrive 2.4s var(--ease-out-expo) both, tlDrive .6s linear 4;
+  animation: weddingArrive 2.6s var(--ease-out-expo) both, tlDrive .6s linear 4, weddingBounce 1.6s ease-in-out 2.6s infinite;
 }
 .service-card--wedding-hero.is-visible .wedding-art__heart { animation: heartFloat 3.2s ease-in-out 1.6s infinite; }
 .service-card--wedding-hero.is-visible .wedding-art__hearts g:nth-child(2) .wedding-art__heart { animation-delay: 2.2s; }
 .service-card--wedding-hero.is-visible .wedding-art__hearts g:nth-child(3) .wedding-art__heart { animation-delay: 2.8s; }
+.service-card--wedding-hero.is-visible .wedding-art__petal { animation: petalFall 4.6s linear infinite; }
+.wedding-art__petals g:nth-child(2) .wedding-art__petal { animation-delay: -.8s; }
+.wedding-art__petals g:nth-child(3) .wedding-art__petal { animation-delay: -1.6s; }
+.wedding-art__petals g:nth-child(4) .wedding-art__petal { animation-delay: -2.4s; }
+.wedding-art__petals g:nth-child(5) .wedding-art__petal { animation-delay: -3.2s; }
+.wedding-art__petals g:nth-child(6) .wedding-art__petal { animation-delay: -4s; }
+.wedding-art__petals g:nth-child(7) .wedding-art__petal { animation-delay: -1.2s; animation-duration: 5.4s; }
+.wedding-art__petals g:nth-child(8) .wedding-art__petal { animation-delay: -2.8s; animation-duration: 5.4s; }
+.service-card--wedding-hero.is-visible .wedding-art__spark { animation: sparkTwinkle 2.4s ease-in-out infinite; }
+.wedding-art__sparks path:nth-child(2) { animation-delay: -.6s; }
+.wedding-art__sparks path:nth-child(3) { animation-delay: -1.2s; }
+.wedding-art__sparks path:nth-child(4) { animation-delay: -1.8s; }
 @keyframes weddingArrive {
-  from { transform: translateX(-120px); opacity: 0; }
+  from { transform: translateX(-140px); opacity: 0; }
   to   { transform: none; opacity: 1; }
+}
+@keyframes weddingBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-.8px); }
 }
 @keyframes heartFloat {
   0%   { opacity: 0; transform: translateY(6px) scale(.6); }
   25%  { opacity: 1; }
   100% { opacity: 0; transform: translateY(-16px) scale(1.1); }
+}
+@keyframes petalFall {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  10%  { opacity: .95; }
+  50%  { transform: translate(8px, 44px) rotate(160deg); }
+  90%  { opacity: .9; }
+  100% { opacity: 0; transform: translate(-4px, 86px) rotate(320deg); }
+}
+@keyframes sparkTwinkle {
+  0%, 100% { opacity: 0; transform: scale(.4); }
+  50%      { opacity: 1; transform: scale(1); }
 }
 
 /* ── Separadores, cotizador, reservas, reseñas y footer ── */
@@ -936,14 +1060,316 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-scene__car, .hero-scene__walker, .hero-scene__window-light, .hero-scene__bulbs circle,
-  .steps__progress-car, .steps-section__chauffeur, .service-art__chauffeur, .service-art__car,
+  .steps__progress-car, .steps-section__chauffeur, .svc-rep__car, .svc-rep__chauffeur, .svc-team__row,
+  .svc-team__member, .svc-team__lights circle, .svc-valet__car, .svc-valet__chauffeur, .svc-valet__key-x,
+  .svc-valet__key-y, .svc-valet__sign rect, .wedding-art__petal, .wedding-art__spark,
   .wedding-art__car, .wedding-art__chauffeur, .wedding-art__heart, .road-divider__car,
   .section-emblem__car, .section-emblem__chauffeur, .success-seal__chauffeur,
   .google-reviews__chauffeur, .footer-road__car, .journey__car { animation: none !important; }
-  .hero-scene__car, .wedding-art__car { opacity: 1; }
+  .wedding-art__car { opacity: 1; }
   .footer-road__car { transform: translateX(24px); }
 }
 
-/* La escena no debe empujar las estadísticas fuera de la primera pantalla. */
-.hero-route { max-width: 420px; margin-bottom: var(--space-4); }
+/* ==========================================
+   16. HERO PREMIUM — texto + escena nocturna
+   La escena (14 s): el chofer espera junto al auto y saluda; camina a la puerta,
+   se sube; el auto parte con los focos encendidos, da la vuelta a la cuadra y
+   regresa; el chofer baja y vuelve a su lugar.
+========================================== */
+.hero {
+  display: flex; align-items: center;
+  min-height: 100svh;
+  padding-top: var(--navbar-height);
+  background:
+    radial-gradient(ellipse 70% 60% at 70% 30%, rgba(30, 61, 110, .55), transparent 70%),
+    var(--color-primary);
+}
+.hero::before,
+.hero__container::before { display: none; }
+.hero__backdrop { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: orbDrift 18s ease-in-out infinite alternate;
+}
+.hero__orb--gold {
+  top: 6%; right: -120px;
+  width: 460px; height: 460px;
+  background: radial-gradient(circle, rgba(201, 168, 76, .28), transparent 68%);
+}
+.hero__orb--blue {
+  bottom: -200px; left: -160px;
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(46, 88, 153, .45), transparent 68%);
+  animation-delay: -7s;
+}
+.hero__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(201, 168, 76, .07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 168, 76, .07) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 10%, transparent 72%);
+          mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 10%, transparent 72%);
+}
+
+.hero__container {
+  position: relative; z-index: 1;
+  display: grid; align-items: center; gap: var(--space-6);
+  width: 100%; max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-3) var(--space-7);
+  text-align: center;
+}
+.hero__content > * { animation: riseIn .9s var(--ease-out-expo) both; }
+.hero__subtitle { animation-delay: .55s; }
+.hero__actions  { animation-delay: .7s; }
+.hero__stats    { animation-delay: .85s; }
+
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: 7px 16px;
+  border: 1px solid var(--gold-a25); border-radius: var(--radius-full);
+  background: var(--gold-a06);
+  font-size: .74rem; letter-spacing: .14em;
+  color: var(--color-gold-pale);
+}
+.hero__eyebrow::before,
+.hero__eyebrow::after { content: none; }
+.hero__eyebrow-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, .5);
+  animation: livePulse 2s ease-out infinite;
+}
+
+.hero__title {
+  margin-bottom: var(--space-4);
+  font-size: clamp(2.7rem, 7.4vw, 4.9rem);
+  line-height: 1.04; letter-spacing: -.02em;
+  color: var(--color-white);
+  animation: none;
+}
+.hero__line { display: block; overflow: hidden; padding-bottom: .08em; }
+.hero__word {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: wordUp 1s var(--ease-out-expo) forwards;
+}
+.hero__line:first-child .hero__word:nth-child(1) { animation-delay: .05s; }
+.hero__line:first-child .hero__word:nth-child(2) { animation-delay: .15s; }
+.hero__line:last-child .hero__word:nth-child(1)  { animation-delay: .3s; }
+.hero__line:last-child .hero__word:nth-child(2)  { animation-delay: .38s; }
+.hero__line:last-child .hero__word:nth-child(3)  { animation-delay: .46s; }
+.hero__word--gold {
+  background: linear-gradient(100deg, #C9A84C 0%, #F5DFA0 38%, #F0C040 55%, #C9A84C 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation-name: wordUp, goldShimmer;
+  animation-duration: 1s, 7s;
+  animation-timing-function: var(--ease-out-expo), linear;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+}
+.hero__subtitle {
+  max-width: 520px;
+  margin: 0 auto var(--space-5);
+  font-size: clamp(1rem, 1.7vw, 1.15rem); line-height: 1.7;
+  color: var(--color-text-muted);
+}
+.hero__subtitle strong { font-weight: 600; color: var(--color-text-light); }
+.hero__actions { justify-content: center; margin-bottom: var(--space-6); }
+.hero__cta { gap: 10px; padding: 16px 30px; animation: riseIn .9s var(--ease-out-expo) .7s both; }
+.hero__cta svg { transition: transform var(--transition-base); }
+.hero__cta:hover svg { transform: translateX(4px); }
+.hero__cta-alt { background: rgba(255, 255, 255, .04); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+.hero__stats {
+  display: flex; flex-wrap: nowrap; justify-content: center; gap: 0;
+  padding: 0;
+  background: none; border: 0; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.hero__stat { align-items: center; padding: 0 var(--space-4); }
+.hero__stat + .hero__stat { border-left: 1px solid var(--gold-a25); }
+.hero__stat-number { font-size: clamp(1.35rem, 3vw, 1.7rem); font-variant-numeric: tabular-nums; }
+.hero__stat-label { font-size: .7rem; letter-spacing: .1em; }
+
+/* Escena */
+.hero__visual { position: relative; animation: stageIn 1.3s var(--ease-out-expo) .35s both; }
+.hero-stage {
+  position: relative;
+  max-width: 560px; margin: 0 auto;
+  border-radius: 26px;
+  box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .7), 0 0 90px rgba(201, 168, 76, .14);
+  transform: perspective(1200px) rotateY(calc(var(--px, 0) * -5deg)) rotateX(calc(var(--py, 0) * 4deg));
+  transition: transform .6s var(--ease-out-expo);
+}
+.hero-stage__svg { display: block; width: 100%; height: auto; }
+.hero-stage__layer {
+  transform: translate(calc(var(--px, 0) * var(--d, 0) * 1px), calc(var(--py, 0) * var(--d, 0) * .5px));
+  transition: transform .6s var(--ease-out-expo);
+}
+.hero-stage__layer--stars { --d: -3; }
+.hero-stage__layer--moon  { --d: -6; }
+.hero-stage__layer--far   { --d: -9; }
+.hero-stage__layer--near  { --d: -15; }
+.hero-stage__star { animation: starTwinkle 3.2s ease-in-out infinite; }
+.hero-stage__star:nth-child(3n)   { animation-delay: -1.1s; }
+.hero-stage__star:nth-child(3n+1) { animation-delay: -2.2s; }
+.hero-stage__lit { animation: windowFlicker 7s steps(1) infinite; }
+.hero-stage__lit:nth-child(2n) { animation-delay: -3s; }
+.hero-stage__lit:nth-child(3n) { animation-delay: -5s; }
+.hero-stage__bulb { filter: drop-shadow(0 0 6px #FFF3C4); animation: bulbHum 4s ease-in-out infinite; }
+.hero-stage__lane { stroke: var(--gold-a45); stroke-width: 1.4; stroke-dasharray: 22 18; }
+
+.hero-stage__car { animation: heroCar 14s ease-in-out infinite; }
+.hero-stage__chauffeur {
+  transform: translateX(385px) scaleX(-1);
+  animation: heroChauffeur 14s linear infinite, heroGait 14s linear infinite, heroArm 14s ease-in-out infinite;
+}
+@keyframes heroChauffeur {
+  0%, 18%   { transform: translateX(385px) scaleX(-1); opacity: 1; }
+  30%       { transform: translateX(250px) scaleX(-1); opacity: 1; }
+  33%       { transform: translateX(246px) scaleX(-1); opacity: 0; }
+  88%       { transform: translateX(250px) scaleX(1); opacity: 0; }
+  90%       { transform: translateX(250px) scaleX(1); opacity: 1; }
+  99%       { transform: translateX(385px) scaleX(1); opacity: 1; }
+  100%      { transform: translateX(385px) scaleX(-1); opacity: 1; }
+}
+@keyframes heroGait {
+  0% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  18% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  19.1% { --tl-bob: -1px; }
+  20.2% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  21.3% { --tl-bob: -1px; }
+  22.4% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  23.5% { --tl-bob: -1px; }
+  24.6% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  25.7% { --tl-bob: -1px; }
+  26.8% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  27.9% { --tl-bob: -1px; }
+  29% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  30.1% { --tl-bob: -1px; }
+  30% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  90% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  91.1% { --tl-bob: -1px; }
+  92.2% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  93.3% { --tl-bob: -1px; }
+  94.4% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  95.5% { --tl-bob: -1px; }
+  96.6% { --tl-leg: 22deg; --tl-arm-back: 18deg; --tl-bob: 0px; }
+  97.7% { --tl-bob: -1px; }
+  98.8% { --tl-leg: -22deg; --tl-arm-back: -18deg; --tl-bob: 0px; }
+  99.9% { --tl-bob: -1px; }
+  99% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+  100% { --tl-leg: 0deg; --tl-arm-back: 0deg; --tl-bob: 0px; }
+}
+@keyframes heroArm {
+  0%, 5% { --tl-arm: 0deg; --tl-cap: 0; }
+  8%, 13% { --tl-arm: -165deg; --tl-cap: 1; }
+  16% { --tl-arm: 0deg; --tl-cap: 0; }
+  18% { --tl-arm: 18deg; }
+  20.2% { --tl-arm: -18deg; }
+  22.4% { --tl-arm: 18deg; }
+  24.6% { --tl-arm: -18deg; }
+  26.8% { --tl-arm: 18deg; }
+  29% { --tl-arm: -18deg; }
+  30% { --tl-arm: 0deg; }
+  90% { --tl-arm: 18deg; }
+  92.2% { --tl-arm: -18deg; }
+  94.4% { --tl-arm: 18deg; }
+  96.6% { --tl-arm: -18deg; }
+  98.8% { --tl-arm: 18deg; }
+  99% { --tl-arm: 0deg; }
+  100% { --tl-arm: 0deg; --tl-cap: 0; }
+}
+@keyframes heroCar {
+  0%      { transform: translateX(0); --tl-driver: 0; --tl-beam: 0; --tl-wheel: 0deg; }
+  32%     { --tl-driver: 0; }
+  35%     { --tl-driver: 1; }
+  38%     { transform: translateX(0); --tl-beam: 1; --tl-wheel: 0deg; }
+  58%     { transform: translateX(480px); --tl-wheel: 1080deg; }
+  58.01%  { transform: translateX(-480px); }
+  78%     { transform: translateX(0); --tl-wheel: 2160deg; }
+  84%     { --tl-beam: 1; --tl-driver: 1; }
+  87%     { --tl-beam: 0; --tl-driver: 1; }
+  90%     { --tl-driver: 0; }
+  100%    { transform: translateX(0); --tl-driver: 0; --tl-beam: 0; --tl-wheel: 2160deg; }
+}
+
+.hero-stage__chip {
+  position: absolute;
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: 9px 15px;
+  border: 1px solid var(--gold-a25); border-radius: var(--radius-full);
+  background: rgba(8, 19, 41, .78);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .4);
+  font-size: .76rem; font-weight: 600; white-space: nowrap;
+  color: var(--color-text-light);
+  animation: chipFloat 5s ease-in-out infinite alternate;
+}
+.hero-stage__chip svg { color: var(--color-gold); }
+.hero-stage__chip--top    { top: 16px; left: 10px; }
+.hero-stage__chip--bottom { right: 10px; bottom: 18px; animation-delay: -2.5s; }
+
+.hero__scroll {
+  position: absolute; left: 50%; bottom: 20px; z-index: 1;
+  display: none;
+  width: 26px; height: 42px;
+  margin-left: -13px;
+  border: 1.5px solid var(--gold-a45); border-radius: 14px;
+}
+.hero__scroll-line {
+  position: absolute; top: 8px; left: 50%;
+  width: 2px; height: 8px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--color-gold);
+  animation: scrollCue 1.8s ease-in-out infinite;
+}
+
+@media (min-width: 768px) {
+  .hero__scroll { display: block; }
+  .hero-stage__chip--top    { left: -18px; }
+  .hero-stage__chip--bottom { right: -18px; }
+}
+@media (min-width: 1024px) {
+  .hero__container {
+    grid-template-columns: 1.02fr 1fr; gap: var(--space-7);
+    padding: var(--space-6) var(--space-5) var(--space-8);
+    text-align: left;
+  }
+  .hero__subtitle { margin-left: 0; }
+  .hero__actions  { justify-content: flex-start; }
+  .hero__stats    { justify-content: flex-start; }
+  .hero__stat:first-child { padding-left: 0; }
+  .hero__stat { align-items: flex-start; }
+}
+@media (max-width: 379px) {
+  .hero__stat { padding: 0 var(--space-3); }
+  .hero-stage__chip { font-size: .68rem; padding: 7px 11px; }
+}
+
+@keyframes wordUp      { to { transform: none; } }
+@keyframes goldShimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+@keyframes orbDrift    { to { transform: translate(-40px, 30px) scale(1.08); } }
+@keyframes livePulse   { 70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
+@keyframes stageIn     { from { opacity: 0; transform: translateY(32px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes chipFloat   { to { transform: translateY(-8px); } }
+@keyframes scrollCue   { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+@keyframes starTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes windowFlicker { 0%, 100% { opacity: 1; } 40% { opacity: .25; } 70% { opacity: .9; } }
+@keyframes bulbHum     { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__word { transform: none; animation: none; }
+  .hero__word--gold { animation: none; }
+  .hero__orb, .hero__visual, .hero-stage__car, .hero-stage__chauffeur, .hero-stage__star,
+  .hero-stage__lit, .hero-stage__bulb, .hero-stage__chip, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
+}
