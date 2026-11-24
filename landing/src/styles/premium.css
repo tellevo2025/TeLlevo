@@ -114,10 +114,6 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 
 /* Ruta animada: del evento a tu casa */
 .hero-route { max-width: 460px; margin: 0 auto var(--space-5); }
-.hero-route__track {
-  display: flex; align-items: flex-end; justify-content: center;
-  gap: var(--space-2);
-}
 .hero-route__tagline {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: var(--space-2);
@@ -128,52 +124,6 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 .hero-route__icon { width: 20px; height: 20px; color: var(--color-gold); }
 .hero-route__icon--sedan { width: 40px; height: auto; }
 .hero-route__plus { color: var(--color-gold); font-weight: 400; }
-.hero-route__label {
-  flex-shrink: 0;
-  padding-bottom: 2px;
-  font-size: .68rem; font-weight: 600; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--color-text-muted);
-}
-.hero-route__map { flex: 1; min-width: 0; height: auto; overflow: visible; }
-.hero-route__path,
-.hero-route__progress { fill: none; stroke-linecap: round; }
-.hero-route__path { stroke: var(--gold-a45); stroke-width: 1.5; stroke-dasharray: 2 6; }
-.hero-route__progress {
-  stroke: var(--color-gold); stroke-width: 2;
-  stroke-dasharray: 1; stroke-dashoffset: 1;
-  filter: drop-shadow(0 0 4px var(--gold-a45));
-  animation: routeDraw 6s ease-in-out infinite;
-}
-.hero-route__pin { fill: var(--color-primary); stroke: var(--color-gold); stroke-width: 2; }
-.hero-route__pin--home { fill: var(--color-gold); }
-.hero-route__car {
-  --sedan-fill: var(--color-gold);
-  --sedan-glass: var(--color-primary);
-  display: none;
-  color: var(--color-gold-bright);
-  filter: drop-shadow(0 0 5px var(--gold-a45));
-}
-@supports (offset-path: path('M0 0')) {
-  .hero-route__car {
-    display: inline;
-    offset-path: path('M10 40 C 90 4, 210 4, 290 40');
-    offset-rotate: auto;
-    animation: routeDrive 6s ease-in-out infinite;
-  }
-}
-@keyframes routeDraw {
-  0%        { stroke-dashoffset: 1; opacity: 0; }
-  8%        { opacity: 1; }
-  78%, 90%  { stroke-dashoffset: 0; opacity: 1; }
-  100%      { stroke-dashoffset: 0; opacity: 0; }
-}
-@keyframes routeDrive {
-  0%        { offset-distance: 0%; opacity: 0; }
-  8%        { opacity: 1; }
-  78%, 90%  { offset-distance: 100%; opacity: 1; }
-  100%      { offset-distance: 100%; opacity: 0; }
-}
-
 /* ==========================================
    4. FRANJA DE CONFIANZA
 ========================================== */
@@ -793,7 +743,6 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 ========================================== */
 /* Tamaños mínimos legibles y áreas táctiles de al menos 44px. */
 .hero__eyebrow { font-size: .72rem; }
-.hero-route__label { font-size: .72rem; }
 .service-card__tags li { font-size: .74rem; }
 .navbar__toggle { align-items: center; justify-content: center; width: 44px; height: 44px; }
 .calendar-nav { width: 40px; height: 40px; }
@@ -854,3 +803,133 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .service-card--sm .service-card__icon { flex-shrink: 0; width: 48px; height: 48px; }
   .service-card--sm .service-card__text { display: block; overflow: visible; -webkit-line-clamp: unset; }
 }
+
+/* ==========================================
+   15. HERO — el chofer llega, saluda, se sube y te lleva
+   Ciclo de 11 s: camina hasta la puerta del auto (0–32 %), levanta la gorra
+   (36–46 %), entra al auto (48–52 %) y el auto parte hacia tu casa (54–86 %).
+========================================== */
+@property --driver-visible {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+.sedan__driver { opacity: var(--driver-visible); }
+
+.hero-scene { width: 100%; }
+.hero-scene__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.hero-scene__road { stroke: var(--gold-a45); stroke-width: 1.5; stroke-dasharray: 6 6; }
+.hero-scene__venue,
+.hero-scene__home { fill: none; stroke: var(--gold-a45); stroke-width: 1.4; stroke-linejoin: round; }
+.hero-scene__home path:first-child { fill: var(--gold-a12); }
+.hero-scene__labels {
+  display: flex; justify-content: space-between;
+  margin-top: 6px;
+  font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.hero-scene__car {
+  --driver-visible: 0;
+  color: var(--color-gold-bright);
+  --sedan-fill: var(--color-gold);
+  --sedan-glass: var(--color-primary);
+  filter: drop-shadow(0 0 6px var(--gold-a45));
+  animation: sceneCar 11s ease-in-out infinite;
+}
+.hero-scene__walker {
+  transform: translateX(110px);
+  animation: sceneWalk 11s linear infinite;
+}
+.hero-scene__jacket { fill: var(--color-gold); }
+.hero-scene__head { fill: var(--color-gold-pale); }
+.hero-scene__cap {
+  fill: var(--color-gold-bright);
+  transform-box: fill-box; transform-origin: 30% 100%;
+  animation: sceneCap 11s ease-in-out infinite;
+}
+.hero-scene__leg,
+.hero-scene__arm {
+  stroke: var(--color-gold-pale); stroke-width: 2.2; stroke-linecap: round;
+  transform-box: view-box;
+}
+.hero-scene__leg { transform-origin: 0 69px; }
+.hero-scene__leg--back { animation: sceneLegBack 11s linear infinite; }
+.hero-scene__leg--front { animation: sceneLegFront 11s linear infinite; }
+.hero-scene__arm { transform-origin: 2.4px 60px; animation: sceneArm 11s ease-in-out infinite; }
+
+@keyframes sceneWalk {
+  0%        { transform: translateX(-14px); opacity: 0; }
+  3%        { opacity: 1; }
+  32%       { transform: translateX(110px); }
+  47%       { transform: translateX(110px); opacity: 1; }
+  52%, 100% { transform: translateX(104px); opacity: 0; }
+}
+@keyframes sceneLegBack {
+  0% { transform: rotate(18deg); }
+  2% { transform: rotate(-18deg); }
+  4% { transform: rotate(18deg); }
+  6% { transform: rotate(-18deg); }
+  8% { transform: rotate(18deg); }
+  10% { transform: rotate(-18deg); }
+  12% { transform: rotate(18deg); }
+  14% { transform: rotate(-18deg); }
+  16% { transform: rotate(18deg); }
+  18% { transform: rotate(-18deg); }
+  20% { transform: rotate(18deg); }
+  22% { transform: rotate(-18deg); }
+  24% { transform: rotate(18deg); }
+  26% { transform: rotate(-18deg); }
+  28% { transform: rotate(18deg); }
+  30% { transform: rotate(-18deg); }
+  32%, 100% { transform: rotate(0deg); }
+}
+@keyframes sceneLegFront {
+  0% { transform: rotate(-18deg); }
+  2% { transform: rotate(18deg); }
+  4% { transform: rotate(-18deg); }
+  6% { transform: rotate(18deg); }
+  8% { transform: rotate(-18deg); }
+  10% { transform: rotate(18deg); }
+  12% { transform: rotate(-18deg); }
+  14% { transform: rotate(18deg); }
+  16% { transform: rotate(-18deg); }
+  18% { transform: rotate(18deg); }
+  20% { transform: rotate(-18deg); }
+  22% { transform: rotate(18deg); }
+  24% { transform: rotate(-18deg); }
+  26% { transform: rotate(18deg); }
+  28% { transform: rotate(-18deg); }
+  30% { transform: rotate(18deg); }
+  32%, 100% { transform: rotate(0deg); }
+}
+@keyframes sceneArm {
+  0%, 35%, 47%, 100% { transform: rotate(0deg); }
+  39%, 43%           { transform: rotate(-155deg); }
+}
+@keyframes sceneCap {
+  0%, 36%, 46%, 100% { transform: none; }
+  40%, 43%           { transform: translateY(-2.5px) rotate(-16deg); }
+}
+@keyframes sceneCar {
+  0%        { transform: translateX(0); opacity: 0; --driver-visible: 0; }
+  4%        { opacity: 1; }
+  49%       { --driver-visible: 0; }
+  53%       { transform: translateX(0); --driver-visible: 1; }
+  86%       { transform: translateX(168px); opacity: 1; }
+  93%       { transform: translateX(168px); opacity: 1; --driver-visible: 1; }
+  97%, 100% { transform: translateX(168px); opacity: 0; --driver-visible: 1; }
+}
+
+/* Sin animaciones: el chofer queda junto a la puerta y el auto estacionado. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scene__car,
+  .hero-scene__walker,
+  .hero-scene__cap,
+  .hero-scene__leg,
+  .hero-scene__arm { animation: none; }
+  .hero-scene__car { opacity: 1; }
+}
+
+/* La escena no debe empujar las estadísticas fuera de la primera pantalla. */
+.hero-route { max-width: 420px; margin-bottom: var(--space-4); }
