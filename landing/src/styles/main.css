@@ -413,92 +413,7 @@ fieldset { border: none; }
 ========================================== */
 .testimonials { padding: var(--space-8) 0; background: var(--color-primary); }
 .testimonials__container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-3); }
-.testimonials__header { text-align: center; margin-bottom: var(--space-7); }
-
-/* ── Carrusel ── */
-.carousel {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  max-width: 680px;
-  margin: 0 auto;
-}
-.carousel__track {
-  display: flex;
-  transition: transform .45s cubic-bezier(.4,0,.2,1);
-  will-change: transform;
-}
-.carousel__slide {
-  flex: 0 0 100%;
-  width: 100%;
-  min-width: 0;
-  padding: 4px 2px;
-  box-sizing: border-box;
-}
-
-/* ── Controles ── */
-.carousel__controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
-}
-.carousel__btn {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-primary-mid);
-  background: var(--color-surface);
-  color: var(--color-gold);
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-  flex-shrink: 0;
-}
-.carousel__btn:hover {
-  border-color: var(--color-gold);
-  box-shadow: var(--glow-gold-sm);
-  background: rgba(201,168,76,.08);
-}
-.carousel__dots { display: flex; gap: 8px; }
-.carousel__dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--color-primary-mid);
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-  padding: 0;
-}
-.carousel__dot--active {
-  background: var(--color-gold);
-  transform: scale(1.35);
-  box-shadow: var(--glow-gold-sm);
-}
-
-/* ── Tarjeta ── */
-.testimonial-card {
-  background: var(--color-primary-light); border: 1px solid var(--color-primary-mid);
-  border-radius: var(--radius-lg); padding: var(--space-5);
-  display: flex; flex-direction: column; gap: var(--space-4);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
-}
-.testimonial-card { transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base); }
-.testimonial-card:hover { border-color: rgba(201,168,76,.4); box-shadow: var(--glow-gold-md); transform: translateY(-5px); }
-.testimonial-card--featured { border-color: var(--color-gold); box-shadow: var(--glow-gold-sm); }
-.testimonial-card__stars { color: var(--color-gold); font-size: 1rem; letter-spacing: 2px; }
-.testimonial-card__text { color: var(--color-text-light); font-style: italic; line-height: 1.7; flex: 1; }
-.testimonial-card__author {
-  display: flex; align-items: center; gap: var(--space-3);
-  padding-top: var(--space-3); border-top: 1px solid var(--color-primary-mid);
-}
-.testimonial-card__avatar {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--color-primary-mid); border: 1.5px solid var(--color-gold);
-  display: flex; align-items: center; justify-content: center;
-  font-size: .75rem; font-weight: 700; color: var(--color-gold); flex-shrink: 0;
-}
-.testimonial-card__name { font-style: normal; font-weight: 600; color: var(--color-white); font-size: .9375rem; }
-.testimonial-card__role { font-size: .8125rem; color: var(--color-text-muted); }
+.testimonials__header { text-align: center; margin-bottom: var(--space-6); }
 
 /* ==========================================
    9. FORMULARIO — BASE
@@ -997,7 +912,6 @@ body.light-mode .codigo-feedback--invalid { color: #64748B; }
   .section-subtitle { font-size: .9rem; }
   .step__text,
   .service-card__text,
-  .testimonial-card__text,
   .benefit-card__text,
   .form-group__hint,
   .hero__subtitle { font-size: .875rem; }
@@ -1194,17 +1108,6 @@ body.light-mode .codigo-feedback--invalid { color: #64748B; }
   background: rgba(201,168,76,.13);
   border-color: rgba(201,168,76,.35);
 }
-
-/* ── Testimonials: comilla decorativa ── */
-.testimonial-card { position: relative; overflow: hidden; }
-.testimonial-card::before {
-  content: '\201C';
-  position: absolute; top: -12px; right: 14px;
-  font-family: var(--font-display); font-size: 8rem;
-  color: var(--color-gold); opacity: .05;
-  line-height: 1; pointer-events: none; user-select: none;
-}
-.testimonial-card--featured::before { opacity: .12; }
 
 /* ── Scroll reveal ── */
 .reveal {
@@ -1647,21 +1550,6 @@ body.light-mode .services__divider-diamond { background: #FFFFFF; color: #8B6520
 body.light-mode .wedding-hero__badge { background: rgba(139,101,32,.12); border-color: rgba(139,101,32,.4); color: #4A2E00; }
 body.light-mode .wedding-hero__title { color: #060C18; text-shadow: none; }
 body.light-mode .wedding-hero__text  { color: #243650; }
-
-/* ── Testimonios ── */
-body.light-mode .testimonial-card {
-  background: #FFFFFF; border: 1.5px solid #A8B2C4;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-body.light-mode .testimonial-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); border-color: #8B6520; }
-body.light-mode .testimonial-card__text   { color: #162036; }
-body.light-mode .testimonial-card__name   { color: #060C18; }
-body.light-mode .testimonial-card__role   { color: #243650; }
-body.light-mode .testimonial-card__author { border-top-color: #A8B2C4; }
-body.light-mode .testimonial-card__avatar { background: #D4DAE6; border-color: #8B6520; color: #5C3D00; }
-body.light-mode .carousel__btn  { background: #FFFFFF; border-color: #A8B2C4; color: #8B6520; }
-body.light-mode .carousel__dot  { background: #A8B2C4; }
-body.light-mode .carousel__dot--active { background: #8B6520; }
 
 /* ── FAQ ── */
 body.light-mode .faq__item          { border-color: #A8B2C4; }

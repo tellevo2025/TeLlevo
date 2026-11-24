@@ -28,6 +28,18 @@
       <path class="sedan__body" d="M8 44 C8 38 12 34 20 33 L46 30 C58 19 72 13 92 13 L114 13 C130 13 142 20 154 29 L178 33 C188 34.5 192 38 192 43 L192 46 Q192 49 189 49 L164 49 A12 12 0 0 0 140 49 L60 49 A12 12 0 0 0 36 49 L11 49 Q8 49 8 46 Z"/>
       <path class="sedan__glass" d="M56 29 C66 21 76 17.5 92 17 L100 17 L100 29 Z"/>
       <path class="sedan__glass" d="M105 17 L114 17 C126 17.5 136 22 146 29 L105 29 Z"/>
+      <g class="sedan__passenger">
+        <circle cx="86" cy="23.6" r="3.4"/>
+        <path d="M79.5 29 Q80 26.2 86 26.2 Q92 26.2 92.5 29 Z"/>
+      </g>
+      <g class="sedan__driver">
+        <circle cx="119" cy="24" r="3.4"/>
+        <path d="M112.5 29 Q113 26.6 119 26.6 Q125 26.6 125.5 29 Z"/>
+        <g class="sedan__cap">
+          <path d="M114.6 21.2 Q114.8 17.9 119 17.9 Q123.2 17.9 123.4 21.2 Z"/>
+          <path d="M114 21.2 H126.4 Q126.4 22.4 125 22.4 H114 Z"/>
+        </g>
+      </g>
       <circle class="sedan__tyre" cx="48" cy="49" r="9"/>
       <circle class="sedan__tyre" cx="152" cy="49" r="9"/>
     </symbol>
@@ -195,12 +207,6 @@
             Cotizar precio
           </a>
         </div>
-        <a class="hero__google" href="https://search.google.com/local/reviews?placeid=ChIJmaX7hBxiDgARkS2rsDLSgQI" target="_blank" rel="noopener" data-google-pill hidden>
-          <svg class="google-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 38.2 44 33 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
-          <span class="hero__google-stars" aria-hidden="true">★</span>
-          <strong data-google="rating"></strong>
-          <span>· <span data-google="count"></span> en Google</span>
-        </a>
         <div class="hero-route">
           <div class="hero-route__track" aria-hidden="true">
             <span class="hero-route__label">Tu evento</span>
@@ -296,6 +302,10 @@
         <div class="statement__road" aria-hidden="true">
           <svg class="statement__car" viewBox="0 0 200 64"><use href="#icon-sedan"/></svg>
         </div>
+        <p class="statement__caption">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><use href="#icon-chauffeur"/></svg>
+          Nuestro chofer al volante · tú atrás, tranquilo
+        </p>
       </div>
     </section>
 
@@ -511,135 +521,6 @@
             <li class="google-review google-review--skeleton" aria-hidden="true"></li>
             <li class="google-review google-review--skeleton" aria-hidden="true"></li>
           </ul>
-        </div>
-
-        <!-- Carrusel -->
-        <div class="carousel" aria-label="Testimonios de clientes">
-          <div class="carousel__track" id="carousel-track">
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Muy bacán el servicio. El chofer llegó puntual, fue súper amable y llegué sin ningún problema. Los recomiendo con los ojos cerrados."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">JM</div>
-                <div>
-                  <cite class="testimonial-card__name">Javier M.</cite>
-                  <p class="testimonial-card__role">Santiago, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card testimonial-card--featured carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Recomendadísimo. Usé el servicio en el matrimonio de mi primo y fue perfecto. Puntual, seguro y amable. Definitivamente lo vuelvo a usar."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">CP</div>
-                <div>
-                  <cite class="testimonial-card__name">Carolina P.</cite>
-                  <p class="testimonial-card__role">Las Condes, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Total confianza. Saber que tenía chofer reservado me permitió disfrutar la noche sin preocupaciones. El formulario es súper fácil."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">RF</div>
-                <div>
-                  <cite class="testimonial-card__name">Rodrigo F.</cite>
-                  <p class="testimonial-card__role">Providencia, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Lo usé en mi cumpleaños de 30 y fue perfecto. El chofer llegó antes de la hora, muy amable y el proceso de reserva fue rapidísimo. ¡Lo recomiendo con los ojos cerrados!"
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">VS</div>
-                <div>
-                  <cite class="testimonial-card__name">Valentina S.</cite>
-                  <p class="testimonial-card__role">Vitacura, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card testimonial-card--featured carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Contraté TeLlevo para mi matrimonio y fue la mejor decisión. Coordinaron todo el regreso de los invitados sin ningún problema. Todos quedaron felices y seguros."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">MH</div>
-                <div>
-                  <cite class="testimonial-card__name">Matías H.</cite>
-                  <p class="testimonial-card__role">La Reina, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Servicio de primera. El chofer manejó mi auto con mucho cuidado. Lo que más me gustó fue que llegan donde estás, no al revés. Muy profesional todo."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">FT</div>
-                <div>
-                  <cite class="testimonial-card__name">Francisca T.</cite>
-                  <p class="testimonial-card__role">Lo Barnechea, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Increíble servicio. Usé TeLlevo después de una cena de empresa y el chofer fue súper puntual y profesional. Ya lo tengo agendado para el próximo evento."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">DM</div>
-                <div>
-                  <cite class="testimonial-card__name">Diego M.</cite>
-                  <p class="testimonial-card__role">Ñuñoa, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-            <div class="testimonial-card carousel__slide">
-              <div class="testimonial-card__stars" aria-label="5 estrellas">★★★★★</div>
-              <blockquote class="testimonial-card__text">
-                "Muy bacán poder irme tranquila de la fiesta sabiendo que mi auto también llegaba sano y salvo. El servicio es cómodo, rápido y muy confiable."
-              </blockquote>
-              <footer class="testimonial-card__author">
-                <div class="testimonial-card__avatar" aria-hidden="true">CR</div>
-                <div>
-                  <cite class="testimonial-card__name">Camila R.</cite>
-                  <p class="testimonial-card__role">Las Condes, Chile</p>
-                </div>
-              </footer>
-            </div>
-
-          </div>
-
-          <div class="carousel__controls">
-            <button class="carousel__btn carousel__btn--prev" id="carousel-prev" aria-label="Testimonio anterior">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div class="carousel__dots" id="carousel-dots" role="tablist" aria-label="Seleccionar testimonio"></div>
-            <button class="carousel__btn carousel__btn--next" id="carousel-next" aria-label="Siguiente testimonio">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
         </div>
 
       </div>
@@ -1057,6 +938,18 @@
               <path class="journey__body" d="M8 44 C8 38 12 34 20 33 L46 30 C58 19 72 13 92 13 L114 13 C130 13 142 20 154 29 L178 33 C188 34.5 192 38 192 43 L192 46 Q192 49 189 49 L164 49 A12 12 0 0 0 140 49 L60 49 A12 12 0 0 0 36 49 L11 49 Q8 49 8 46 Z"/>
               <path class="journey__glass" d="M56 29 C66 21 76 17.5 92 17 L100 17 L100 29 Z"/>
               <path class="journey__glass" d="M105 17 L114 17 C126 17.5 136 22 146 29 L105 29 Z"/>
+              <g class="journey__passenger">
+                <circle cx="86" cy="23.6" r="3.4"/>
+                <path d="M79.5 29 Q80 26.2 86 26.2 Q92 26.2 92.5 29 Z"/>
+              </g>
+              <g class="journey__driver">
+                <circle cx="119" cy="24" r="3.4"/>
+                <path d="M112.5 29 Q113 26.6 119 26.6 Q125 26.6 125.5 29 Z"/>
+                <g class="journey__cap">
+                  <path d="M114.6 21.2 Q114.8 17.9 119 17.9 Q123.2 17.9 123.4 21.2 Z"/>
+                  <path d="M114 21.2 H126.4 Q126.4 22.4 125 22.4 H114 Z"/>
+                </g>
+              </g>
               <g class="journey__wheel">
                 <circle class="journey__tyre" cx="48" cy="49" r="9"/>
                 <path class="journey__spokes" d="M48 42v14M41 49h14"/>
@@ -1076,7 +969,7 @@
             <span class="booking-loading__dot"></span>
             <span class="booking-loading__dot"></span>
           </div>
-          <p class="booking-loading__sub">Estamos preparando tu viaje.</p>
+          <p class="booking-loading__sub">Tu chofer TeLlevo maneja tu auto; tú solo disfrutas.</p>
         </div>
 
         <div class="booking-result booking-result--success" id="result-success" hidden role="status" aria-live="polite">

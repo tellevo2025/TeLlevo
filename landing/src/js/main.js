@@ -650,59 +650,6 @@ const initParadaToggle = () => {
   addBtn?.addEventListener('click', addParada);
 };
 
-// ─── CARRUSEL TESTIMONIOS ─────────────────────────────────────────────────────
-const initCarousel = () => {
-  const track  = document.getElementById('carousel-track');
-  const dotsEl = document.getElementById('carousel-dots');
-  if (!track) return;
-
-  const slides = track.querySelectorAll('.carousel__slide');
-  const total  = slides.length;
-  let current  = 0;
-  let autoTimer = null;
-
-  // Crear dots
-  slides.forEach((_, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'carousel__dot' + (i === 0 ? ' carousel__dot--active' : '');
-    btn.setAttribute('role', 'tab');
-    btn.setAttribute('aria-label', `Testimonio ${i + 1}`);
-    btn.addEventListener('click', () => goTo(i));
-    dotsEl.appendChild(btn);
-  });
-
-  const goTo = (idx) => {
-    current = (idx + total) % total;
-    // Desplazamiento simple: cada slide ocupa exactamente el 100% del wrapper
-    track.style.transform = `translateX(-${current * 100}%)`;
-    dotsEl.querySelectorAll('.carousel__dot').forEach((d, i) => {
-      d.classList.toggle('carousel__dot--active', i === current);
-    });
-  };
-
-  const startAuto = () => {
-    clearInterval(autoTimer);
-    autoTimer = setInterval(() => goTo(current + 1), 4000);
-  };
-
-  document.getElementById('carousel-prev')?.addEventListener('click', () => { goTo(current - 1); startAuto(); });
-  document.getElementById('carousel-next')?.addEventListener('click', () => { goTo(current + 1); startAuto(); });
-
-  // Swipe táctil
-  let startX = 0;
-  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-  track.addEventListener('touchend', e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); startAuto(); }
-  }, { passive: true });
-
-  // Pausar al hacer hover
-  track.addEventListener('mouseenter', () => clearInterval(autoTimer));
-  track.addEventListener('mouseleave', startAuto);
-
-  startAuto();
-};
-
 // ─── SCROLL REVEAL ────────────────────────────────────────────────────────────
 const initReveal = () => {
   const els = document.querySelectorAll('.reveal');
@@ -1318,7 +1265,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSteps();
   initParadaToggle();
   initForm();
-  initCarousel();
   initReveal();
   initHeroRotator();
 

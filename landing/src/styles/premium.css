@@ -656,20 +656,7 @@ html { scrollbar-color: var(--color-primary-mid) var(--color-primary); }
 .google-logo { width: 18px; height: 18px; flex-shrink: 0; }
 .google-stars { color: #FBBC04; letter-spacing: 1px; }
 
-.hero__google {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin: 0 auto var(--space-4);
-  padding: 6px 14px;
-  border: 1px solid var(--gold-a25); border-radius: var(--radius-full);
-  background: rgba(6, 12, 24, .55);
-  font-size: .82rem; color: var(--color-text-light);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
-}
-.hero__google:hover { border-color: var(--color-gold); box-shadow: var(--glow-gold-sm); }
-.hero__google-stars { color: #FBBC04; }
-.hero__google strong { color: var(--color-white); }
-
-.google-reviews { margin-bottom: var(--space-7); }
+.google-reviews { margin-bottom: 0; }
 .google-reviews__summary {
   display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
   margin-bottom: var(--space-5);
@@ -747,4 +734,123 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @media (prefers-reduced-motion: reduce) {
   .statement__car { animation: none; }
   .statement__word { transition: none; }
+}
+
+/* ==========================================
+   13. MASCOTA — el chofer TeLlevo al volante
+   Cada auto de la landing lleva al chofer con gorra adelante y al cliente atrás:
+   el chofer maneja el auto del cliente.
+========================================== */
+@property --cap-lift {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.sedan__driver,
+.journey__driver { fill: var(--sedan-driver, currentColor); }
+.sedan__passenger,
+.journey__passenger { fill: var(--sedan-passenger, currentColor); opacity: .5; }
+.journey__driver { fill: var(--color-gold-bright); }
+.journey__passenger { fill: var(--color-gold-pale); }
+/* La gorra se levanta como saludo: el valor llega desde el auto que la contiene. */
+.sedan__cap,
+.journey__cap {
+  transform-box: fill-box;
+  transform-origin: 30% 100%;
+  transform: translateY(calc(var(--cap-lift) * -3px)) rotate(calc(var(--cap-lift) * -14deg));
+}
+@keyframes capTip {
+  0%, 40%, 58%, 90%, 100% { --cap-lift: 0; }
+  46%, 52%                { --cap-lift: 1; }
+}
+@keyframes capTipLoop {
+  0%, 70%, 100% { --cap-lift: 0; }
+  80%, 88%      { --cap-lift: 1; }
+}
+.journey__car { animation: carBob .9s ease-in-out infinite, capTipLoop 2.6s ease-in-out infinite; }
+
+/* Autos más grandes donde son protagonistas, para que se distinga al chofer. */
+.statement__car {
+  width: clamp(110px, 24vw, 150px);
+  animation: statementDrive 9s ease-in-out infinite, capTip 9s ease-in-out infinite;
+}
+.statement__road { height: clamp(56px, 12vw, 72px); }
+.road-divider { height: 46px; }
+.road-divider__car { width: 110px; margin-left: -55px; }
+@media (min-width: 1024px) {
+  .steps__progress-car { top: -28px; width: 84px; margin-left: -42px; }
+}
+.statement__caption {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--color-gold-pale);
+}
+.statement__caption svg { width: 22px; height: 22px; color: var(--color-gold); }
+
+/* ==========================================
+   14. AJUSTES CELULAR Y ESCRITORIO
+========================================== */
+/* Tamaños mínimos legibles y áreas táctiles de al menos 44px. */
+.hero__eyebrow { font-size: .72rem; }
+.hero-route__label { font-size: .72rem; }
+.service-card__tags li { font-size: .74rem; }
+.navbar__toggle { align-items: center; justify-content: center; width: 44px; height: 44px; }
+.calendar-nav { width: 40px; height: 40px; }
+.footer__nav-link { display: inline-block; padding: 10px 0; }
+.footer__contact-link { padding: 6px 0; }
+
+@media (max-width: 767px) {
+  .services,
+  .cotizador,
+  .faq { padding: var(--space-7) 0; }
+  .statement__container { padding: var(--space-7) var(--space-3) var(--space-6); }
+
+  /* Franja de confianza: una columna, filas compactas. */
+  .trust__list { grid-template-columns: 1fr; gap: var(--space-3); padding: var(--space-5) var(--space-3); }
+
+  /* Cómo funciona: una columna, número a la izquierda, ícono y texto en fila. */
+  .steps { grid-template-columns: 1fr; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .step {
+    flex-direction: row; align-items: center; gap: var(--space-3);
+    margin: 0 0 0 20px;
+    padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 22px);
+    text-align: left;
+  }
+  .step__num { top: 50%; left: 0; width: 38px; height: 38px; transform: translate(-50%, -50%); }
+  .step__icon { flex-shrink: 0; margin: 0; }
+  .step__title { margin-bottom: 2px; }
+
+  /* Matrimonios: menos aire y beneficios en lista. */
+  .service-card--wedding-hero__inner { padding: var(--space-6) var(--space-4); gap: var(--space-3); }
+  .wedding-hero__perks { flex-direction: column; align-items: flex-start; gap: var(--space-2); margin: 0 auto; }
+  .wedding-hero__cta { padding: 12px 24px; font-size: .95rem; }
+
+  /* WhatsApp: botón redondo que no tapa el contenido. */
+  .whatsapp-fab { right: 16px; bottom: 16px; width: 56px; padding: 0; justify-content: center; }
+  .whatsapp-fab__label { display: none; }
+
+  .google-reviews__actions .btn { width: 100%; justify-content: center; }
+  .google-reviews__actions { width: 100%; max-width: 360px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .trust__list { gap: var(--space-4) var(--space-5); }
+  .steps { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+}
+
+@media (min-width: 1024px) {
+  .hero__container { padding-top: var(--space-7); padding-bottom: var(--space-7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey__car { animation: none; }
+}
+
+/* Tablet: tres tarjetas de servicio no caben a lo ancho; van en filas con el ícono a la izquierda. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .services__grid { grid-template-columns: 1fr; }
+  .service-card--sm { flex-direction: row; align-items: flex-start; gap: var(--space-4); }
+  .service-card--sm .service-card__icon { flex-shrink: 0; width: 48px; height: 48px; }
+  .service-card--sm .service-card__text { display: block; overflow: visible; -webkit-line-clamp: unset; }
 }
