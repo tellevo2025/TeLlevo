@@ -1199,10 +1199,20 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 .hero__stat-number { font-size: clamp(1.35rem, 3vw, 1.7rem); font-variant-numeric: tabular-nums; }
 .hero__stat-label { font-size: .7rem; letter-spacing: .1em; }
 
-/* Escena: un sedán de lujo avanza de noche por la ciudad. La cámara lo acompaña, así
-   que el auto queda al centro y es la ciudad la que pasa: faroles, luces desenfocadas,
-   estelas de otros autos y el reflejo de cada farol recorriendo la carrocería.
-   Sin recuadro: la escena usa el fondo del hero y se desvanece por todos sus bordes. */
+/* Escena (20 s), como un corte de película:
+   1. Estacionado: la luz interior deja ver al cliente en el asiento trasero.
+   2. El chofer llega caminando por la vereda, saluda con la gorra y se sube:
+      al agacharse la carrocería lo tapa y aparece al volante.
+   3. Se encienden los focos y el auto arranca; la ciudad empieza a pasar
+      (faroles, luces desenfocadas, estelas) y la luz de cada farol recorre la carrocería.
+   4. Fundido a negro y vuelve a empezar.
+   Sin recuadro: usa el fondo del hero y se desvanece por todos sus bordes. */
+@property --hp-leg       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-arm       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-arm-front { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-cap       { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --hp-bob       { syntax: '<length>'; inherits: true; initial-value: 0px; }
+
 .hero__visual { position: relative; animation: stageIn 1.4s var(--ease-out-expo) .35s both; }
 .hero-stage {
   position: relative;
@@ -1218,24 +1228,116 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 }
 .hero-stage__svg { display: block; width: 100%; height: auto; overflow: hidden; }
 
-/* Velocidad de crucero: la calle avanza 54 unidades por segundo. Faroles, líneas,
-   reflejo y ruedas usan esa misma velocidad para que todo se mueva en sincronía. */
-.hero-scene__skyline     { animation: sceneScroll 64s linear infinite; }
-.hero-scene__bokeh--far  { animation: sceneScroll 26s linear infinite; }
-.hero-scene__bokeh--near { animation: sceneScroll 8s linear infinite; }
-.hero-scene__lamps       { animation: lampScroll 4.8s linear infinite; }
-.hero-scene__lane        { animation: laneScroll .74s linear infinite; }
-.hero-scene__trail       { animation: oncoming 7s cubic-bezier(.4, 0, .9, 1) infinite; }
-.hero-car__sweep         { animation: carSweep 4.8s linear infinite; }
-.hero-car__wheel         { animation: wheelSpin 2.5s linear infinite; }
-.hero-car__beam          { animation: beamBreath 6s ease-in-out infinite; }
+/* El chofer */
+.hero-chauffeur__walk { transform: translateX(288px); animation: heroWalk 20s linear infinite, heroGait 20s linear infinite, heroWave 20s ease-in-out infinite; }
+.hero-chauffeur__body { transform: translateY(var(--hp-bob)); }
+.hero-chauffeur__limb { transform-box: fill-box; transform-origin: 50% 4%; }
+.hero-chauffeur__leg-front { transform: rotate(var(--hp-leg)); }
+.hero-chauffeur__leg-back  { transform: rotate(calc(var(--hp-leg) * -1)); }
+.hero-chauffeur__arm-back  { transform: rotate(var(--hp-arm)); }
+.hero-chauffeur__arm-front { transform: rotate(var(--hp-arm-front)); }
+.hero-chauffeur__cap {
+  transform-box: fill-box; transform-origin: 20% 100%;
+  transform: translateY(calc(var(--hp-cap) * -4px)) rotate(calc(var(--hp-cap) * -12deg));
+}
 
-@keyframes sceneScroll { to { transform: translateX(-520px); } }
-@keyframes lampScroll  { to { transform: translateX(-260px); } }
-@keyframes laneScroll  { to { transform: translateX(-40px); } }
-@keyframes carSweep    { from { transform: translateX(170px); } to { transform: translateX(-30px); } }
-@keyframes wheelSpin   { to { transform: rotate(360deg); } }
-@keyframes beamBreath  { 0%, 100% { opacity: 1; } 50% { opacity: .82; } }
+/* El auto */
+.hero-car__driver { opacity: 0; animation: heroDriver 20s ease-in-out infinite; }
+.hero-car__cabin  { animation: heroCabin 20s ease-in-out infinite; }
+.hero-car__beam   { opacity: 0; animation: heroBeams 20s ease-in-out infinite; }
+.hero-car__wheel  { animation: heroWheels 20s infinite; }
+.hero-car__sweep  { opacity: 0; animation: carSweep 2.94s linear infinite, heroSweepGate 20s linear infinite; }
+
+/* La ciudad: quieta mientras el auto está detenido, pasa cuando arranca. */
+.hero-scene__drive--road { animation: heroRoad 20s infinite; }
+.hero-scene__drive--slow { animation: heroRoadSlow 20s infinite; }
+.hero-scene__drive--near { animation: heroRoadNear 20s infinite; }
+.hero-scene__traffic { opacity: 0; animation: heroTraffic 20s linear infinite; }
+.hero-scene__trail   { animation: oncoming 6s cubic-bezier(.4, 0, .9, 1) infinite; }
+.hero-scene__fade    { opacity: 0; pointer-events: none; animation: heroFade 20s linear infinite; }
+
+@keyframes heroWalk {
+  0%, 3%  { transform: translateX(30px); opacity: 1; }
+  17%, 21% { transform: translateX(288px); opacity: 1; }
+  24%       { transform: translate(288px, 64px); opacity: 1; }
+  24.5%, 100% { transform: translate(288px, 64px); opacity: 0; }
+}
+@keyframes heroGait {
+  0% { --hp-leg: 0deg; --hp-arm: 0deg; --hp-bob: 0px; }
+  3% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
+  4.3% { --hp-bob: -1.4px; }
+  5.6% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
+  6.9% { --hp-bob: -1.4px; }
+  8.2% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
+  9.5% { --hp-bob: -1.4px; }
+  10.8% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
+  12.1% { --hp-bob: -1.4px; }
+  13.4% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
+  14.7% { --hp-bob: -1.4px; }
+  16% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
+  17.3% { --hp-bob: -1.4px; }
+  17%, 100% { --hp-leg: 0deg; --hp-arm: 0deg; --hp-bob: 0px; }
+}
+@keyframes heroWave {
+  0% { --hp-arm-front: 0deg; --hp-cap: 0; }
+  3% { --hp-arm-front: 16deg; }
+  5.6% { --hp-arm-front: -16deg; }
+  8.2% { --hp-arm-front: 16deg; }
+  10.8% { --hp-arm-front: -16deg; }
+  13.4% { --hp-arm-front: 16deg; }
+  16% { --hp-arm-front: -16deg; }
+  17% { --hp-arm-front: 0deg; --hp-cap: 0; }
+  18.6%, 20% { --hp-arm-front: -158deg; --hp-cap: 1; }
+  21.5%, 100% { --hp-arm-front: 0deg; --hp-cap: 0; }
+}
+@keyframes heroDriver {
+  0%, 22%   { opacity: 0; }
+  25%, 100% { opacity: 1; }
+}
+@keyframes heroCabin {
+  0%, 24%   { opacity: 1; }
+  32%, 100% { opacity: .45; }
+}
+@keyframes heroBeams {
+  0%, 24%   { opacity: 0; }
+  28%, 100% { opacity: 1; }
+}
+@keyframes heroWheels {
+  0%, 27%   { transform: rotate(0deg); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  40%       { transform: rotate(320deg); animation-timing-function: linear; }
+  92%, 100% { transform: rotate(2880deg); }
+}
+@keyframes heroRoad {
+  0%, 27%   { transform: translateX(0); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  40%       { transform: translateX(-120px); animation-timing-function: linear; }
+  92%, 100% { transform: translateX(-1040px); }
+}
+@keyframes heroRoadSlow {
+  0%, 27%   { transform: translateX(0); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  40%       { transform: translateX(-60px); animation-timing-function: linear; }
+  92%, 100% { transform: translateX(-520px); }
+}
+@keyframes heroRoadNear {
+  0%, 27%   { transform: translateX(0); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+  40%       { transform: translateX(-180px); animation-timing-function: linear; }
+  92%, 100% { transform: translateX(-1560px); }
+}
+@keyframes heroSweepGate {
+  0%, 40%   { opacity: 0; }
+  42%, 90%  { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+@keyframes heroTraffic {
+  0%, 40%   { opacity: 0; }
+  42%, 88%  { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+@keyframes heroFade {
+  0%        { opacity: 1; }
+  3%, 92%   { opacity: 0; }
+  97%, 100% { opacity: 1; }
+}
+@keyframes carSweep   { from { transform: translateX(170px); } to { transform: translateX(-30px); } }
 @keyframes oncoming {
   0%        { transform: translateX(600px); }
   32%, 100% { transform: translateX(-140px); }
@@ -1289,8 +1391,8 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @media (prefers-reduced-motion: reduce) {
   .hero__word { transform: none; animation: none; }
   .hero__word--gold { animation: none; }
-  .hero__orb, .hero__visual, .hero-scene__skyline, .hero-scene__bokeh, .hero-scene__lamps,
-  .hero-scene__lane, .hero-scene__trail, .hero-car__sweep, .hero-car__wheel, .hero-car__beam, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
+  .hero__orb, .hero__visual, .hero-scene__drive, .hero-scene__traffic, .hero-scene__trail, .hero-scene__fade,
+  .hero-chauffeur__walk, .hero-car__driver, .hero-car__cabin, .hero-car__sweep, .hero-car__wheel, .hero-car__beam, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
 }
 
 /* ==========================================
