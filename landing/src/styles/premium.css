@@ -1207,11 +1207,17 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
       (faroles, luces desenfocadas, estelas) y la luz de cada farol recorre la carrocería.
    4. Fundido a negro y vuelve a empezar.
    Sin recuadro: usa el fondo del hero y se desvanece por todos sus bordes. */
-@property --hp-leg       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
-@property --hp-arm       { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
-@property --hp-arm-front { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
-@property --hp-cap       { syntax: '<number>'; inherits: true; initial-value: 0; }
-@property --hp-bob       { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --hp-thigh-f { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-knee-f  { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-thigh-b { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-knee-b  { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-arm-f   { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-elbow-f { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-arm-b   { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-elbow-b { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-lean    { syntax: '<angle>';  inherits: true; initial-value: 0deg; }
+@property --hp-cap     { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --hp-bob     { syntax: '<length>'; inherits: true; initial-value: 0px; }
 
 .hero__visual { position: relative; animation: stageIn 1.4s var(--ease-out-expo) .35s both; }
 .hero-stage {
@@ -1228,14 +1234,21 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 }
 .hero-stage__svg { display: block; width: 100%; height: auto; overflow: hidden; }
 
-/* El chofer */
-.hero-chauffeur__walk { transform: translateX(288px); animation: heroWalk 20s linear infinite, heroGait 20s linear infinite, heroWave 20s ease-in-out infinite; }
-.hero-chauffeur__body { transform: translateY(var(--hp-bob)); }
-.hero-chauffeur__limb { transform-box: fill-box; transform-origin: 50% 4%; }
-.hero-chauffeur__leg-front { transform: rotate(var(--hp-leg)); }
-.hero-chauffeur__leg-back  { transform: rotate(calc(var(--hp-leg) * -1)); }
-.hero-chauffeur__arm-back  { transform: rotate(var(--hp-arm)); }
-.hero-chauffeur__arm-front { transform: rotate(var(--hp-arm-front)); }
+/* El chofer: marcha articulada (3 zancadas entre 3 % y 17 %, ~2 pasos por segundo,
+   86 unidades por zancada: los pies no patinan), saludo con la gorra y subida al auto. */
+.hero-chauffeur__walk { transform: translateX(288px); animation: heroWalk 20s linear infinite, heroWalkCycle 20s linear infinite; }
+/* Articulaciones: cada segmento gira sobre su unión (cadera, rodilla, hombro, codo). */
+.hc-thigh, .hc-shin, .hc-upper, .hc-fore { transform-box: view-box; transform-origin: 0 0; }
+.hc-thigh--front { transform: rotate(var(--hp-thigh-f)); }
+.hc-shin--front  { transform: rotate(var(--hp-knee-f)); }
+.hc-thigh--back  { transform: rotate(var(--hp-thigh-b)); }
+.hc-shin--back   { transform: rotate(var(--hp-knee-b)); }
+.hc-upper--front { transform: rotate(var(--hp-arm-f)); }
+.hc-fore--front  { transform: rotate(var(--hp-elbow-f)); }
+.hc-upper--back  { transform: rotate(var(--hp-arm-b)); }
+.hc-fore--back   { transform: rotate(var(--hp-elbow-b)); }
+.hc-bob  { transform: translateY(var(--hp-bob)); }
+.hc-lean { transform-box: view-box; transform-origin: 0 -46px; transform: rotate(var(--hp-lean)); }
 .hero-chauffeur__cap {
   transform-box: fill-box; transform-origin: 20% 100%;
   transform: translateY(calc(var(--hp-cap) * -4px)) rotate(calc(var(--hp-cap) * -12deg));
@@ -1262,33 +1275,48 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   24%       { transform: translate(288px, 64px); opacity: 1; }
   24.5%, 100% { transform: translate(288px, 64px); opacity: 0; }
 }
-@keyframes heroGait {
-  0% { --hp-leg: 0deg; --hp-arm: 0deg; --hp-bob: 0px; }
-  3% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
-  4.3% { --hp-bob: -1.4px; }
-  5.6% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
-  6.9% { --hp-bob: -1.4px; }
-  8.2% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
-  9.5% { --hp-bob: -1.4px; }
-  10.8% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
-  12.1% { --hp-bob: -1.4px; }
-  13.4% { --hp-leg: 20deg; --hp-arm: -16deg; --hp-bob: 0px; }
-  14.7% { --hp-bob: -1.4px; }
-  16% { --hp-leg: -20deg; --hp-arm: 16deg; --hp-bob: 0px; }
-  17.3% { --hp-bob: -1.4px; }
-  17%, 100% { --hp-leg: 0deg; --hp-arm: 0deg; --hp-bob: 0px; }
-}
-@keyframes heroWave {
-  0% { --hp-arm-front: 0deg; --hp-cap: 0; }
-  3% { --hp-arm-front: 16deg; }
-  5.6% { --hp-arm-front: -16deg; }
-  8.2% { --hp-arm-front: 16deg; }
-  10.8% { --hp-arm-front: -16deg; }
-  13.4% { --hp-arm-front: 16deg; }
-  16% { --hp-arm-front: -16deg; }
-  17% { --hp-arm-front: 0deg; --hp-cap: 0; }
-  18.6%, 20% { --hp-arm-front: -158deg; --hp-cap: 1; }
-  21.5%, 100% { --hp-arm-front: 0deg; --hp-cap: 0; }
+@keyframes heroWalkCycle {
+  0% { --hp-thigh-f: -24.0deg; --hp-knee-f: 4.0deg; --hp-thigh-b: 20.0deg; --hp-knee-b: 6.0deg; --hp-arm-f: 15.0deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -0.40px; --hp-lean: 3deg; --hp-cap: 0; }
+  3.000% { --hp-thigh-f: -24.0deg; --hp-knee-f: 4.0deg; --hp-thigh-b: 20.0deg; --hp-knee-b: 6.0deg; --hp-arm-f: 15.0deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  3.389% { --hp-thigh-f: -19.3deg; --hp-knee-f: 13.4deg; --hp-thigh-b: 15.3deg; --hp-knee-b: 34.3deg; --hp-arm-f: 11.5deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -14.5deg; --hp-elbow-b: -16.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  3.778% { --hp-thigh-f: -15.5deg; --hp-knee-f: 14.4deg; --hp-thigh-b: 8.3deg; --hp-knee-b: 46.6deg; --hp-arm-f: 6.2deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -11.6deg; --hp-elbow-b: -14.4deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  4.167% { --hp-thigh-f: -4.9deg; --hp-knee-f: 7.8deg; --hp-thigh-b: -6.0deg; --hp-knee-b: 58.0deg; --hp-arm-f: -4.5deg; --hp-elbow-f: -10.5deg; --hp-arm-b: -3.6deg; --hp-elbow-b: -10.0deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  4.556% { --hp-thigh-f: -0.5deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -18.9deg; --hp-knee-b: 29.4deg; --hp-arm-f: -14.1deg; --hp-elbow-f: -15.8deg; --hp-arm-b: -0.4deg; --hp-elbow-b: -8.2deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  4.944% { --hp-thigh-f: 11.8deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 15.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 8.9deg; --hp-elbow-b: -8.0deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  5.333% { --hp-thigh-f: 20.0deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 4.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 15.0deg; --hp-elbow-b: -8.0deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  5.722% { --hp-thigh-f: 15.3deg; --hp-knee-f: 34.3deg; --hp-thigh-b: -19.3deg; --hp-knee-b: 13.4deg; --hp-arm-f: -14.5deg; --hp-elbow-f: -16.0deg; --hp-arm-b: 11.5deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  6.111% { --hp-thigh-f: 8.3deg; --hp-knee-f: 46.6deg; --hp-thigh-b: -15.5deg; --hp-knee-b: 14.4deg; --hp-arm-f: -11.6deg; --hp-elbow-f: -14.4deg; --hp-arm-b: 6.2deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  6.500% { --hp-thigh-f: -6.0deg; --hp-knee-f: 58.0deg; --hp-thigh-b: -4.9deg; --hp-knee-b: 7.8deg; --hp-arm-f: -3.6deg; --hp-elbow-f: -10.0deg; --hp-arm-b: -4.5deg; --hp-elbow-b: -10.5deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  6.889% { --hp-thigh-f: -18.9deg; --hp-knee-f: 29.4deg; --hp-thigh-b: -0.5deg; --hp-knee-b: 6.0deg; --hp-arm-f: -0.4deg; --hp-elbow-f: -8.2deg; --hp-arm-b: -14.1deg; --hp-elbow-b: -15.8deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  7.278% { --hp-thigh-f: -24.0deg; --hp-knee-f: 15.0deg; --hp-thigh-b: 11.8deg; --hp-knee-b: 6.0deg; --hp-arm-f: 8.9deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  7.667% { --hp-thigh-f: -24.0deg; --hp-knee-f: 4.0deg; --hp-thigh-b: 20.0deg; --hp-knee-b: 6.0deg; --hp-arm-f: 15.0deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  8.056% { --hp-thigh-f: -19.3deg; --hp-knee-f: 13.4deg; --hp-thigh-b: 15.3deg; --hp-knee-b: 34.3deg; --hp-arm-f: 11.5deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -14.5deg; --hp-elbow-b: -16.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  8.444% { --hp-thigh-f: -15.5deg; --hp-knee-f: 14.4deg; --hp-thigh-b: 8.3deg; --hp-knee-b: 46.6deg; --hp-arm-f: 6.2deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -11.6deg; --hp-elbow-b: -14.4deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  8.833% { --hp-thigh-f: -4.9deg; --hp-knee-f: 7.8deg; --hp-thigh-b: -6.0deg; --hp-knee-b: 58.0deg; --hp-arm-f: -4.5deg; --hp-elbow-f: -10.5deg; --hp-arm-b: -3.6deg; --hp-elbow-b: -10.0deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  9.222% { --hp-thigh-f: -0.5deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -18.9deg; --hp-knee-b: 29.4deg; --hp-arm-f: -14.1deg; --hp-elbow-f: -15.8deg; --hp-arm-b: -0.4deg; --hp-elbow-b: -8.2deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  9.611% { --hp-thigh-f: 11.8deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 15.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 8.9deg; --hp-elbow-b: -8.0deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  10.000% { --hp-thigh-f: 20.0deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 4.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 15.0deg; --hp-elbow-b: -8.0deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  10.389% { --hp-thigh-f: 15.3deg; --hp-knee-f: 34.3deg; --hp-thigh-b: -19.3deg; --hp-knee-b: 13.4deg; --hp-arm-f: -14.5deg; --hp-elbow-f: -16.0deg; --hp-arm-b: 11.5deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  10.778% { --hp-thigh-f: 8.3deg; --hp-knee-f: 46.6deg; --hp-thigh-b: -15.5deg; --hp-knee-b: 14.4deg; --hp-arm-f: -11.6deg; --hp-elbow-f: -14.4deg; --hp-arm-b: 6.2deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  11.167% { --hp-thigh-f: -6.0deg; --hp-knee-f: 58.0deg; --hp-thigh-b: -4.9deg; --hp-knee-b: 7.8deg; --hp-arm-f: -3.6deg; --hp-elbow-f: -10.0deg; --hp-arm-b: -4.5deg; --hp-elbow-b: -10.5deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  11.556% { --hp-thigh-f: -18.9deg; --hp-knee-f: 29.4deg; --hp-thigh-b: -0.5deg; --hp-knee-b: 6.0deg; --hp-arm-f: -0.4deg; --hp-elbow-f: -8.2deg; --hp-arm-b: -14.1deg; --hp-elbow-b: -15.8deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  11.944% { --hp-thigh-f: -24.0deg; --hp-knee-f: 15.0deg; --hp-thigh-b: 11.8deg; --hp-knee-b: 6.0deg; --hp-arm-f: 8.9deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  12.333% { --hp-thigh-f: -24.0deg; --hp-knee-f: 4.0deg; --hp-thigh-b: 20.0deg; --hp-knee-b: 6.0deg; --hp-arm-f: 15.0deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  12.722% { --hp-thigh-f: -19.3deg; --hp-knee-f: 13.4deg; --hp-thigh-b: 15.3deg; --hp-knee-b: 34.3deg; --hp-arm-f: 11.5deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -14.5deg; --hp-elbow-b: -16.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  13.111% { --hp-thigh-f: -15.5deg; --hp-knee-f: 14.4deg; --hp-thigh-b: 8.3deg; --hp-knee-b: 46.6deg; --hp-arm-f: 6.2deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -11.6deg; --hp-elbow-b: -14.4deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  13.500% { --hp-thigh-f: -4.9deg; --hp-knee-f: 7.8deg; --hp-thigh-b: -6.0deg; --hp-knee-b: 58.0deg; --hp-arm-f: -4.5deg; --hp-elbow-f: -10.5deg; --hp-arm-b: -3.6deg; --hp-elbow-b: -10.0deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  13.889% { --hp-thigh-f: -0.5deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -18.9deg; --hp-knee-b: 29.4deg; --hp-arm-f: -14.1deg; --hp-elbow-f: -15.8deg; --hp-arm-b: -0.4deg; --hp-elbow-b: -8.2deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  14.278% { --hp-thigh-f: 11.8deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 15.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 8.9deg; --hp-elbow-b: -8.0deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  14.667% { --hp-thigh-f: 20.0deg; --hp-knee-f: 6.0deg; --hp-thigh-b: -24.0deg; --hp-knee-b: 4.0deg; --hp-arm-f: -18.0deg; --hp-elbow-f: -17.9deg; --hp-arm-b: 15.0deg; --hp-elbow-b: -8.0deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  15.056% { --hp-thigh-f: 15.3deg; --hp-knee-f: 34.3deg; --hp-thigh-b: -19.3deg; --hp-knee-b: 13.4deg; --hp-arm-f: -14.5deg; --hp-elbow-f: -16.0deg; --hp-arm-b: 11.5deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.02px; --hp-lean: 3deg; }
+  15.444% { --hp-thigh-f: 8.3deg; --hp-knee-f: 46.6deg; --hp-thigh-b: -15.5deg; --hp-knee-b: 14.4deg; --hp-arm-f: -11.6deg; --hp-elbow-f: -14.4deg; --hp-arm-b: 6.2deg; --hp-elbow-b: -8.0deg; --hp-bob: 1.11px; --hp-lean: 3deg; }
+  15.833% { --hp-thigh-f: -6.0deg; --hp-knee-f: 58.0deg; --hp-thigh-b: -4.9deg; --hp-knee-b: 7.8deg; --hp-arm-f: -3.6deg; --hp-elbow-f: -10.0deg; --hp-arm-b: -4.5deg; --hp-elbow-b: -10.5deg; --hp-bob: -0.41px; --hp-lean: 3deg; }
+  16.222% { --hp-thigh-f: -18.9deg; --hp-knee-f: 29.4deg; --hp-thigh-b: -0.5deg; --hp-knee-b: 6.0deg; --hp-arm-f: -0.4deg; --hp-elbow-f: -8.2deg; --hp-arm-b: -14.1deg; --hp-elbow-b: -15.8deg; --hp-bob: -1.56px; --hp-lean: 3deg; }
+  16.611% { --hp-thigh-f: -24.0deg; --hp-knee-f: 15.0deg; --hp-thigh-b: 11.8deg; --hp-knee-b: 6.0deg; --hp-arm-f: 8.9deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -1.10px; --hp-lean: 3deg; }
+  17.000% { --hp-thigh-f: -24.0deg; --hp-knee-f: 4.0deg; --hp-thigh-b: 20.0deg; --hp-knee-b: 6.0deg; --hp-arm-f: 15.0deg; --hp-elbow-f: -8.0deg; --hp-arm-b: -18.0deg; --hp-elbow-b: -17.9deg; --hp-bob: -0.40px; --hp-lean: 3deg; }
+  18.0% { --hp-thigh-f: 0deg; --hp-knee-f: 0deg; --hp-thigh-b: 0deg; --hp-knee-b: 0deg; --hp-arm-f: 0deg; --hp-elbow-f: -6deg; --hp-arm-b: 0deg; --hp-elbow-b: -6deg; --hp-bob: 0px; --hp-lean: 0deg; --hp-cap: 0; }
+  18.6%, 20% { --hp-thigh-f: 0deg; --hp-knee-f: 0deg; --hp-thigh-b: 0deg; --hp-knee-b: 0deg; --hp-arm-f: -142deg; --hp-elbow-f: -58deg; --hp-arm-b: 0deg; --hp-elbow-b: -6deg; --hp-bob: 0px; --hp-lean: 0deg; --hp-cap: 1; }
+  21.5%, 100% { --hp-thigh-f: 0deg; --hp-knee-f: 0deg; --hp-thigh-b: 0deg; --hp-knee-b: 0deg; --hp-arm-f: 0deg; --hp-elbow-f: -6deg; --hp-arm-b: 0deg; --hp-elbow-b: -6deg; --hp-bob: 0px; --hp-lean: 0deg; --hp-cap: 0; }
 }
 @keyframes heroDriver {
   0%, 22%   { opacity: 0; }
