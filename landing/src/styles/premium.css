@@ -533,7 +533,12 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 .google-review__when { font-size: .78rem; color: var(--color-text-muted); }
 .google-review__text { flex: 1; font-size: .92rem; line-height: 1.65; color: var(--color-text-light); }
 .google-review__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.google-review__link { font-size: .8rem; font-weight: 600; color: var(--color-gold); }
+.google-review__link {
+  display: inline-flex; align-items: center;
+  min-height: 32px; padding: 4px 0;
+  font-size: .8rem; font-weight: 600;
+  color: var(--color-gold);
+}
 .google-review__link:hover { color: var(--color-gold-bright); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1268,6 +1273,13 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 
 /* El auto: leve vaivén de la carrocería sobre el camino. */
 .hero-pov__world { animation: povSway 3.7s ease-in-out infinite alternate; }
+/* El chofer corrige la dirección con el vaivén y de vez en cuando mira el espejo. */
+.hero-pov__steer, .hero-pov__head, .hero-pov__wiper { transform-box: view-box; transform-origin: 0 0; }
+.hero-pov__steer { animation: povSteer 3.7s ease-in-out infinite alternate; }
+.hero-pov__head  { animation: povHead 13s ease-in-out infinite; }
+/* Llovizna: el limpiaparabrisas pasa cada 8 s y las gotas vuelven a juntarse. */
+.hero-pov__wiper { animation: povWiper 8s ease-in-out infinite; }
+.hero-pov__rain  { animation: povRain 8s linear infinite; }
 .hero-pov__lead  { animation: povLead 7s ease-in-out infinite alternate; }
 .hero-pov__brake { opacity: 0; animation: povBrake 11s ease-in-out infinite; }
 .hero-pov__beacon { animation: povBeacon 2.4s steps(1) infinite; }
@@ -1470,6 +1482,18 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @keyframes povMap   { from { transform: translateY(0); } to { transform: translateY(13px); } }
 @keyframes povTag   { from { transform: rotate(-7deg); } to { transform: rotate(5deg); } }
 @keyframes povRim   { 0% { opacity: 1; } 40% { opacity: .25; } 75% { opacity: .2; } 100% { opacity: 1; } }
+@keyframes povSteer { from { transform: rotate(-1.4deg); } to { transform: rotate(1.2deg); } }
+@keyframes povHead {
+  0%, 52%, 74%, 100% { transform: rotate(0deg) translateX(0); }
+  58%, 68% { transform: translateX(1.4px) rotate(2deg); }
+  84%, 90% { transform: translateX(-.6px) rotate(-1deg); }
+}
+@keyframes povWiper {
+  0%, 1%    { transform: rotate(0deg); }
+  4.5%      { transform: rotate(-112deg); }
+  8.5%, 100% { transform: rotate(0deg); }
+}
+@keyframes povRain { 0%, 2% { opacity: 1; } 5% { opacity: 0; } 12% { opacity: .2; } 100% { opacity: 1; } }
 @keyframes povFlash { 0%, 18% { opacity: 0; } 23% { opacity: 1; } 26%, 100% { opacity: 0; } }
 
 .hero__scroll {
@@ -1521,7 +1545,8 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .hero__word { transform: none; animation: none; }
   .hero__word--gold { animation: none; }
   .hero__orb, .hero__visual, .hero-pov__world, .hero-pov__lead, .hero-pov__brake, .hero-pov__beacon, .hero-pov__map,
-  .hero-pov__tag, .hero-pov__rim, .hero-pov__wash, .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
+  .hero-pov__tag, .hero-pov__rim, .hero-pov__wash, .hero-pov__steer, .hero-pov__head, .hero-pov__wiper, .hero-pov__rain,
+  .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
   /* Sin movimiento: la avenida queda como una foto, con los faroles a media distancia. */
   .hero-pov__approach { animation: none; opacity: 1; transform: scale(.45); }
   .hero-pov__approach--oncoming, .hero-pov__approach--oncoming2 { opacity: 0; }

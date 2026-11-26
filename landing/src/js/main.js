@@ -1224,8 +1224,17 @@ const initCotizadorWidget = () => {
   };
 };
 
-// Callback invocado por el script de Google Maps una vez cargado
-window.initGoogleMaps = () => { initCotizadorWidget(); initCotizador(); };
+// Callback invocado por el script de Google Maps una vez cargado.
+// El script de Maps es async: si llega antes que este archivo no encuentra el callback,
+// así que también se inicializa aquí cuando la API ya está lista. Nunca corre dos veces.
+let mapsInitialized = false;
+window.initGoogleMaps = () => {
+  if (mapsInitialized) return;
+  mapsInitialized = true;
+  initCotizadorWidget();
+  initCotizador();
+};
+if (window.google?.maps?.places) window.initGoogleMaps();
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
