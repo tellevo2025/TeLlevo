@@ -699,6 +699,7 @@ const DISCOUNT_CODES = {
   'MATRIFRAN&FABRI':         10,
   'SLIER':                   10,
   'GERMAINE&CHRISTOPHER':    10,
+  'HERNAN&CLAUDIO':          10,
 };
 const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 
