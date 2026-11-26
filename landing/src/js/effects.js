@@ -37,6 +37,33 @@ const initScrollProgress = () => {
   update();
 };
 
+// ─── TONO AMBIENTE SEGÚN EL SCROLL ───────────────────────────────────────────
+/**
+ * La página recorre la noche del cliente: azul profundo arriba, medianoche al medio
+ * y un dorado cálido de "llegaste a casa" al final. Solo se actualiza una variable
+ * en la capa fija del fondo; el CSS decide la opacidad de cada tono.
+ */
+const initScrollAmbient = () => {
+  const ambient = document.querySelector('.scroll-ambient');
+  if (!ambient) return;
+
+  let ticking = false;
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    ambient.style.setProperty('--ambient', progress.toFixed(3));
+    ticking = false;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+};
+
 // ─── CONTADORES ───────────────────────────────────────────────────────────────
 /**
  * Anima un número desde 0 hasta data-count-to al entrar en pantalla.
@@ -156,6 +183,7 @@ const fillBookingTicket = () => {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initScrollProgress();
+  initScrollAmbient();
   initCountUp();
   initSpotlight();
 });

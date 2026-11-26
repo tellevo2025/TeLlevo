@@ -706,7 +706,7 @@ const normalizeCode = (c) => c.toUpperCase().replace(/\s+/g, '');
 // ─── PRECIOS (compartidos entre cotizador widget y formulario) ────────────────
 const PRICE_TABLE = [
   { max: 19, price: 35000 },
-  { max: 34, price: 40000 },
+  { max: 34, price: 45000 },
   { max: 44, price: 50000 },
   { max: 54, price: 55000 },
   { max: 64, price: 62000 },

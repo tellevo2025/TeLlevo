@@ -1627,3 +1627,51 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   .hero__stats { margin-bottom: 4px; }
   .hero__visual { margin-top: 0; }
 }
+
+/* ==========================================
+   19. TONO AMBIENTE — la noche del cliente
+========================================== */
+/* Capa fija detrás de todo el contenido. effects.js escribe --ambient (0 arriba, 1 al final);
+   cada tono aparece y se va con opacidad, que no repinta la página. */
+.scroll-ambient {
+  --ambient: 0;
+  position: fixed; inset: 0; z-index: -1;
+  pointer-events: none;
+}
+.scroll-ambient__layer {
+  position: absolute; inset: 0;
+  will-change: opacity;
+  transition: opacity .6s ease;
+}
+/* Noche: azul profundo de la marca. */
+.scroll-ambient__layer--night {
+  background:
+    radial-gradient(ellipse 80% 60% at 85% 10%, rgba(27, 58, 107, .62), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 0% 100%, rgba(27, 58, 107, .4), transparent 70%);
+  opacity: clamp(0, calc(1 - var(--ambient) * 2.2), 1);
+}
+/* Medianoche: el azul se corre a la izquierda y aparece el primer reflejo dorado. */
+.scroll-ambient__layer--midnight {
+  background:
+    radial-gradient(ellipse 70% 60% at 0% 35%, rgba(27, 58, 107, .6), transparent 70%),
+    radial-gradient(ellipse 65% 60% at 100% 75%, rgba(201, 168, 76, .16), transparent 70%);
+  opacity: clamp(0, min(calc(var(--ambient) * 2.6), calc((1 - var(--ambient)) * 2.6)), 1);
+}
+/* Llegada a casa: luz cálida dorada que sube desde abajo. */
+.scroll-ambient__layer--home {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 110%, rgba(201, 168, 76, .3), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 0% 10%, rgba(240, 192, 64, .13), transparent 70%);
+  opacity: clamp(0, calc(var(--ambient) * 2.2 - 1.1), 1);
+}
+
+/* Las secciones dejan pasar el tono: las oscuras quedan transparentes y las alternas
+   conservan su azul más claro, pero translúcido. */
+.hero { background-color: transparent; }
+.trust, .steps-section, .testimonials, .faq, .footer { background: transparent; }
+.services, .cotizador { background: rgba(10, 22, 40, .6); }
+.booking { background: linear-gradient(180deg, rgba(10, 22, 40, .6) 0%, rgba(17, 34, 64, .6) 100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-ambient__layer { transition: none; }
+}
