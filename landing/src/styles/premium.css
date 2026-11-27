@@ -1703,10 +1703,10 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 
 .brand-loader__wordmark {
   display: block; width: 100%; height: auto;
+  overflow: visible;
   opacity: 0;
   animation: loaderWordIn .9s ease .25s forwards;
 }
-/* Brillo dorado que recorre las letras (la máscara es el propio logo). */
 /* Texto del logo en vector: la tipografía clásica con serifas del logo y la bajada en sans. */
 .brand-loader__name {
   font-family: Georgia, "Times New Roman", serif;
