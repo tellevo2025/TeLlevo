@@ -103,7 +103,7 @@ async function start() {
     goldMetal: new THREE.MeshStandardMaterial({ color: 0xe0b44a, roughness: 0.28, metalness: 1 }),
     glove: new THREE.MeshPhysicalMaterial({ color: 0xf4f0e6, roughness: 0.7, sheen: 0.5, sheenColor: 0xffffff }),
     wheel: new THREE.MeshPhysicalMaterial({ color: 0x1a120e, roughness: 0.4, clearcoat: 0.6 }),
-    trim: mat(0x07090f, 0.92),
+    trim: mat(0x1a1f2e, 0.85, { side: THREE.DoubleSide }),
     road: new THREE.MeshStandardMaterial({ color: 0x23273a, roughness: 0.38, metalness: 0.15 }),
     sidewalk: mat(0x1a2236, 0.8),
     pole: mat(0x2a3858, 0.4, { metalness: 0.6 }),
@@ -257,26 +257,79 @@ async function start() {
     return light;
   });
 
-  // Auto de adelante y autos en sentido contrario
-  const carGeo = new RoundedBoxGeometry(1.8, 0.9, 4, 4, 0.35);
-  const cabinGeo = new RoundedBoxGeometry(1.5, 0.55, 2, 4, 0.25);
-  const lightGeo = new RoundedBoxGeometry(0.34, 0.14, 0.05, 2, 0.05);
-  const makeCar = (lightMaterial, front) => {
-    const car = new THREE.Group();
-    const body = new THREE.Mesh(carGeo, M.carBody); body.position.y = 0.6; car.add(body);
-    const cabin = new THREE.Mesh(cabinGeo, M.carBody); cabin.position.set(0, 1.25, 0.2); car.add(cabin);
-    [-0.62, 0.62].forEach((x) => {
-      const l = new THREE.Mesh(lightGeo, lightMaterial);
-      l.position.set(x, 0.72, front ? -2.02 : 2.02);
-      car.add(l);
+  // ── Sedán: perfil lateral real (capó, parabrisas inclinado, techo, luneta y maleta)
+  // extruido a lo ancho con bisel, cabina de vidrio más angosta, ruedas y luces. ──
+  const sedanProfile = () => {
+    const p = new THREE.Shape();
+    p.moveTo(-2.3, 0.32);                                   // parachoques trasero, abajo
+    p.lineTo(-2.32, 0.72);
+    p.quadraticCurveTo(-2.32, 0.94, -2.12, 0.96);           // maleta
+    p.lineTo(-1.5, 0.98);
+    p.lineTo(1.1, 0.95);                                    // línea de cintura hasta el capó
+    p.quadraticCurveTo(2.0, 0.9, 2.22, 0.78);               // capó
+    p.quadraticCurveTo(2.34, 0.7, 2.32, 0.5);               // trompa
+    p.lineTo(2.28, 0.32);
+    // pasos de rueda
+    p.lineTo(1.78, 0.32); p.absarc(1.42, 0.32, 0.38, 0, Math.PI, false);
+    p.lineTo(-1.06, 0.32); p.absarc(-1.42, 0.32, 0.38, 0, Math.PI, false);
+    p.lineTo(-2.3, 0.32);
+    return p;
+  };
+  const greenhouseProfile = () => {
+    const g = new THREE.Shape();
+    g.moveTo(-1.5, 0.96);
+    g.quadraticCurveTo(-1.05, 1.4, -0.55, 1.44);             // luneta
+    g.lineTo(0.35, 1.45);                                   // techo
+    g.quadraticCurveTo(0.7, 1.42, 1.15, 0.96);              // parabrisas
+    g.lineTo(-1.5, 0.96);
+    return g;
+  };
+  const extrude = (shape, depth, bevel) => {
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth, steps: 1, curveSegments: 14,
+      bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4,
     });
+    geo.translate(0, 0, -depth / 2);
+    return geo;
+  };
+  const bodyGeo = extrude(sedanProfile(), 1.56, 0.1);
+  const glassGeo = extrude(greenhouseProfile(), 1.3, 0.08);
+  const tyreGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.26, 24);
+  const rimGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.27, 16);
+  const stripGeo = new RoundedBoxGeometry(0.06, 0.1, 1.5, 2, 0.03);
+  const lampGeo = new RoundedBoxGeometry(0.06, 0.12, 0.34, 2, 0.04);
+  const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x0a1226, roughness: 0.08, metalness: 0.2, clearcoat: 1 });
+  const tyreMat = mat(0x0a0a0e, 0.9);
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0x9aa4bc, roughness: 0.3, metalness: 0.9 });
+
+  /** Sedán con el frente hacia +x; `lightMaterial` va adelante (focos) o atrás (pilotos). */
+  const makeSedan = (lightMaterial, lightsAtFront) => {
+    const car = new THREE.Group();
+    car.add(new THREE.Mesh(bodyGeo, M.carBody));
+    car.add(new THREE.Mesh(glassGeo, glassMat));
+    [[1.42, 0.86], [1.42, -0.86], [-1.42, 0.86], [-1.42, -0.86]].forEach(([x, z]) => {
+      const tyre = new THREE.Mesh(tyreGeo, tyreMat);
+      tyre.rotation.x = Math.PI / 2; tyre.position.set(x, 0.34, z); car.add(tyre);
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.rotation.x = Math.PI / 2; rim.position.set(x, 0.34, z); car.add(rim);
+    });
+    if (lightsAtFront) {
+      [-0.6, 0.6].forEach((z) => {
+        const lamp = new THREE.Mesh(lampGeo, lightMaterial);
+        lamp.position.set(2.44, 0.66, z); car.add(lamp);
+      });
+    } else {
+      const strip = new THREE.Mesh(stripGeo, lightMaterial);   // piloto de lado a lado
+      strip.position.set(-2.46, 0.8, 0); car.add(strip);
+    }
     return car;
   };
-  const leadCar = makeCar(M.tail, false);
+  const leadCar = makeSedan(M.tail, false);
+  leadCar.rotation.y = Math.PI / 2;            // el frente mira al horizonte: vemos su cola
   leadCar.position.set(0, 0, -26);
   scene.add(leadCar);
-  const oncoming = makeCar(M.head, true);
-  oncoming.rotation.y = Math.PI;
+  const oncoming = makeSedan(M.head, true);
+  oncoming.rotation.y = -Math.PI / 2;          // viene hacia nosotros por la pista contraria
   oncoming.position.set(-5, 0, -200);
   scene.add(oncoming);
 
@@ -284,21 +337,57 @@ async function start() {
   const cabin = new THREE.Group();
   scene.add(cabin);
 
-  const roof = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 3), M.trim); roof.position.set(0, 1.86, 0.6); cabin.add(roof);
+  /** Rectángulo con esquinas redondeadas como trazado (para los huecos de las ventanas). */
+  const roundedRect = (path, x0, y0, x1, y1, r) => {
+    path.moveTo(x0 + r, y0);
+    path.lineTo(x1 - r, y0); path.quadraticCurveTo(x1, y0, x1, y0 + r);
+    path.lineTo(x1, y1 - r); path.quadraticCurveTo(x1, y1, x1 - r, y1);
+    path.lineTo(x0 + r, y1); path.quadraticCurveTo(x0, y1, x0, y1 - r);
+    path.lineTo(x0, y0 + r); path.quadraticCurveTo(x0, y0, x0 + r, y0);
+    return path;
+  };
+
+  // Marco del parabrisas: techo, pilares A y tablero forman un solo contorno con el vidrio
+  // trapezoidal de esquinas redondeadas (más angosto arriba, como en un auto real).
+  const frameShape = new THREE.Shape();
+  frameShape.moveTo(-4, -1); frameShape.lineTo(4, -1); frameShape.lineTo(4, 3); frameShape.lineTo(-4, 3); frameShape.lineTo(-4, -1);
+  const windshield = new THREE.Path();
+  windshield.moveTo(-1.42, 0.96);
+  windshield.lineTo(1.42, 0.96);
+  windshield.quadraticCurveTo(1.6, 0.96, 1.58, 1.12);
+  windshield.lineTo(1.34, 1.86);
+  windshield.quadraticCurveTo(1.28, 1.98, 1.1, 1.99);
+  windshield.quadraticCurveTo(0, 2.04, -1.1, 1.99);
+  windshield.quadraticCurveTo(-1.28, 1.98, -1.34, 1.86);
+  windshield.lineTo(-1.58, 1.12);
+  windshield.quadraticCurveTo(-1.6, 0.96, -1.42, 0.96);
+  frameShape.holes.push(windshield);
+  const windshieldFrame = new THREE.Mesh(new THREE.ShapeGeometry(frameShape, 16), M.trim);
+  windshieldFrame.position.z = -1.12;
+  cabin.add(windshieldFrame);
+  // Borde interior del parabrisas: un reflejo cálido muy tenue que dibuja el vidrio
+  const edgePoints = windshield.getPoints(48).map((pt) => new THREE.Vector3(pt.x, pt.y, -1.11));
+  const edge = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(edgePoints),
+    new THREE.LineBasicMaterial({ color: 0xffc46b, transparent: true, opacity: 0.22 }));
+  cabin.add(edge);
+
+  // Techo tapizado
+  const roof = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 3.4), M.trim);
+  roof.rotation.x = Math.PI / 2; roof.position.set(0, 2.0, 0.5);
+  cabin.add(roof);
+
+  // Costados: puertas y ventanas laterales con pilar B, y su línea de luz ambiente dorada
   [-1, 1].forEach((side) => {
-    const pillar = new THREE.Mesh(new RoundedBoxGeometry(0.12, 1.1, 0.12, 2, 0.05), M.trim);
-    pillar.position.set(side * 0.92, 1.3, -0.62);
-    pillar.rotation.x = -0.62;
-    pillar.rotation.z = side * 0.12;
-    cabin.add(pillar);
-  });
-  // Puertas con su línea de luz ambiente dorada
-  [-1, 1].forEach((side) => {
-    const door = new THREE.Mesh(new RoundedBoxGeometry(0.1, 1.05, 2.6, 3, 0.04), M.trim);
-    door.position.set(side * 0.98, 0.52, 0.5);
-    cabin.add(door);
+    const sideShape = new THREE.Shape();
+    sideShape.moveTo(-1.12, -0.2); sideShape.lineTo(2.6, -0.2); sideShape.lineTo(2.6, 2.2); sideShape.lineTo(-1.12, 2.2); sideShape.lineTo(-1.12, -0.2);
+    sideShape.holes.push(roundedRect(new THREE.Path(), -0.9, 1.02, 0.78, 1.7, 0.12));   // ventana delantera
+    sideShape.holes.push(roundedRect(new THREE.Path(), 0.94, 1.02, 1.95, 1.66, 0.12));    // ventana trasera
+    const panel = new THREE.Mesh(new THREE.ShapeGeometry(sideShape, 8), M.trim);
+    panel.rotation.y = -Math.PI / 2;           // el eje x de la figura queda a lo largo del auto
+    panel.position.x = side * 1.6;
+    cabin.add(panel);
     const strip = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.008, 1.6), M.doorLed);
-    strip.position.set(side * 0.92, 0.98, 0.1);
+    strip.position.set(side * 1.57, 0.98, 0.1);
     cabin.add(strip);
   });
   const dashboard = new THREE.Mesh(new RoundedBoxGeometry(2.1, 0.34, 0.8, 4, 0.14), M.dash);
@@ -494,7 +583,7 @@ async function start() {
 
     // Auto de adelante: leve vaivén; auto en contra cada 9 s
     leadCar.position.x = Math.sin(t * 0.4) * 0.35;
-    leadCar.position.z = -24 + Math.sin(t * 0.27) * 3;
+    leadCar.position.z = -17 + Math.sin(t * 0.27) * 2.5;
     const cycle = t % 9;
     oncoming.position.z = cycle < 3 ? -160 + cycle * 62 : -400;
 
