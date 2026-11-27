@@ -1166,111 +1166,330 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 .hero__stat-number { font-size: clamp(1.35rem, 3vw, 1.7rem); font-variant-numeric: tabular-nums; }
 .hero__stat-label { font-size: .7rem; letter-spacing: .1em; }
 
-/* Escena: toma real desde el asiento trasero, de noche. Sin recuadro: se funde con el
-   fondo del hero por todos sus bordes. Recorte 16:8,4 centrado en el parabrisas. */
+/* Escena animada con acabado 3D (luz cálida y fría, volumen, fondo desenfocado): desde el asiento trasero, de noche en Santiago. El chofer de TeLlevo maneja tu auto;
+   por el parabrisas pasa la avenida (perspectiva real: cada objeto crece como 1/distancia) con la
+   cordillera y la Gran Torre al fondo; del espejo cuelga el volante dorado de la marca y la pantalla
+   marca la ruta "A tu casa". Cada ciclo empalma consigo mismo: la escena nunca se corta. */
 .hero__visual { position: relative; animation: stageIn 1.4s var(--ease-out-expo) .35s both; }
 .hero-stage {
   position: relative;
-  aspect-ratio: 16 / 8.4;
   margin: 0 calc(-1 * var(--space-3));
-  overflow: hidden;
   -webkit-mask-image:
-    linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 16%, #000 80%, transparent 100%);
+    linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 14%, #000 80%, transparent 100%);
   -webkit-mask-composite: source-in;
           mask-image:
-    linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 16%, #000 80%, transparent 100%);
+    linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 14%, #000 80%, transparent 100%);
           mask-composite: intersect;
 }
-.hero-video {
-  display: block;
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: 50% 52%;
-  background: var(--color-primary);
+/* Se recorta el respaldo de los asientos: abajo solo habría penumbra. */
+.hero-stage { aspect-ratio: 520 / 214; overflow: hidden; }
+.hero-stage__svg { display: block; width: 100%; height: auto; overflow: hidden; }
+
+/* Lo que se acerca: escala alrededor del punto de fuga (el grupo padre ya está trasladado a él). */
+.hero-pov__approach {
+  transform-box: view-box; transform-origin: 0 0;
+  opacity: 0;
+  animation-timing-function: linear; animation-iteration-count: infinite;
 }
-/* Interfaz de la marca sobre la toma (no parte de la escena): tarjeta del viaje en curso,
-   sello del volante y botón para pausar. */
-.trip-card {
-  position: absolute; left: 13%; bottom: 19%;
-  display: flex; align-items: center; gap: var(--space-2);
-  max-width: 74%;
-  padding: 8px 14px 8px 10px;
-  border: 1px solid var(--gold-a25);
-  border-radius: 14px;
-  color: var(--color-text-light);
-  background: rgba(6, 12, 24, .72);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+.hero-pov__approach--far      { animation-name: povFar;  animation-duration: 4.8s; }
+.hero-pov__approach--shop     { animation-name: povShop; animation-duration: 3.8s; }
+.hero-pov__approach--dash     { animation-name: povDash; animation-duration: 1.16s; }
+.hero-pov__approach--oncoming  { animation-name: povOncoming; animation-duration: 9s; }
+.hero-pov__approach--oncoming2 { animation-name: povOncoming; animation-duration: 11s; }
+.hero-pov__bloom {
+  transform-box: fill-box; transform-origin: center;
+  animation: inherit; animation-delay: inherit;
 }
-.trip-card__icon {
-  flex-shrink: 0;
-  width: 26px; height: 26px;
-  color: var(--color-gold);
-  filter: drop-shadow(0 0 6px rgba(201, 168, 76, .6));
-  animation: tripSteer 6s ease-in-out infinite;
+.hero-pov__approach--far .hero-pov__bloom      { animation-name: povFarBloom; }
+.hero-pov__approach--shop .hero-pov__bloom     { animation-name: povShopBloom; opacity: .7; }
+.hero-pov__approach--oncoming .hero-pov__bloom,
+.hero-pov__approach--oncoming2 .hero-pov__bloom { animation-name: povOncomingBloom; }
+.hero-pov__approach--dash.hero-pov__approach--d29 { animation-delay: -0.29s; }
+.hero-pov__approach--dash.hero-pov__approach--d58 { animation-delay: -0.58s; }
+.hero-pov__approach--dash.hero-pov__approach--d87 { animation-delay: -0.87s; }
+.hero-pov__approach--far.hero-pov__approach--d120 { animation-delay: -1.20s; }
+.hero-pov__approach--far.hero-pov__approach--d160 { animation-delay: -1.60s; }
+.hero-pov__approach--far.hero-pov__approach--d200 { animation-delay: -2.00s; }
+.hero-pov__approach--far.hero-pov__approach--d240 { animation-delay: -2.40s; }
+.hero-pov__approach--far.hero-pov__approach--d280 { animation-delay: -2.80s; }
+.hero-pov__approach--far.hero-pov__approach--d320 { animation-delay: -3.20s; }
+.hero-pov__approach--far.hero-pov__approach--d360 { animation-delay: -3.60s; }
+.hero-pov__approach--far.hero-pov__approach--d40 { animation-delay: -0.40s; }
+.hero-pov__approach--far.hero-pov__approach--d400 { animation-delay: -4.00s; }
+.hero-pov__approach--far.hero-pov__approach--d440 { animation-delay: -4.40s; }
+.hero-pov__approach--far.hero-pov__approach--d80 { animation-delay: -0.80s; }
+.hero-pov__approach--oncoming2.hero-pov__approach--d550 { animation-delay: -5.50s; }
+.hero-pov__approach--shop.hero-pov__approach--d126 { animation-delay: -1.26s; }
+.hero-pov__approach--shop.hero-pov__approach--d157 { animation-delay: -1.57s; }
+.hero-pov__approach--shop.hero-pov__approach--d189 { animation-delay: -1.89s; }
+.hero-pov__approach--shop.hero-pov__approach--d220 { animation-delay: -2.20s; }
+.hero-pov__approach--shop.hero-pov__approach--d252 { animation-delay: -2.52s; }
+.hero-pov__approach--shop.hero-pov__approach--d283 { animation-delay: -2.83s; }
+.hero-pov__approach--shop.hero-pov__approach--d31 { animation-delay: -0.31s; }
+.hero-pov__approach--shop.hero-pov__approach--d315 { animation-delay: -3.15s; }
+.hero-pov__approach--shop.hero-pov__approach--d346 { animation-delay: -3.46s; }
+.hero-pov__approach--shop.hero-pov__approach--d63 { animation-delay: -0.63s; }
+.hero-pov__approach--shop.hero-pov__approach--d94 { animation-delay: -0.94s; }
+
+/* El auto: leve vaivén de la carrocería sobre el camino. */
+.hero-pov__world { animation: povSway 3.7s ease-in-out infinite alternate; }
+/* El chofer corrige la dirección con el vaivén y de vez en cuando mira el espejo. */
+.hero-pov__steer, .hero-pov__head { transform-box: view-box; transform-origin: 0 0; }
+.hero-pov__steer { animation: povSteer 3.7s ease-in-out infinite alternate; }
+.hero-pov__head  { animation: povHead 13s ease-in-out infinite; }
+.hero-pov__stars { animation: povTwinkle 3.4s ease-in-out infinite alternate; }
+.hero-pov__lead  { animation: povLead 7s ease-in-out infinite alternate; }
+.hero-pov__brake { opacity: 0; animation: povBrake 11s ease-in-out infinite; }
+.hero-pov__beacon { animation: povBeacon 2.4s steps(1) infinite; }
+.hero-pov__map   { animation: povMap 2.6s linear infinite; }
+.hero-pov__tag   { transform-box: view-box; transform-origin: 0 0; animation: povTag 3.1s ease-in-out infinite alternate; }
+
+/* La luz de cada farol recorre el interior y dibuja el contorno del chofer (sincronizada con los faroles). */
+.hero-pov__rim, .hero-pov__wash { opacity: .15; animation: povRim .8s linear infinite; }
+.hero-pov__rim--left, .hero-pov__wash--left { animation-delay: -.4s; }
+.hero-pov__wash--flash { opacity: 0; animation: povFlash 9s linear infinite; }
+.hero-pov__screen-text { font: 600 5.2px var(--font-body); letter-spacing: .02em; fill: var(--color-text-light); }
+.hero-pov__screen-text--gold { fill: var(--color-gold-bright); }
+
+@keyframes povFar {
+  0.00% { transform: scale(0.0167); opacity: 0.00; }
+  9.73% { transform: scale(0.0184); opacity: 0.54; }
+  18.92% { transform: scale(0.0205); opacity: 1.00; }
+  27.57% { transform: scale(0.0229); opacity: 1.00; }
+  35.69% { transform: scale(0.0258); opacity: 1.00; }
+  43.29% { transform: scale(0.0292); opacity: 1.00; }
+  50.37% { transform: scale(0.0333); opacity: 1.00; }
+  56.94% { transform: scale(0.0383); opacity: 1.00; }
+  63.00% { transform: scale(0.0444); opacity: 1.00; }
+  68.57% { transform: scale(0.0521); opacity: 1.00; }
+  73.64% { transform: scale(0.0618); opacity: 1.00; }
+  78.24% { transform: scale(0.0744); opacity: 1.00; }
+  82.35% { transform: scale(0.0909); opacity: 1.00; }
+  86.00% { transform: scale(0.1133); opacity: 1.00; }
+  89.20% { transform: scale(0.1444); opacity: 1.00; }
+  91.95% { transform: scale(0.1890); opacity: 1.00; }
+  94.26% { transform: scale(0.2556); opacity: 1.00; }
+  96.16% { transform: scale(0.3590); opacity: 1.00; }
+  97.65% { transform: scale(0.5267); opacity: 1.00; }
+  98.75% { transform: scale(0.8047); opacity: 1.00; }
+  99.49% { transform: scale(1.2432); opacity: 1.00; }
+  99.89% { transform: scale(1.7660); opacity: 1.00; }
+  100.00% { transform: scale(2.0000); opacity: 1.00; }
 }
-.trip-card__body { min-width: 0; }
-.trip-card__title {
-  margin: 0 0 4px;
-  font-size: clamp(.66rem, 1.5vw, .8rem); font-weight: 600; letter-spacing: .02em;
-  white-space: nowrap;
+@keyframes povShop {
+  0.00% { transform: scale(0.0222); opacity: 0.00; }
+  9.73% { transform: scale(0.0246); opacity: 0.54; }
+  18.92% { transform: scale(0.0273); opacity: 1.00; }
+  27.57% { transform: scale(0.0306); opacity: 1.00; }
+  35.69% { transform: scale(0.0343); opacity: 1.00; }
+  43.29% { transform: scale(0.0389); opacity: 1.00; }
+  50.37% { transform: scale(0.0443); opacity: 1.00; }
+  56.94% { transform: scale(0.0509); opacity: 1.00; }
+  63.00% { transform: scale(0.0590); opacity: 1.00; }
+  68.57% { transform: scale(0.0690); opacity: 1.00; }
+  73.64% { transform: scale(0.0818); opacity: 1.00; }
+  78.24% { transform: scale(0.0982); opacity: 1.00; }
+  82.35% { transform: scale(0.1197); opacity: 1.00; }
+  86.00% { transform: scale(0.1486); opacity: 1.00; }
+  89.20% { transform: scale(0.1884); opacity: 1.00; }
+  91.95% { transform: scale(0.2449); opacity: 1.00; }
+  94.26% { transform: scale(0.3276); opacity: 1.00; }
+  96.16% { transform: scale(0.4527); opacity: 1.00; }
+  97.65% { transform: scale(0.6468); opacity: 1.00; }
+  98.75% { transform: scale(0.9474); opacity: 1.00; }
+  99.49% { transform: scale(1.3743); opacity: 1.00; }
+  99.89% { transform: scale(1.8197); opacity: 1.00; }
+  100.00% { transform: scale(2.0000); opacity: 1.00; }
 }
-.trip-card__live { color: var(--color-gold-bright); font-weight: 500; }
-.trip-card__live::before {
-  content: "";
-  display: inline-block;
-  width: 6px; height: 6px;
-  margin: 0 5px 1px 2px;
-  border-radius: 50%;
-  background: var(--color-gold-bright);
-  box-shadow: var(--glow-gold-sm);
-  animation: chipPulse 2s ease-in-out infinite;
+@keyframes povDash {
+  0.00% { transform: scale(0.0667); opacity: 0.00; }
+  9.73% { transform: scale(0.0736); opacity: 0.54; }
+  18.92% { transform: scale(0.0816); opacity: 1.00; }
+  27.57% { transform: scale(0.0909); opacity: 1.00; }
+  35.69% { transform: scale(0.1018); opacity: 1.00; }
+  43.29% { transform: scale(0.1146); opacity: 1.00; }
+  50.37% { transform: scale(0.1299); opacity: 1.00; }
+  56.94% { transform: scale(0.1483); opacity: 1.00; }
+  63.00% { transform: scale(0.1705); opacity: 1.00; }
+  68.57% { transform: scale(0.1977); opacity: 1.00; }
+  73.64% { transform: scale(0.2314); opacity: 1.00; }
+  78.24% { transform: scale(0.2735); opacity: 1.00; }
+  82.35% { transform: scale(0.3269); opacity: 1.00; }
+  86.00% { transform: scale(0.3953); opacity: 1.00; }
+  89.20% { transform: scale(0.4840); opacity: 1.00; }
+  91.95% { transform: scale(0.5997); opacity: 1.00; }
+  94.26% { transform: scale(0.7509); opacity: 1.00; }
+  96.16% { transform: scale(0.9462); opacity: 1.00; }
+  97.65% { transform: scale(1.1893); opacity: 1.00; }
+  98.75% { transform: scale(1.4684); opacity: 1.00; }
+  99.49% { transform: scale(1.7416); opacity: 1.00; }
+  99.89% { transform: scale(1.9374); opacity: 1.00; }
+  100.00% { transform: scale(2.0000); opacity: 1.00; }
 }
-.trip-card__route {
-  display: flex; align-items: center; gap: 8px;
-  font-size: clamp(.58rem, 1.3vw, .7rem);
-  color: var(--color-text-muted);
-  white-space: nowrap;
+@keyframes povOncoming {
+  0.00% { transform: scale(0.0167); opacity: 0.00; }
+  2.33% { transform: scale(0.0184); opacity: 0.54; }
+  4.54% { transform: scale(0.0205); opacity: 1.00; }
+  6.62% { transform: scale(0.0229); opacity: 1.00; }
+  8.57% { transform: scale(0.0258); opacity: 1.00; }
+  10.39% { transform: scale(0.0292); opacity: 1.00; }
+  12.09% { transform: scale(0.0333); opacity: 1.00; }
+  13.67% { transform: scale(0.0383); opacity: 1.00; }
+  15.12% { transform: scale(0.0444); opacity: 1.00; }
+  16.46% { transform: scale(0.0521); opacity: 1.00; }
+  17.67% { transform: scale(0.0618); opacity: 1.00; }
+  18.78% { transform: scale(0.0744); opacity: 1.00; }
+  19.76% { transform: scale(0.0909); opacity: 1.00; }
+  20.64% { transform: scale(0.1133); opacity: 1.00; }
+  21.41% { transform: scale(0.1444); opacity: 1.00; }
+  22.07% { transform: scale(0.1890); opacity: 1.00; }
+  22.62% { transform: scale(0.2556); opacity: 1.00; }
+  23.08% { transform: scale(0.3590); opacity: 1.00; }
+  23.44% { transform: scale(0.5267); opacity: 1.00; }
+  23.70% { transform: scale(0.8047); opacity: 1.00; }
+  23.88% { transform: scale(1.2432); opacity: 1.00; }
+  23.97% { transform: scale(1.7660); opacity: 1.00; }
+  24.00% { transform: scale(2.0000); opacity: 1.00; }
+  24.01%, 100% { transform: scale(2.0000); opacity: 0; }
 }
-.trip-card__bar {
-  position: relative;
-  width: clamp(48px, 9vw, 96px); height: 3px;
-  border-radius: 2px;
-  background: var(--color-primary-mid);
-  overflow: hidden;
+@keyframes povFarBloom {
+  0.00% { transform: scale(9.600); }
+  9.73% { transform: scale(8.674); }
+  18.92% { transform: scale(7.799); }
+  27.57% { transform: scale(6.975); }
+  35.69% { transform: scale(6.202); }
+  43.29% { transform: scale(5.479); }
+  50.37% { transform: scale(4.805); }
+  56.94% { transform: scale(4.179); }
+  63.00% { transform: scale(3.602); }
+  68.57% { transform: scale(3.072); }
+  73.64% { transform: scale(2.589); }
+  78.24% { transform: scale(2.152); }
+  82.35% { transform: scale(1.760); }
+  86.00% { transform: scale(1.412); }
+  89.20% { transform: scale(1.108); }
+  91.95% { transform: scale(1.000); }
+  94.26% { transform: scale(1.000); }
+  96.16% { transform: scale(1.000); }
+  97.65% { transform: scale(1.000); }
+  98.75% { transform: scale(1.000); }
+  99.49% { transform: scale(1.000); }
+  99.89% { transform: scale(1.000); }
+  100.00% { transform: scale(1.000); }
 }
-.trip-card__progress {
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  background: var(--gradient-gold);
-  transform-origin: left;
-  animation: tripProgress 11s linear infinite;
+@keyframes povShopBloom {
+  0.00% { transform: scale(6.300); }
+  9.73% { transform: scale(5.694); }
+  18.92% { transform: scale(5.122); }
+  27.57% { transform: scale(4.582); }
+  35.69% { transform: scale(4.076); }
+  43.29% { transform: scale(3.603); }
+  50.37% { transform: scale(3.162); }
+  56.94% { transform: scale(2.753); }
+  63.00% { transform: scale(2.375); }
+  68.57% { transform: scale(2.028); }
+  73.64% { transform: scale(1.712); }
+  78.24% { transform: scale(1.426); }
+  82.35% { transform: scale(1.169); }
+  86.00% { transform: scale(1.000); }
+  89.20% { transform: scale(1.000); }
+  91.95% { transform: scale(1.000); }
+  94.26% { transform: scale(1.000); }
+  96.16% { transform: scale(1.000); }
+  97.65% { transform: scale(1.000); }
+  98.75% { transform: scale(1.000); }
+  99.49% { transform: scale(1.000); }
+  99.89% { transform: scale(1.000); }
+  100.00% { transform: scale(1.000); }
 }
-.hero-video__bug {
-  position: absolute; top: 18%; right: 14%;
-  width: clamp(26px, 4vw, 40px); height: auto;
-  opacity: .75;
-  filter: drop-shadow(0 0 6px rgba(201, 168, 76, .5));
+@keyframes povOncomingBloom {
+  0.00% { transform: scale(12.000); }
+  2.33% { transform: scale(10.842); }
+  4.54% { transform: scale(9.749); }
+  6.62% { transform: scale(8.719); }
+  8.57% { transform: scale(7.753); }
+  10.39% { transform: scale(6.848); }
+  12.09% { transform: scale(6.006); }
+  13.67% { transform: scale(5.224); }
+  15.12% { transform: scale(4.502); }
+  16.46% { transform: scale(3.840); }
+  17.67% { transform: scale(3.236); }
+  18.78% { transform: scale(2.690); }
+  19.76% { transform: scale(2.200); }
+  20.64% { transform: scale(1.766); }
+  21.41% { transform: scale(1.385); }
+  22.07% { transform: scale(1.058); }
+  22.62% { transform: scale(1.000); }
+  23.08% { transform: scale(1.000); }
+  23.44% { transform: scale(1.000); }
+  23.70% { transform: scale(1.000); }
+  23.88% { transform: scale(1.000); }
+  23.97% { transform: scale(1.000); }
+  24.00% { transform: scale(1.000); }
+  24.01%, 100% { transform: scale(1); }
 }
-.hero-video__bug .brand-loader__arc, .hero-video__bug .brand-loader__glow { display: none; }
-.hero-video__toggle {
-  position: absolute; right: 14%; bottom: 19%;
-  display: grid; place-items: center;
-  width: 36px; height: 36px;
-  border: 1px solid var(--gold-a25);
-  border-radius: 50%;
-  color: var(--color-gold-pale);
-  background: rgba(6, 12, 24, .6);
-  transition: all .2s ease;
+@keyframes povSway {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  35%  { transform: translate(-.6px, .5px) rotate(-.12deg); }
+  70%  { transform: translate(.4px, -.3px) rotate(.08deg); }
+  100% { transform: translate(.8px, .4px) rotate(.14deg); }
 }
-.hero-video__toggle:hover { color: var(--color-gold-bright); border-color: var(--color-gold); }
-.hero-video__toggle:focus-visible { outline: 2px solid var(--color-gold-bright); outline-offset: 2px; }
-.hero-video__toggle svg { width: 16px; height: 16px; fill: currentColor; }
-.hero-video__toggle[data-state="playing"] .hero-video__icon-play,
-.hero-video__toggle[data-state="paused"] .hero-video__icon-pause { display: none; }
-@keyframes tripProgress { from { transform: scaleX(.04); } to { transform: scaleX(1); } }
-@keyframes tripSteer { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-14deg); } 60% { transform: rotate(10deg); } }
-@keyframes chipPulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes povLead  { from { transform: translate(-3px, 0) scale(1); } to { transform: translate(4px, .6px) scale(1.06); } }
+@keyframes povBrake { 0%, 58%, 76%, 100% { opacity: 0; } 62%, 72% { opacity: 1; } }
+@keyframes povBeacon { 0% { opacity: 1; } 50% { opacity: .15; } }
+@keyframes povMap   { from { transform: translateY(0); } to { transform: translateY(13px); } }
+@keyframes povTag   { from { transform: rotate(-7deg); } to { transform: rotate(5deg); } }
+@keyframes povRim   { 0% { opacity: 1; } 40% { opacity: .25; } 75% { opacity: .2; } 100% { opacity: 1; } }
+@keyframes povSteer { from { transform: rotate(-1.4deg); } to { transform: rotate(1.2deg); } }
+@keyframes povHead {
+  0%, 52%, 74%, 100% { transform: rotate(0deg) translateX(0); }
+  58%, 68% { transform: translateX(1.4px) rotate(2deg); }
+  84%, 90% { transform: translateX(-.6px) rotate(-1deg); }
+}
+@keyframes povTwinkle { from { opacity: .45; } to { opacity: 1; } }
+@keyframes povFlash { 0%, 18% { opacity: 0; } 23% { opacity: 1; } 26%, 100% { opacity: 0; } }
+
+
+.hero-pov__approach--dash.hero-pov__approach--d29 { animation-delay: -0.29s; }
+.hero-pov__approach--dash.hero-pov__approach--d58 { animation-delay: -0.58s; }
+.hero-pov__approach--dash.hero-pov__approach--d87 { animation-delay: -0.87s; }
+.hero-pov__approach--far.hero-pov__approach--d100 { animation-delay: -1.00s; }
+.hero-pov__approach--far.hero-pov__approach--d120 { animation-delay: -1.20s; }
+.hero-pov__approach--far.hero-pov__approach--d140 { animation-delay: -1.40s; }
+.hero-pov__approach--far.hero-pov__approach--d160 { animation-delay: -1.60s; }
+.hero-pov__approach--far.hero-pov__approach--d180 { animation-delay: -1.80s; }
+.hero-pov__approach--far.hero-pov__approach--d20 { animation-delay: -0.20s; }
+.hero-pov__approach--far.hero-pov__approach--d200 { animation-delay: -2.00s; }
+.hero-pov__approach--far.hero-pov__approach--d220 { animation-delay: -2.20s; }
+.hero-pov__approach--far.hero-pov__approach--d240 { animation-delay: -2.40s; }
+.hero-pov__approach--far.hero-pov__approach--d260 { animation-delay: -2.60s; }
+.hero-pov__approach--far.hero-pov__approach--d280 { animation-delay: -2.80s; }
+.hero-pov__approach--far.hero-pov__approach--d300 { animation-delay: -3.00s; }
+.hero-pov__approach--far.hero-pov__approach--d320 { animation-delay: -3.20s; }
+.hero-pov__approach--far.hero-pov__approach--d340 { animation-delay: -3.40s; }
+.hero-pov__approach--far.hero-pov__approach--d360 { animation-delay: -3.60s; }
+.hero-pov__approach--far.hero-pov__approach--d380 { animation-delay: -3.80s; }
+.hero-pov__approach--far.hero-pov__approach--d40 { animation-delay: -0.40s; }
+.hero-pov__approach--far.hero-pov__approach--d400 { animation-delay: -4.00s; }
+.hero-pov__approach--far.hero-pov__approach--d420 { animation-delay: -4.20s; }
+.hero-pov__approach--far.hero-pov__approach--d440 { animation-delay: -4.40s; }
+.hero-pov__approach--far.hero-pov__approach--d460 { animation-delay: -4.60s; }
+.hero-pov__approach--far.hero-pov__approach--d60 { animation-delay: -0.60s; }
+.hero-pov__approach--far.hero-pov__approach--d80 { animation-delay: -0.80s; }
+.hero-pov__approach--oncoming2.hero-pov__approach--d550 { animation-delay: -5.50s; }
+.hero-pov__approach--shop.hero-pov__approach--d126 { animation-delay: -1.26s; }
+.hero-pov__approach--shop.hero-pov__approach--d157 { animation-delay: -1.57s; }
+.hero-pov__approach--shop.hero-pov__approach--d189 { animation-delay: -1.89s; }
+.hero-pov__approach--shop.hero-pov__approach--d220 { animation-delay: -2.20s; }
+.hero-pov__approach--shop.hero-pov__approach--d252 { animation-delay: -2.52s; }
+.hero-pov__approach--shop.hero-pov__approach--d283 { animation-delay: -2.83s; }
+.hero-pov__approach--shop.hero-pov__approach--d31 { animation-delay: -0.31s; }
+.hero-pov__approach--shop.hero-pov__approach--d315 { animation-delay: -3.15s; }
+.hero-pov__approach--shop.hero-pov__approach--d346 { animation-delay: -3.46s; }
+.hero-pov__approach--shop.hero-pov__approach--d63 { animation-delay: -0.63s; }
+.hero-pov__approach--shop.hero-pov__approach--d94 { animation-delay: -0.94s; }
 
 .hero__scroll {
   position: absolute; left: 50%; bottom: 20px; z-index: 1;
@@ -1320,8 +1539,12 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
 @media (prefers-reduced-motion: reduce) {
   .hero__word { transform: none; animation: none; }
   .hero__word--gold { animation: none; }
-  .hero__orb, .hero__visual, .trip-card__icon, .trip-card__progress, .trip-card__live::before,
+  .hero__orb, .hero__visual, .hero-pov__world, .hero-pov__lead, .hero-pov__brake, .hero-pov__beacon, .hero-pov__map,
+  .hero-pov__tag, .hero-pov__rim, .hero-pov__wash, .hero-pov__steer, .hero-pov__head, .hero-pov__stars,
   .hero__scroll-line, .hero__eyebrow-dot { animation: none; }
+  /* Sin movimiento: la avenida queda como una foto, con los faroles a media distancia. */
+  .hero-pov__approach { animation: none; opacity: 1; transform: scale(.45); }
+  .hero-pov__approach--oncoming, .hero-pov__approach--oncoming2 { opacity: 0; }
 }
 
 /* ==========================================

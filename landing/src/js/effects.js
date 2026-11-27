@@ -298,54 +298,6 @@ const initHeroParallax = () => {
   });
 };
 
-// ─── VIDEO DEL HERO ───────────────────────────────────────────────────────────
-/**
- * El video arranca solo (autoplay, silenciado). Este módulo lo pausa fuera de pantalla,
- * lo detiene con "reducir movimiento" o ahorro de datos, reintenta con el primer toque si
- * el navegador bloqueó la reproducción (modo de bajo consumo del iPhone) y maneja el botón.
- */
-const initHeroVideo = () => {
-  const video  = document.querySelector('.hero-video');
-  const toggle = document.querySelector('.hero-video__toggle');
-  if (!video) return;
-
-  let userPaused = prefersReducedMotion() || Boolean(navigator.connection?.saveData);
-  let inView = true;
-
-  const syncToggle = () => {
-    if (!toggle) return;
-    const playing = !video.paused;
-    toggle.dataset.state = playing ? 'playing' : 'paused';
-    toggle.setAttribute('aria-label', playing ? 'Pausar video' : 'Reproducir video');
-  };
-  const tryPlay = () => {
-    if (userPaused || !inView) return;
-    video.play().catch(() => { /* bloqueado: queda la imagen fija hasta el primer toque */ });
-  };
-
-  if (userPaused) video.pause();
-  video.addEventListener('play', syncToggle);
-  video.addEventListener('pause', syncToggle);
-  syncToggle();
-
-  toggle?.addEventListener('click', () => {
-    userPaused = !video.paused;
-    if (userPaused) video.pause();
-    else tryPlay();
-  });
-
-  new IntersectionObserver(([entry]) => {
-    inView = entry.isIntersecting;
-    if (inView) tryPlay();
-    else video.pause();
-  }, { threshold: 0.1 }).observe(video);
-
-  const onFirstGesture = () => { if (video.paused) tryPlay(); };
-  ['pointerdown', 'touchend', 'keydown'].forEach((type) =>
-    window.addEventListener(type, onFirstGesture, { once: true, passive: true }));
-  tryPlay();
-};
-
 // ─── COTIZADOR: EL AUTO ACELERA AL CALCULAR ───────────────────────────────────
 const COT_DRIVE_MS = 1800;
 
@@ -366,7 +318,6 @@ const initCotizadorCar = () => {
 document.addEventListener('DOMContentLoaded', () => {
   initOffscreenPause();
   initHeroParallax();
-  initHeroVideo();
   initCotizadorCar();
   initStepsProgress();
 });
