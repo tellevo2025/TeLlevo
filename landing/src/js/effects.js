@@ -16,6 +16,36 @@ const COUNT_UP_MS = 1400;
 const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// ─── PANTALLA DE CARGA ────────────────────────────────────────────────────────
+/**
+ * Retira la pantalla de carga cuando la página terminó de cargar. Se muestra al menos
+ * MIN_MS (para que el volante alcance a girar) y nunca más de MAX_MS, aunque algún
+ * recurso externo (Maps, reseñas) siga cargando.
+ */
+const initPageLoader = () => {
+  const loader = document.querySelector('.page-loader');
+  if (!loader) return;
+
+  const MIN_MS = prefersReducedMotion() ? 0 : 1100;
+  const MAX_MS = 2600;
+  let finished = false;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    const wait = Math.max(0, MIN_MS - performance.now());
+    setTimeout(() => {
+      loader.classList.add('page-loader--done');
+      loader.setAttribute('aria-hidden', 'true');
+      setTimeout(() => loader.remove(), 900);
+    }, wait);
+  };
+
+  if (document.readyState === 'complete') finish();
+  else window.addEventListener('load', finish, { once: true });
+  setTimeout(finish, MAX_MS);
+};
+
 // ─── PROGRESO DE LECTURA ──────────────────────────────────────────────────────
 const initScrollProgress = () => {
   const bar = document.querySelector('.scroll-progress');
@@ -182,6 +212,7 @@ const fillBookingTicket = () => {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initPageLoader();
   initScrollProgress();
   initScrollAmbient();
   initCountUp();
@@ -264,6 +295,30 @@ const initHeroParallax = () => {
   });
 };
 
+// ─── VIDEO DEL HERO ───────────────────────────────────────────────────────────
+/**
+ * Reproduce la toma del hero solo cuando se ve en pantalla. Con "reducir movimiento"
+ * o ahorro de datos no se descarga: queda la imagen fija (poster).
+ */
+const initHeroVideo = () => {
+  const video = document.querySelector('.hero-video');
+  if (!video) return;
+  if (prefersReducedMotion() || navigator.connection?.saveData) return;
+
+  const play = () => {
+    video.play().catch(() => { /* el navegador bloqueó la reproducción: queda el poster */ });
+  };
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) play();
+    else video.pause();
+  }, { threshold: 0.1 });
+
+  // Se espera a que termine de cargar la página para no competir con lo esencial.
+  const start = () => { video.preload = 'auto'; observer.observe(video); };
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start, { once: true });
+};
+
 // ─── COTIZADOR: EL AUTO ACELERA AL CALCULAR ───────────────────────────────────
 const COT_DRIVE_MS = 1800;
 
@@ -284,6 +339,7 @@ const initCotizadorCar = () => {
 document.addEventListener('DOMContentLoaded', () => {
   initOffscreenPause();
   initHeroParallax();
+  initHeroVideo();
   initCotizadorCar();
   initStepsProgress();
 });
