@@ -23,13 +23,13 @@
   <!-- Pantalla de carga: el logo de la barra con el volante girando. effects.js la retira
        al cargar la página; si el JS fallara, el CSS la oculta sola a los 6 s. -->
   <div class="page-loader" role="status" aria-live="polite">
-    <div class="page-loader__logo">
+    <div class="brand-loader">
       <picture>
         <source srcset="src/assets/logo-wordmark.webp" type="image/webp">
-        <img class="page-loader__wordmark" src="src/assets/logo-wordmark.png" alt="" width="230" height="100" decoding="async">
+        <img class="brand-loader__wordmark" src="src/assets/logo-wordmark.png" alt="" width="230" height="100" decoding="async">
       </picture>
-      <span class="page-loader__shine" aria-hidden="true"></span>
-      <svg class="page-loader__wheel" viewBox="-50 -50 100 100" aria-hidden="true">
+      <span class="brand-loader__shine" aria-hidden="true"></span>
+      <svg class="brand-loader__wheel" viewBox="-50 -50 100 100" aria-hidden="true">
         <defs>
           <linearGradient id="loader-gold" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stop-color="#8E6E3C"/>
@@ -38,13 +38,13 @@
             <stop offset="1" stop-color="#7E6136"/>
           </linearGradient>
           <radialGradient id="loader-glow">
-            <stop offset="0" stop-color="#F0C040" stop-opacity=".35"/>
+            <stop offset="0" stop-color="#F0C040" stop-opacity=".22"/>
             <stop offset="1" stop-color="#F0C040" stop-opacity="0"/>
           </radialGradient>
         </defs>
-        <circle class="page-loader__glow" r="50" fill="url(#loader-glow)"/>
-        <circle class="page-loader__arc" r="47.5" fill="none" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round" pathLength="100"/>
-        <g class="page-loader__steer">
+        <circle class="brand-loader__glow" r="50" fill="url(#loader-glow)"/>
+        <circle class="brand-loader__arc" r="47.5" fill="none" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round" pathLength="100"/>
+        <g class="brand-loader__steer">
           <circle r="41" fill="none" stroke="url(#loader-gold)" stroke-width="6"/>
           <circle r="33.6" fill="none" stroke="url(#loader-gold)" stroke-width="1.8"/>
           <g fill="none" stroke="url(#loader-gold)" stroke-width="1.7" stroke-linejoin="round">
@@ -430,19 +430,64 @@
             </li>
           </ul>
         </div>
-        <div class="hero__visual" aria-hidden="true">
+        <div class="hero__visual">
           <div class="hero-stage hero-stage--video" data-parallax>
-            <!-- Toma real desde el asiento trasero (Pexels, licencia libre; etalonada con la paleta).
-                 effects.js la reproduce solo en pantalla; sin JS o con ahorro de datos queda la imagen fija. -->
-            <video class="hero-video" muted loop playsinline preload="none"
+            <!-- Toma real desde el asiento trasero (Pexels 19830551, licencia libre; etalonada con la
+                 paleta). Solo MP4/H.264: Safari puede elegir un WebM y no reproducirlo. effects.js la pausa
+                 fuera de pantalla, con "reducir movimiento" o ahorro de datos; ahí queda la imagen fija. -->
+            <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"
                    poster="src/assets/hero-drive-poster.webp" width="1280" height="720">
-              <source src="src/assets/hero-drive.webm" type="video/webm">
               <source src="src/assets/hero-drive.mp4" type="video/mp4">
             </video>
-            <div class="hero-video__chip">
-              <span class="hero-video__chip-dot"></span>
-              <span><strong>En ruta</strong> · a tu casa</span>
+            <!-- Sello de la marca sobre la toma, como en televisión -->
+            <svg class="hero-video__bug" viewBox="-50 -50 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="loader-gold-bug" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#8E6E3C"/>
+            <stop offset=".42" stop-color="#E6C47E"/>
+            <stop offset=".7" stop-color="#B08D4F"/>
+            <stop offset="1" stop-color="#7E6136"/>
+          </linearGradient>
+          <radialGradient id="loader-glow-bug">
+            <stop offset="0" stop-color="#F0C040" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#F0C040" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle class="brand-loader__glow" r="50" fill="url(#loader-glow-bug)"/>
+        <circle class="brand-loader__arc" r="47.5" fill="none" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round" pathLength="100"/>
+        <g class="brand-loader__steer">
+          <circle r="41" fill="none" stroke="url(#loader-gold-bug)" stroke-width="6"/>
+          <circle r="33.6" fill="none" stroke="url(#loader-gold-bug)" stroke-width="1.8"/>
+          <g fill="none" stroke="url(#loader-gold-bug)" stroke-width="1.7" stroke-linejoin="round">
+            <path d="M-8.2 -3.6 L-31.6 -12.6 L-33.4 -5.4 L-9.2 3.2"/>
+            <path d="M8.2 -3.6 L31.6 -12.6 L33.4 -5.4 L9.2 3.2"/>
+            <path d="M-3.8 8.6 L-3.2 33.4 M3.8 8.6 L3.2 33.4"/>
+            <circle r="9"/>
+          </g>
+          <circle r="4.8" fill="url(#loader-gold-bug)"/>
+        </g>
+      </svg>
+            <div class="trip-card" aria-hidden="true">
+              <svg class="trip-card__icon" viewBox="-50 -50 100 100">
+                <circle r="41" fill="none" stroke="currentColor" stroke-width="7"/>
+                <path d="M-8 -3.6 L-33 -12 M8 -3.6 L33 -12 M0 9 V34" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+                <circle r="9" fill="currentColor"/>
+              </svg>
+              <div class="trip-card__body">
+                <p class="trip-card__title">Viaje TeLlevo <span class="trip-card__live">en curso</span></p>
+                <div class="trip-card__route">
+                  <span>Tu evento</span>
+                  <span class="trip-card__bar"><span class="trip-card__progress"></span></span>
+                  <span>Tu casa</span>
+                </div>
+              </div>
             </div>
+            <button class="hero-video__toggle" type="button" aria-label="Pausar video" data-state="playing">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="hero-video__icon-pause" d="M8 5h3v14H8zM13 5h3v14h-3z"/>
+                <path class="hero-video__icon-play" d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -1136,12 +1181,39 @@
         </form>
 
         <div class="booking-loading" id="booking-loading" hidden role="status" aria-live="polite" data-stage="0">
-          <div class="journey" aria-hidden="true">
-            <span class="journey__light journey__light--1"></span>
-            <span class="journey__light journey__light--2"></span>
-            <span class="journey__light journey__light--3"></span>
-            <svg class="tl-art journey__car" viewBox="0 0 160 60"><use href="#tl-car"/></svg>
-            <span class="journey__road"></span>
+          <div class="brand-loader brand-loader--compact">
+            <picture>
+              <source srcset="src/assets/logo-wordmark.webp" type="image/webp">
+              <img class="brand-loader__wordmark" src="src/assets/logo-wordmark.png" alt="" width="230" height="100" decoding="async">
+            </picture>
+            <span class="brand-loader__shine" aria-hidden="true"></span>
+            <svg class="brand-loader__wheel" viewBox="-50 -50 100 100" aria-hidden="true">
+              <defs>
+                <linearGradient id="loader-gold-booking" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#8E6E3C"/>
+                  <stop offset=".42" stop-color="#E6C47E"/>
+                  <stop offset=".7" stop-color="#B08D4F"/>
+                  <stop offset="1" stop-color="#7E6136"/>
+                </linearGradient>
+                <radialGradient id="loader-glow-booking">
+                  <stop offset="0" stop-color="#F0C040" stop-opacity=".22"/>
+                  <stop offset="1" stop-color="#F0C040" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <circle class="brand-loader__glow" r="50" fill="url(#loader-glow-booking)"/>
+              <circle class="brand-loader__arc" r="47.5" fill="none" stroke="#F0C040" stroke-width="1.4" stroke-linecap="round" pathLength="100"/>
+              <g class="brand-loader__steer">
+                <circle r="41" fill="none" stroke="url(#loader-gold-booking)" stroke-width="6"/>
+                <circle r="33.6" fill="none" stroke="url(#loader-gold-booking)" stroke-width="1.8"/>
+                <g fill="none" stroke="url(#loader-gold-booking)" stroke-width="1.7" stroke-linejoin="round">
+                  <path d="M-8.2 -3.6 L-31.6 -12.6 L-33.4 -5.4 L-9.2 3.2"/>
+                  <path d="M8.2 -3.6 L31.6 -12.6 L33.4 -5.4 L9.2 3.2"/>
+                  <path d="M-3.8 8.6 L-3.2 33.4 M3.8 8.6 L3.2 33.4"/>
+                  <circle r="9"/>
+                </g>
+                <circle r="4.8" fill="url(#loader-gold-booking)"/>
+              </g>
+            </svg>
           </div>
           <p class="booking-loading__text" id="booking-loading-text">Recibiendo tu solicitud…</p>
           <div class="booking-loading__steps" aria-hidden="true">

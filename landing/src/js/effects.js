@@ -26,14 +26,17 @@ const initPageLoader = () => {
   const loader = document.querySelector('.page-loader');
   if (!loader) return;
 
-  const MIN_MS = prefersReducedMotion() ? 0 : 1100;
-  const MAX_MS = 2600;
+  // Los tiempos corren desde que el script toma el control, no desde que se pidió la página:
+  // en una conexión lenta el logo alcanzaba a verse solo un instante.
+  const MIN_MS = prefersReducedMotion() ? 400 : 1700;
+  const MAX_MS = 3500;
+  const shownAt = performance.now();
   let finished = false;
 
   const finish = () => {
     if (finished) return;
     finished = true;
-    const wait = Math.max(0, MIN_MS - performance.now());
+    const wait = Math.max(0, MIN_MS - (performance.now() - shownAt));
     setTimeout(() => {
       loader.classList.add('page-loader--done');
       loader.setAttribute('aria-hidden', 'true');
@@ -297,26 +300,50 @@ const initHeroParallax = () => {
 
 // ─── VIDEO DEL HERO ───────────────────────────────────────────────────────────
 /**
- * Reproduce la toma del hero solo cuando se ve en pantalla. Con "reducir movimiento"
- * o ahorro de datos no se descarga: queda la imagen fija (poster).
+ * El video arranca solo (autoplay, silenciado). Este módulo lo pausa fuera de pantalla,
+ * lo detiene con "reducir movimiento" o ahorro de datos, reintenta con el primer toque si
+ * el navegador bloqueó la reproducción (modo de bajo consumo del iPhone) y maneja el botón.
  */
 const initHeroVideo = () => {
-  const video = document.querySelector('.hero-video');
+  const video  = document.querySelector('.hero-video');
+  const toggle = document.querySelector('.hero-video__toggle');
   if (!video) return;
-  if (prefersReducedMotion() || navigator.connection?.saveData) return;
 
-  const play = () => {
-    video.play().catch(() => { /* el navegador bloqueó la reproducción: queda el poster */ });
+  let userPaused = prefersReducedMotion() || Boolean(navigator.connection?.saveData);
+  let inView = true;
+
+  const syncToggle = () => {
+    if (!toggle) return;
+    const playing = !video.paused;
+    toggle.dataset.state = playing ? 'playing' : 'paused';
+    toggle.setAttribute('aria-label', playing ? 'Pausar video' : 'Reproducir video');
   };
-  const observer = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting) play();
-    else video.pause();
-  }, { threshold: 0.1 });
+  const tryPlay = () => {
+    if (userPaused || !inView) return;
+    video.play().catch(() => { /* bloqueado: queda la imagen fija hasta el primer toque */ });
+  };
 
-  // Se espera a que termine de cargar la página para no competir con lo esencial.
-  const start = () => { video.preload = 'auto'; observer.observe(video); };
-  if (document.readyState === 'complete') start();
-  else window.addEventListener('load', start, { once: true });
+  if (userPaused) video.pause();
+  video.addEventListener('play', syncToggle);
+  video.addEventListener('pause', syncToggle);
+  syncToggle();
+
+  toggle?.addEventListener('click', () => {
+    userPaused = !video.paused;
+    if (userPaused) video.pause();
+    else tryPlay();
+  });
+
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    if (inView) tryPlay();
+    else video.pause();
+  }, { threshold: 0.1 }).observe(video);
+
+  const onFirstGesture = () => { if (video.paused) tryPlay(); };
+  ['pointerdown', 'touchend', 'keydown'].forEach((type) =>
+    window.addEventListener(type, onFirstGesture, { once: true, passive: true }));
+  tryPlay();
 };
 
 // ─── COTIZADOR: EL AUTO ACELERA AL CALCULAR ───────────────────────────────────
