@@ -314,7 +314,37 @@
   <header class="navbar" id="navbar" role="banner">
     <div class="navbar__container">
       <a href="/" class="navbar__logo" aria-label="TeLlevo — Inicio">
-        <img src="src/assets/logo.png.png" alt="TeLlevo" class="navbar__logo-img" width="140" height="48">
+        <svg class="tl-logo navbar__logo-img" viewBox="0 0 230 100" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="logo-gold-nav" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#8E6E3C"/>
+              <stop offset=".42" stop-color="#E6C47E"/>
+              <stop offset=".7" stop-color="#B08D4F"/>
+              <stop offset="1" stop-color="#7E6136"/>
+            </linearGradient>
+            <linearGradient id="logo-text-nav" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F3D68E"/>
+              <stop offset=".5" stop-color="#D4AC5C"/>
+              <stop offset="1" stop-color="#A9843F"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(47.5 49)">
+            <g class="tl-logo__wheel">
+              <circle r="41" fill="none" stroke="url(#logo-gold-nav)" stroke-width="6"/>
+              <circle r="33.6" fill="none" stroke="url(#logo-gold-nav)" stroke-width="1.8"/>
+              <g fill="none" stroke="url(#logo-gold-nav)" stroke-width="2" stroke-linejoin="round">
+                <path d="M-8.2 -3.6 L-31.6 -12.6 L-33.4 -5.4 L-9.2 3.2"/>
+                <path d="M8.2 -3.6 L31.6 -12.6 L33.4 -5.4 L9.2 3.2"/>
+                <path d="M-3.8 8.6 L-3.2 33.4 M3.8 8.6 L3.2 33.4"/>
+                <circle r="9"/>
+              </g>
+              <circle r="4.8" fill="url(#logo-gold-nav)"/>
+            </g>
+          </g>
+          <path d="M86 20.5 H226 M86 78 H226" stroke="url(#logo-text-nav)" stroke-width="1.3"/>
+          <text class="tl-logo__name" x="99" y="62.5" textLength="124" lengthAdjust="spacingAndGlyphs" fill="url(#logo-text-nav)">E LLEVO</text>
+          <text class="tl-logo__tagline" x="89" y="91.5" textLength="128" lengthAdjust="spacingAndGlyphs" fill="url(#logo-text-nav)">Choferes de reemplazo</text>
+        </svg>
       </a>
       <nav class="navbar__nav" aria-label="Navegación principal">
         <ul class="navbar__list" role="list">

@@ -115,12 +115,20 @@ fieldset { border: none; }
   max-width: 1200px; margin: 0 auto; padding: 0 var(--space-3); height: var(--navbar-height);
 }
 .navbar__logo { flex-shrink: 0; display: flex; align-items: center; }
+/* Logo en vector: el volante gira apenas al pasar el cursor. */
 .navbar__logo-img {
-  height: 130px;
+  display: block;
+  height: clamp(40px, 4.2vw, 48px);
   width: auto;
-  object-fit: contain;
+  overflow: visible;
   animation: logoEntrance .8s cubic-bezier(.22,.61,.36,1) both;
 }
+.tl-logo__name { font-family: Georgia, "Times New Roman", serif; font-size: 35px; font-weight: 400; }
+.tl-logo__tagline { font-family: var(--font-body); font-size: 10.6px; font-weight: 600; }
+.tl-logo__wheel { transform-box: fill-box; transform-origin: center; transition: transform .6s cubic-bezier(.22,.61,.36,1); }
+.navbar__logo:hover .tl-logo__wheel,
+.navbar__logo:focus-visible .tl-logo__wheel,
+.footer__logo-link:hover .tl-logo__wheel { transform: rotate(-28deg); }
 @keyframes logoEntrance {
   from { opacity: 0; transform: translateY(-10px) scale(.92); filter: brightness(.4); }
   to   { opacity: 1; transform: translateY(0)     scale(1);   filter: brightness(1); }
@@ -626,7 +634,7 @@ body.light-mode .codigo-feedback--invalid { color: #64748B; }
   max-width: 1200px; margin: 0 auto; padding: var(--space-7) var(--space-3) var(--space-5);
 }
 .footer__logo-link { display: inline-block; margin-bottom: var(--space-3); }
-.footer__logo-img { height: 64px; width: auto; object-fit: contain; }
+.footer__logo-img { display: block; height: 58px; width: auto; overflow: visible; }
 .footer__tagline { font-size: .9375rem; color: var(--color-text-muted); }
 .footer__legal { font-size: .8125rem; color: var(--color-text-muted); opacity: .6; margin-top: var(--space-1); }
 .footer__nav-list { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
