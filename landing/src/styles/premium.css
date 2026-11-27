@@ -1760,3 +1760,20 @@ body:has(> .page-loader:not(.page-loader--done)) .hero * { animation-play-state:
   .brand-loader__steer, .brand-loader__glow, .brand-loader__arc, .brand-loader__shine { animation: none; }
   .brand-loader__wordmark { opacity: 1; animation: none; }
 }
+
+/* ==========================================
+   21. HERO EN 3D (hero3d.js)
+========================================== */
+/* El lienzo WebGL se monta sobre la escena SVG y la reemplaza con un fundido al dibujar
+   su primer cuadro; si no hay WebGL, la escena SVG queda como está. */
+.hero-stage__canvas {
+  position: absolute; inset: 0;
+  display: block;
+  width: 100%; height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.hero-stage--3d .hero-stage__canvas { opacity: 1; }
+.hero-stage__svg { transition: opacity 1.2s ease, visibility 0s linear 1.2s; }
+.hero-stage--3d .hero-stage__svg { opacity: 0; visibility: hidden; }
+.hero-stage--3d .hero-stage__svg * { animation-play-state: paused; }

@@ -17,6 +17,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/main.css">
   <link rel="stylesheet" href="src/styles/premium.css">
+  <!-- Three.js para la escena 3D del hero (se carga después de la página, ver hero3d.js) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -1933,6 +1942,7 @@
   <script src="src/js/effects.js" defer></script>
   <script src="src/js/reviews.js" defer></script>
   <script src="src/js/main.js" defer></script>
+  <script type="module" src="src/js/hero3d.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=%%GOOGLE_MAPS_KEY%%&libraries=places&language=es&region=CL&loading=async&callback=initGoogleMaps" defer></script>
 </body>
 </html>
