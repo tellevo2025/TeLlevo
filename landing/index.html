@@ -33,11 +33,31 @@
        al cargar la página; si el JS fallara, el CSS la oculta sola a los 6 s. -->
   <div class="page-loader" role="status" aria-live="polite">
     <div class="brand-loader">
-      <picture>
-        <source srcset="src/assets/logo-wordmark.webp" type="image/webp">
-        <img class="brand-loader__wordmark" src="src/assets/logo-wordmark.png" alt="" width="230" height="100" decoding="async">
-      </picture>
-      <span class="brand-loader__shine" aria-hidden="true"></span>
+      <svg class="brand-loader__wordmark" viewBox="0 0 230 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="wm-gold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F3D68E"/>
+            <stop offset=".5" stop-color="#D4AC5C"/>
+            <stop offset="1" stop-color="#A9843F"/>
+          </linearGradient>
+          <linearGradient id="wm-shine" x1="-.6" y1="0" x2="-.2" y2="0" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#FFF6DC" stop-opacity="0"/>
+            <stop offset=".5" stop-color="#FFF6DC" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#FFF6DC" stop-opacity="0"/>
+            <animate class="brand-loader__shine" attributeName="x1" values="-.6;1.2;1.2" keyTimes="0;.6;1" dur="2.4s" begin=".9s" repeatCount="indefinite"/>
+            <animate attributeName="x2" values="-.2;1.6;1.6" keyTimes="0;.6;1" dur="2.4s" begin=".9s" repeatCount="indefinite"/>
+          </linearGradient>
+        </defs>
+        <g class="brand-loader__letters">
+          <path d="M86 20.5 H226 M86 78 H226" stroke="url(#wm-gold)" stroke-width="1.3"/>
+          <text class="brand-loader__name" x="99" y="62.5" textLength="124" lengthAdjust="spacingAndGlyphs" fill="url(#wm-gold)">E LLEVO</text>
+          <text class="brand-loader__tagline" x="89" y="91.5" textLength="128" lengthAdjust="spacingAndGlyphs" fill="url(#wm-gold)">Choferes de reemplazo</text>
+        </g>
+        <g class="brand-loader__gloss" aria-hidden="true">
+          <text class="brand-loader__name" x="99" y="62.5" textLength="124" lengthAdjust="spacingAndGlyphs" fill="url(#wm-shine)">E LLEVO</text>
+          <text class="brand-loader__tagline" x="89" y="91.5" textLength="128" lengthAdjust="spacingAndGlyphs" fill="url(#wm-shine)">Choferes de reemplazo</text>
+        </g>
+      </svg>
       <svg class="brand-loader__wheel" viewBox="-50 -50 100 100" aria-hidden="true">
         <defs>
           <linearGradient id="loader-gold" x1="0" y1="0" x2="1" y2="1">
@@ -1627,11 +1647,31 @@
 
         <div class="booking-loading" id="booking-loading" hidden role="status" aria-live="polite" data-stage="0">
           <div class="brand-loader brand-loader--compact">
-            <picture>
-              <source srcset="src/assets/logo-wordmark.webp" type="image/webp">
-              <img class="brand-loader__wordmark" src="src/assets/logo-wordmark.png" alt="" width="230" height="100" decoding="async">
-            </picture>
-            <span class="brand-loader__shine" aria-hidden="true"></span>
+            <svg class="brand-loader__wordmark" viewBox="0 0 230 100" aria-hidden="true">
+              <defs>
+                <linearGradient id="wm-gold-booking" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#F3D68E"/>
+                  <stop offset=".5" stop-color="#D4AC5C"/>
+                  <stop offset="1" stop-color="#A9843F"/>
+                </linearGradient>
+                <linearGradient id="wm-shine-booking" x1="-.6" y1="0" x2="-.2" y2="0" gradientUnits="objectBoundingBox">
+                  <stop offset="0" stop-color="#FFF6DC" stop-opacity="0"/>
+                  <stop offset=".5" stop-color="#FFF6DC" stop-opacity=".95"/>
+                  <stop offset="1" stop-color="#FFF6DC" stop-opacity="0"/>
+                  <animate class="brand-loader__shine" attributeName="x1" values="-.6;1.2;1.2" keyTimes="0;.6;1" dur="2.4s" begin=".9s" repeatCount="indefinite"/>
+                  <animate attributeName="x2" values="-.2;1.6;1.6" keyTimes="0;.6;1" dur="2.4s" begin=".9s" repeatCount="indefinite"/>
+                </linearGradient>
+              </defs>
+              <g class="brand-loader__letters">
+                <path d="M86 20.5 H226 M86 78 H226" stroke="url(#wm-gold-booking)" stroke-width="1.3"/>
+                <text class="brand-loader__name" x="99" y="62.5" textLength="124" lengthAdjust="spacingAndGlyphs" fill="url(#wm-gold-booking)">E LLEVO</text>
+                <text class="brand-loader__tagline" x="89" y="91.5" textLength="128" lengthAdjust="spacingAndGlyphs" fill="url(#wm-gold-booking)">Choferes de reemplazo</text>
+              </g>
+              <g class="brand-loader__gloss" aria-hidden="true">
+                <text class="brand-loader__name" x="99" y="62.5" textLength="124" lengthAdjust="spacingAndGlyphs" fill="url(#wm-shine-booking)">E LLEVO</text>
+                <text class="brand-loader__tagline" x="89" y="91.5" textLength="128" lengthAdjust="spacingAndGlyphs" fill="url(#wm-shine-booking)">Choferes de reemplazo</text>
+              </g>
+            </svg>
             <svg class="brand-loader__wheel" viewBox="-50 -50 100 100" aria-hidden="true">
               <defs>
                 <linearGradient id="loader-gold-booking" x1="0" y1="0" x2="1" y2="1">

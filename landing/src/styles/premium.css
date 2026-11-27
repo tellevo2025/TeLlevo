@@ -1707,14 +1707,14 @@ a.google-review__name:hover { color: var(--color-gold-bright); }
   animation: loaderWordIn .9s ease .25s forwards;
 }
 /* Brillo dorado que recorre las letras (la máscara es el propio logo). */
-.brand-loader__shine {
-  position: absolute; inset: 0;
-  background: linear-gradient(105deg, transparent 35%, rgba(255, 241, 208, .85) 50%, transparent 65%) no-repeat;
-  background-size: 250% 100%;
-  background-position: 130% 0;
-  -webkit-mask: url("../assets/logo-wordmark.webp") center / 100% 100% no-repeat;
-          mask: url("../assets/logo-wordmark.webp") center / 100% 100% no-repeat;
-  animation: loaderShine 2.2s ease-in-out .9s infinite;
+/* Texto del logo en vector: la tipografía clásica con serifas del logo y la bajada en sans. */
+.brand-loader__name {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 35px; font-weight: 400;
+}
+.brand-loader__tagline {
+  font-family: var(--font-body);
+  font-size: 10.6px; font-weight: 600;
 }
 
 /* El volante ocupa el mismo lugar que en el logo (centro en 47,5 / 49 de 230 × 100). */
@@ -1757,7 +1757,8 @@ body:has(> .page-loader:not(.page-loader--done)) .hero * { animation-play-state:
 @keyframes loaderFailsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-loader__steer, .brand-loader__glow, .brand-loader__arc, .brand-loader__shine { animation: none; }
+  .brand-loader__steer, .brand-loader__glow, .brand-loader__arc { animation: none; }
+  .brand-loader__gloss { display: none; }
   .brand-loader__wordmark { opacity: 1; animation: none; }
 }
 
