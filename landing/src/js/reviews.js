@@ -112,8 +112,23 @@ async function loadGoogleReviews() {
   }
 }
 
-// Se pide una sola vez, cuando el navegador queda libre, para no retrasar la carga inicial.
+/*
+  Cada consulta a Google descuenta del cupo diario y las condiciones de Places no permiten
+  guardar las reseñas en caché. Por eso se piden una sola vez y solo cuando el visitante se
+  acerca a la sección (unos 600 px antes): quien no llega hasta ahí no gasta cupo.
+*/
 document.addEventListener('DOMContentLoaded', () => {
-  const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
-  schedule(loadGoogleReviews);
+  const section = document.getElementById('google-reviews');
+  if (!section) return;
+
+  if (!('IntersectionObserver' in window)) {
+    loadGoogleReviews();
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    if (!entries.some((entry) => entry.isIntersecting)) return;
+    observer.disconnect();
+    loadGoogleReviews();
+  }, { rootMargin: '600px 0px' });
+  observer.observe(section);
 });
